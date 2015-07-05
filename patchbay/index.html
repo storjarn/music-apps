@@ -1,0 +1,235 @@
+<!doctype html>
+<html>
+<head>
+    <title>P48 Patchbay</title>
+    <script type="text/javascript" src="../bower/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="../bower/underscore/underscore-min.js"></script>
+    <script type="text/javascript" src="../bower/d3/d3.min.js"></script>
+    <script type="text/javascript" src="../bower/vue/dist/vue.min.js"></script>
+
+    <style>
+        .circle {
+            background: #fff;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #000;
+        }
+        .plugged {
+            background: green;
+        }
+        .plug-space {
+            float: left;
+        }
+        .center {
+            margin: auto auto auto auto;
+            vertical-align: middle;
+        }
+
+        .imgwrap {
+            position: relative;
+            padding: 0;
+        }
+        .labelColumn {
+            width: 20px;
+            display: inline-block;
+        }
+        .cell2 {
+            display: inline-block;
+            width: 300px;
+        }
+        .cell2 input{
+            /*display: inline-block;*/
+            width: 290px;
+        }
+        ul {
+            list-style: none;
+        }
+        #tooltip {
+            background: #f6f6f6;
+            position: absolute;
+            padding: 10px;
+            border: 1px solid silver;
+            width: 300px;
+            display: none;
+        }
+        .close {
+            font-size: 16px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-family: Verdana;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="center">
+        <template id="tmpl-jackDialog">
+            <span class="close">X</span>
+            <div>{{index + 1}}</div>
+            <div class="cell2">
+                Front: <input v-model="front" class="cell2" />
+            </div>
+            <div class="cell2">
+                Back: <input v-model="back" class="cell2" />
+            </div>
+        </template>
+
+        <div id="log">&nbsp;</div>
+
+    </div>
+
+    <script>
+        var jackData = [];
+        var persistenceUrl = '//192.168.0.100:6504/music/patchbay/jacks';
+
+        $(function() {
+            for(var i = 0; i < 48; ++i) {
+                jackData.push(new Jack(i));
+            }
+
+            function Jack(index) {
+                this.front = null;
+                this.back = null;
+
+                this.index = index;
+            }
+
+            $.ajax({
+                type: "GET",
+                url: persistenceUrl,
+                success: function(data, textStatus, jqXHR) {
+                    if (data && data.data && _.isArray(data.data) ) {
+                        jackData = data.data;
+                    }
+                    svgApp();
+                }
+            });
+
+            function svgApp() {
+                var $app = $("#app");
+
+                $app.mousemove(function( event ) {
+                    var msg = "Handler for .mousemove() called at ";
+                    msg += event.pageX + ", " + event.pageY;
+                    $( "#log" ).html(msg);
+                });
+
+                var $tooltip = $("<div id='tooltip' />");
+                $app.append($tooltip);
+
+                var svg = d3.select("#app").append('svg').attr({
+                    'width': 900,
+                    'height': 250
+                });
+
+                var frontGroup = svg.append('g')
+                    .attr('class', 'front');
+
+                frontGroup.append("svg:image")
+                   .attr('x',0)
+                   .attr('y',0)
+                   .attr('width', 900)
+                   .attr('height', 112)
+                   .attr("xlink:href","./p48-front.jpg");
+
+                frontGroup.selectAll("circle")
+                    .data(jackData)
+                  .enter().append("circle")
+                    .attr('style', 'fill:#ccc')
+                    .attr('class', 'front')
+                    .text(function(d, i) { return i; })
+                    .attr("cx", function(d, i) {
+                        if (i < 24) {
+                            return 75 + (i * 32.8);
+                        } else {
+                            return 75 + ((i - 24) * 32.8);
+                        }
+                    })
+                    .attr("cy", function(d, i) {
+                        if (i < 24) {
+                            return 50;
+                        } else {
+                            return 80;
+                        }
+                    })
+                    .attr("r", 7)
+                    .on('click', clickHandler);
+
+                var backGroup = svg.append('g')
+                    .attr('class', 'back');
+
+                backGroup.append("svg:image")
+                   .attr('x',0)
+                   .attr('y',120)
+                   .attr('width', 885)
+                   .attr('height', 122)
+                   .attr("xlink:href","./p48-back.jpg");
+
+                backGroup.selectAll("circle")
+                    .data(jackData)
+                  .enter().append("circle")
+                    .attr('style', 'fill:#ccc')
+                    .attr('class', 'back')
+                    .text(function(d, i) { return i; })
+                    .attr("cx", function(d, i) {
+                        if (i < 24) {
+                            return 835.8 - (i * 33.6);
+                        } else {
+                            return 835.8 - ((i - 24) * 33.6);
+                        }
+                    })
+                    .attr("cy", function(d, i) {
+                        if (i < 24) {
+                            return 171;
+                        } else {
+                            return 213;
+                        }
+                    })
+                    .attr("r", 7)
+                    .on('click', clickHandler);
+
+                function clickHandler(jack) {
+                    console.log(this, arguments, d3.event);
+                    $tooltip.html($("#tmpl-jackDialog").html());
+                    var view = new Vue({
+                      el: '#tooltip',
+                      data: jack
+                    });
+                    $tooltip.show();
+                    var left = $tooltip.width();
+                    if (left > d3.event.view.innerWidth - d3.event.offsetX) {
+                        left = d3.event.offsetX - left - 10;
+                    } else {
+                        left = d3.event.offsetX + 10;
+                    }
+                    $tooltip.css({
+                        top: d3.event.offsetY + 10,
+                        left: left
+                    });
+                    $tooltip.find('.close').on('click', function(ev) {
+                        ev.preventDefault();
+                        $tooltip.hide();
+                    });
+                    var isFront = d3.select(this).classed("front");
+                    $tooltip.find('input:eq('+ (isFront ? 0 : 1) +')').focus();
+
+                    $tooltip.find('input').on('change', function(ev) {
+
+                        $.ajax({
+                          type: "POST",
+                          contentType: 'application/json',
+                          url: persistenceUrl,
+                          data: JSON.stringify({ data: jackData }),
+                          traditional: false,
+                          success: function(data, textStatus, jqXHR) {
+                            console.log(data);
+                          }
+                        });
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
