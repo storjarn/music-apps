@@ -1058,36 +1058,57 @@
 
             var ticker = this;
 
+            ticker.setInterval = function(value){
+                interval = parseInt(value.toString()) || 24;
+            };
+
             var pos = 0;
             var interval = 24;
 
-            var time = ticker.time = function time(){
-                if (audioContext){
-                    return audioContext.currentTime * 1000;
-                } else if (typeof global !== 'undefined' && global.process && global.process.hrtime) {
-                  var t = global.process.hrtime();
-                  return (t[0] + (t[1] / Math.pow(10, 9))) * 1000;
-                } else {
-                  return Date.now();
+            var tickCount = 0;
+            var frameCount = 0;
+            var fps,startTime,now,then=Date.now(),elapsed;
+
+            var requestAnimFrame = (function() {
+                if (typeof window !== 'undefined') {
+                    return window.requestAnimationFrame ||
+                        window.webkitRequestAnimationFrame ||
+                        window.mozRequestAnimationFrame ||
+                        function(callback) {
+                            window.setTimeout(callback, 1000 / 60);
+                        };
+                } else{
+                    return function(callback) {
+                        setTimeout(callback, 1000 / 60);
+                    };
                 }
-            };
+            })();
 
-            function tick(){
-                if (!pos){
-                  pos = time();
+            (function tick() {
+
+                ++frameCount;
+                ticker.emit('frame', frameCount);
+
+                // calc elapsed time since last loop
+                now = Date.now();
+                elapsed = now - then;
+
+                // if enough time has elapsed, draw the next frame
+                if (elapsed > interval) {
+                    // Get ready for next frame by setting then=now, but also adjust for your
+                    // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
+                    then = now - (elapsed % interval);
+
+                    // Put your drawing code here
+                    ++tickCount;
+                    ticker.emit('tick', tickCount);
+                    // console.log("Ticker frame", tickCount);
                 }
-                pos += interval;
-                var diff = pos - time();
-                ticker.emit('tick');
-                setTimeout(tick, diff);
-            }
 
-            ticker.setInterval = function(tempo){
-                interval = parseInt(tempo.toString()) || 24;
-                // console.log('ticker interval:', interval)
-            };
-
-            tick();
+                // request another frame
+                // setInterval(tick, 1);
+                requestAnimFrame(tick);
+            })();
         }
     });
 
@@ -1097,7 +1118,6 @@
             options = options || {};
             var clock = this;
 
-            var ticker = new Ticker(options.context);
             clock.IO = null;
             clock.isMaster = false;
 
@@ -1115,7 +1135,9 @@
                 playing: false,
 
                 startTime: 0,
-                runningTime: 0
+                runningTime: 0,
+
+                remainder: 0
             };
 
             var prevState = state;
@@ -1123,9 +1145,14 @@
             if (options.Tempo) state.tempo = options.Tempo;
             // if (options.PPQ) state.ppq = options.PPQ;
 
-            ticker.on('tick', function(){
+            var ticker = new Ticker(options.context);
+            updateTicker();
+
+            ticker.on('tick', function(tickCount){
+                clock.emit('tick', tickCount);
                 if (state.playing){
-                    clock.advance(1);
+                    // clock.advance(1);
+                    clock.advance(tickCount);
                     state.runningTime = new Date().getTime() - state.startTime;
                     // state.nextTickAt = 0
                     if (!!clock.IO && !!clock.isMaster) {
@@ -1165,7 +1192,7 @@
 
             clock.advance = function(n) {
                 n = n || 1;
-                clock.setPosition( state.position + n );
+                clock.setPosition( /*state.position + */n );
             };
 
             clock.getPosition = function() {
@@ -1175,7 +1202,6 @@
             clock.setPosition = function(pos) {
                 state.position = pos;
                 clock.emit('position', state.position);
-                // state.runningTime =
             };
 
             clock.getRunningTime = function() {

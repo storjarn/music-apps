@@ -20,6 +20,25 @@
                 ddMidiInputs.appendChild(option);
             }
         });
+
+        // var clock = new MIDI.Clock();
+        // clock.setTempo(20);
+        // var now = new Date().getTime();
+        // clock.on('tick', function(tickCount){
+        //     if (tickCount % 24 === 0){
+        //         console.log('Beat,', new Date().getTime() - now, 'ms long');
+        //         now = new Date().getTime();
+        //     }
+        // });
+
+        var clock = new MIDI.Clock();
+        var now = new Date().getTime();
+        clock.on('clock', function(clockMessage, clock){
+            if (clock.State.tickCount % 24 === 0){
+                console.log('Beat,', new Date().getTime() - now, 'ms long');
+                now = new Date().getTime();
+            }
+        });
     });
 </script>
 
