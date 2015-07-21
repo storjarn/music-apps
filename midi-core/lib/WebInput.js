@@ -9,6 +9,9 @@
         },
         connect: function(webMIDIInput) {
             var input = this;
+            if (input.Port) {
+                input.disconnect();
+            }
             var _input = input.Port = webMIDIInput;
 
             function getDeltaTime() {
