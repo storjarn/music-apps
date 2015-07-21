@@ -112,11 +112,10 @@
             this.advance(tickVal);
         },
         advance: function(tickVal) {
-            // if (arguments.length) {
-                // this.State.tickCount = tickVal;
-            // } else {
-                ++this.State.tickCount;
-            // }
+            this.State.tickCount = this.State.tickCount + (tickVal || 1);
+        },
+        advanceTo: function(tickVal) {
+            this.State.tickCount = tickVal;
         },
         sendClock: function() {
             this.emit('clock', MIDI.Constants.TimingClock, this);
