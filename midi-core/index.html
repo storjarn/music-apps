@@ -21,35 +21,96 @@
             }
         });
 
-        // var clock = new MIDI.Clock();
-        // clock.setTempo(20);
-        // var now = new Date().getTime();
-        // clock.on('tick', function(tickCount){
-        //     if (tickCount % 24 === 0){
-        //         console.log('Beat,', new Date().getTime() - now, 'ms long');
-        //         now = new Date().getTime();
-        //     }
-        // });
+        var mockInput = {
+            onmidimessage: function(ev) {
+                // console.log("Input", ev);
+            }
+        };
+        var mockOutput = {
+            send: function(msg) {
+                // console.log("Output", msg);
+            }
+        };
 
-        var clock = new MIDI.Clock();
+        var clock = window.clock = new MIDI.Clock();
         var now = new Date().getTime();
         clock.on('clock', function(clockMessage, clock){
             if (clock.State.tickCount % 24 === 0){
                 console.log('Beat,', new Date().getTime() - now, 'ms long');
                 now = new Date().getTime();
+                document.getElementById('pulseIndicator').setAttribute('class', 'on');
             }
+            if (clock.State.tickCount % 26 === 0){
+                document.getElementById('pulseIndicator').setAttribute('class', 'off');
+            }
+            document.getElementById('tempo').value = clock.State.tempo;
+            tempo = parseFloat(document.getElementById('tempoSelect').value);
+
+            // tempos.push(clock.State.tempo);
+
+            document.getElementById('tempoAverage').value = (function() {
+                // var ret = 0;
+                // for(var i = 0; i < tempos.length; ++i) {
+                //     ret += tempos[i];
+                // }
+                // return ret / tempos.length;
+                var ret =(clock.State.tickCount / clock.State.ppq) / ((new Date().getTime() - clock.State.startTime) / 60000);
+                return ret;
+            })();
         });
+        clock.linkOutput(mockOutput);
+        clock.linkInput(mockInput);
+
+        var tempo = 30;
+        var tmr = null;
+        var tempos = [];
+
+        window.go = function () {
+            tmr = setTimeout(function() {
+                function generate() {
+                    return Math.round(Math.random() * 256);
+                }
+                var msg = {data: [MIDI.Constants.TimingClock, 0, 0]};
+                mockInput.onmidimessage(msg);
+                // msg = {data: [generate(), generate(), generate()]};
+                // mockInput.onmidimessage(msg);
+                clearTimeout(tmr);
+                go();
+            }, MIDI.Utility.tempoToPulseInterval(tempo));
+        };
+
+
     });
 </script>
 
 <div id="app">
     <div>MIDI Inputs</div>
     <select id="midiInputs"></select>
+    <div>
+        Desired Tempo: <input id="tempoSelect" value="60" style="width: 60px" onchange="go()" /> BPM
+    </div>
+    <div>
+        Actual Tempo: <input id="tempo" disabled value="0" style="width: 60px" /> BPM
+        <svg width="10" height="10">
+            <circle id="pulseIndicator" class="off" r="5" cx="5" cy="5"></circle>
+        </svg>
+    </div>
+    <div>
+        Average Tempo: <input id="tempoAverage" disabled value="0" style="width: 60px" /> BPM
+    </div>
     <div id="pianoRoll">
     </div>
 </div>
 
 <style>
+circle.off {
+    color: transparent;
+    fill: transparent;
+}
+circle.on {
+    color: green;
+    fill: green;
+}
 svg {
     font: 10px sans-serif;
 }

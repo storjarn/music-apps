@@ -39,6 +39,12 @@
             },
             frequencyFromNoteNumber : function( note ) {
                 return 440 * Math.pow(2,(note-69)/12);
+            },
+            tempoToPulseInterval: function(tempo) {
+                return 1000 / (tempo / 60) / 24;
+            },
+            pulseIntervalToTempo: function(interval, ppq) {
+                return 60000 / (interval * (ppq || 24));
             }
         },
         initialize: function(success, errorHandler){

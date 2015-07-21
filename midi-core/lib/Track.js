@@ -13,8 +13,8 @@
                 offset: 0,
 
                 cursor: -1,
-                loopStart: -1,
-                loopEnd: -1
+                startPoint: -1,
+                endPoint: -1
             };
 
             [{
@@ -45,13 +45,13 @@
                 enumerable: true
             });
 
-            Class.define(self, 'LoopStart', {
-                get: MIDI.Utility.stateValueGetter(_state, 'loopStart'),
+            Class.define(self, 'StartPoint', {
+                get: MIDI.Utility.stateValueGetter(_state, 'startPoint'),
                 enumerable: true
             });
 
-            Class.define(self, 'LoopEnd', {
-                get: MIDI.Utility.stateValueGetter(_state, 'loopEnd'),
+            Class.define(self, 'EndPoint', {
+                get: MIDI.Utility.stateValueGetter(_state, 'endPoint'),
                 enumerable: true
             });
         },

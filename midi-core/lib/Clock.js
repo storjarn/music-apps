@@ -266,12 +266,26 @@
 
                 playing: false,
 
-                startTime: 0
+                startTime: new Date().getTime()
             };
 
             clock.State = state;
             clock.Input = null;
             clock.Output = null;
+
+            clock.on('clock', function(firstByte, clk) {
+                console.log('Clock', clk.State.tickCount);
+            });
+            clock.on('play', function(firstByte, clk) {
+                clock.State.startTime = new Date().getTime();
+                console.log('Play', clk.State.tickCount);
+            });
+            clock.on('continue', function(firstByte, clk) {
+                console.log('Continue', clk.State.tickCount);
+            });
+            clock.on('stop', function(firstByte, clk) {
+                console.log('Stop', clk.State.tickCount);
+            });
         },
         linkInput: function(inputPort) {
             var clock = this;
@@ -280,7 +294,7 @@
                 switch (event.data[0]) {
                     case MIDI.Constants.TimingClock:
                         clock.State.tickInterval = new Date().getTime() - clock.State.lastTickTime;
-                        clock.State.tempo = 1000 / clock.State.tickInterval * 60 / clock.State.ppq;
+                        clock.State.tempo = MIDI.Utility.pulseIntervalToTempo(clock.State.tickInterval, clock.State.ppq);
                         clock.State.lastTickTime = new Date().getTime();
                         ++clock.State.tickCount;
                         clock.emit('clock', MIDI.Constants.TimingClock, clock);
@@ -322,7 +336,7 @@
             inputPort.onmidimessage = MIDIMessageEventHandler;
             clock.Input = inputPort;
         },
-        linkOuput: function(outputPort) {
+        linkOutput: function(outputPort) {
             var clock = this;
             clock.Output = outputPort;
         },

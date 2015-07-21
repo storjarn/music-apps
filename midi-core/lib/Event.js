@@ -3,20 +3,22 @@
         inherits: Array,
         init: function(data) {
             var event = this;
-            this.data = data || [0,0,0];
+            for(var i = 0; i < data.length; ++i) {
+                event.push(data[i]);
+            }
             Class.define(event, 'FirstByte', {
                 get: function() {
-                    return this.data[0];
+                    return this[0];
                 }
             });
             Class.define(event, 'SecondByte', {
                 get: function() {
-                    return this.data[1];
+                    return this[1];
                 }
             });
             Class.define(event, 'ThirdByte', {
                 get: function() {
-                    return this.data[2];
+                    return this[2];
                 }
             });
         }
