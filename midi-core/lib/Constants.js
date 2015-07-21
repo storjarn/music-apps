@@ -16,7 +16,7 @@
         );
     } else {
         // Browser globals (root is window)
-        root.Namespace = factory(root.Namespace);
+        factory(root.MIDI, root.Namespace);
     }
 }(this, function (MIDI, Namespace) {
     'use strict';
@@ -73,6 +73,7 @@
         var Constants = new Namespace('Constants', MIDI, _constants);
         var Events = new Namespace('Events', Constants, _events);
 
+        return Constants;
     }
 
     var ccs = [{
@@ -971,9 +972,7 @@
         "Description": ""
     }];
 
-    _setup();
-
-    return MIDI;
+    return _setup();
 
 }));
 
