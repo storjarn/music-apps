@@ -11,8 +11,11 @@ module.exports = function(grunt) {
                 src: [
                     './bower/ee-class/dist/**/*.min.js',
                     './midi-core/lib/MIDI.js',
+                    './midi-core/lib/Input.js',
+                    './midi-core/lib/Event.js',
                     './midi-core/lib/Constants.js',
                     './midi-core/lib/Clock.js',
+                    './midi-core/lib/AudioClock.js',
                     './midi-core/lib/Track.js'
                 ],
                 dest: 'dist/midi-core.js',
@@ -30,14 +33,14 @@ module.exports = function(grunt) {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
                 sourceMap: true
             },
-            core: {
-                src: 'dist/onto.js',
-                dest: 'dist/onto.min.js'
+            midicore: {
+                src: 'dist/midi-core.js',
+                dest: 'dist/midi-core.min.js'
             },
-            ui: {
-                src: 'dist/onto.ui.js',
-                dest: 'dist/onto.ui.min.js'
-            }
+            // ui: {
+            //     src: 'dist/onto.ui.js',
+            //     dest: 'dist/onto.ui.min.js'
+            // }
         },
         jasmine: { //Browser tests
             midicore: {
@@ -72,7 +75,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
-    // grunt.registerTask('jasmine', ['connect', 'jasmine']);
+    grunt.registerTask('build', '', function() {
+        grunt.task.run(['uglify', 'concat']);
+    });
+
     grunt.registerTask('test', '', function() {
         grunt.task.run(['concat', 'jasmine', 'watch']);
     });

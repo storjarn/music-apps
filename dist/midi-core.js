@@ -14,8 +14,6 @@
 !function(a,b){"use strict";"function"==typeof define&&define.amd?define(["../dist/Class.min"],b):"object"==typeof exports?module.exports=b(require("../dist/Class.min")):a.ReferenceObject=b(a.Class)}(this,function(a){"use strict";var b=new a({init:function(a,b){for(var c in b)this[c]=b[c];this.Name=a},toData:function(){var a={};for(var b in this)this.hasOwnProperty(b)&&(a[b]=this[b]);return a},valueOf:function(){return this.toData()},toJSON:function(){return this.toData()}});return b});
 //# sourceMappingURL=ReferenceObject.min.js.map
 
-
-
 (function() {
 
     MIDI = new Namespace('MIDI', null, {
@@ -56,6 +54,12 @@
             },
             frequencyFromNoteNumber : function( note ) {
                 return 440 * Math.pow(2,(note-69)/12);
+            },
+            tempoToPulseInterval: function(tempo) {
+                return 1000 / (tempo / 60) / 24;
+            },
+            pulseIntervalToTempo: function(interval, ppq) {
+                return 60000 / (interval * (ppq || 24));
             }
         },
         initialize: function(success, errorHandler){
@@ -92,6 +96,64 @@
         }
     });
 
+})();
+
+(function() {
+    var Input = new Class({
+        inherits: EventEmitter,
+        init: function(webMIDIInput) {
+            var input = this;
+            var _input = webMIDIInput;
+
+            input.eventHandlers = {
+                'message': []
+            };
+
+            _input.onmidimessage = function(event) {
+                for(var i = 0; i < input.eventHandlers.message.length; ++i) {
+                    input.eventHandlers.message[i].call(this, event);
+                }
+            };
+        },
+        on: function on(eventName, func) {
+            if (!input.eventHandlers[eventName]) {
+                input.eventHandlers[eventName] = [];
+            }
+            input.eventHandlers[eventName].push(func);
+            return on.super.apply(this, arguments);
+        }
+    });
+
+    MIDI.addClass(Input);
+})();
+
+(function() {
+    var Event = new Class({
+        inherits: Array,
+        init: function(data) {
+            var event = this;
+            for(var i = 0; i < data.length; ++i) {
+                event.push(data[i]);
+            }
+            Class.define(event, 'FirstByte', {
+                get: function() {
+                    return this[0];
+                }
+            });
+            Class.define(event, 'SecondByte', {
+                get: function() {
+                    return this[1];
+                }
+            });
+            Class.define(event, 'ThirdByte', {
+                get: function() {
+                    return this[2];
+                }
+            });
+        }
+    });
+
+    MIDI.addClass(Event);
 })();
 
 (function() {
@@ -1052,259 +1114,283 @@
 
 (function() {
 
-    var Ticker = new Class({
-        inherits: EventEmitter,
-        init: function constructor(audioContext) {
+    //         clock.synchronize = function(masterClock) {
+    //             if (!!masterClock /*&& masterClock instanceof Clock*/) {
 
-            var ticker = this;
+    //                 prevState = state;
 
-            ticker.setInterval = function(value){
-                interval = parseInt(value.toString()) || 24;
-            };
+    //                 clock.Master = masterClock;
 
-            var pos = 0;
-            var interval = 24;
+    //                 clock.setPosition(masterClock.getPosition());
+    //                 state.runningTime = masterClock.getRunningTime();
+    //                 state.startTime = masterClock.getStartTime();
+    //                 clock.setTempo(masterClock.getTempo());
 
-            var tickCount = 0;
-            var frameCount = 0;
-            var fps,startTime,now,then=Date.now(),elapsed;
+    //                 clock.Master.on('start', clock.start);
+    //                 clock.Master.on('resume', clock.resume);
+    //                 clock.Master.on('stop', clock.stop);
+    //                 clock.Master.on('tempo', clock.setTempo);
+    //                 clock.Master.on('position', clock.setPosition);
+    //             }
+    //         };
 
-            var requestAnimFrame = (function() {
-                if (typeof window !== 'undefined') {
-                    return window.requestAnimationFrame ||
-                        window.webkitRequestAnimationFrame ||
-                        window.mozRequestAnimationFrame ||
-                        function(callback) {
-                            window.setTimeout(callback, 1000 / 60);
-                        };
-                } else{
-                    return function(callback) {
-                        setTimeout(callback, 1000 / 60);
-                    };
-                }
-            })();
+    //         clock.unsynchronize = function() {
+    //             if(!!clock.Master /*&& masterClock instanceof Clock*/) {
+    //                 clock.Master.removeListener('start', clock.start);
+    //                 clock.Master.removeListener('start', clock.resume);
+    //                 clock.Master.removeListener('start', clock.stop);
+    //                 clock.Master.removeListener('tempo', clock.setTempo);
+    //                 clock.Master.removeListener('position', clock.setPosition);
 
-            (function tick() {
+    //                 clock.Master = null;
+    //                 state = prevState;
 
-                ++frameCount;
-                ticker.emit('frame', frameCount);
-
-                // calc elapsed time since last loop
-                now = Date.now();
-                elapsed = now - then;
-
-                // if enough time has elapsed, draw the next frame
-                if (elapsed > interval) {
-                    // Get ready for next frame by setting then=now, but also adjust for your
-                    // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
-                    then = now - (elapsed % interval);
-
-                    // Put your drawing code here
-                    ++tickCount;
-                    ticker.emit('tick', tickCount);
-                    // console.log("Ticker frame", tickCount);
-                }
-
-                // request another frame
-                // setInterval(tick, 1);
-                requestAnimFrame(tick);
-            })();
-        }
-    });
+    //                 clock.setPosition(state.playing ? state.position : -1);
+    //                 state.runningTime = state.playing ? state.runningTime : 0;
+    //                 state.startTime = state.playing ? state.startTime : 0;
+    //                 clock.setTempo(state.tempo);
+    //             }
+    //         };
 
     var Clock = new Class({
         inherits: EventEmitter,
-        init: function(options) {
-            options = options || {};
+        init: function constructor() {
             var clock = this;
 
-            clock.IO = null;
-            clock.isMaster = false;
-
             var state = {
+                DEBUG: true,
+
                 tempo: 120,
                 ppq: 24,
 
-                beatDivision: 4/4,
+                beatDivision: 4 / 4,
 
                 tickInterval: 0,
-
-                nextTickAt: 0,
-                position: 0,
+                tickCount: 0,
+                lastTickTime: 0,
 
                 playing: false,
 
-                startTime: 0,
-                runningTime: 0,
-
-                remainder: 0
+                startTime: new Date().getTime()
             };
 
-            var prevState = state;
+            clock.State = state;
+            clock.Input = null;
+            clock.Output = null;
 
-            if (options.Tempo) state.tempo = options.Tempo;
-            // if (options.PPQ) state.ppq = options.PPQ;
-
-            var ticker = new Ticker(options.context);
-            updateTicker();
-
-            ticker.on('tick', function(tickCount){
-                clock.emit('tick', tickCount);
-                if (state.playing){
-                    // clock.advance(1);
-                    clock.advance(tickCount);
-                    state.runningTime = new Date().getTime() - state.startTime;
-                    // state.nextTickAt = 0
-                    if (!!clock.IO && !!clock.isMaster) {
-                        clock.IO.sendMessage([248]);
-                    }
+            clock.on('clock', function(firstByte, clk) {
+                clock.updateInterval();
+                clock.updateTempo();
+                clock.updateTicks();
+                if (clock.State.DEBUG) {
+                    console.log('Clock', clk.State.tickCount);
                 }
             });
-
-            function ticksPerMinute() {
-                return state.tempo * state.ppq;
-            }
-            function tickInterval() {
-                return 60000 / ticksPerMinute();
-            }
-            function ticksPerMillisecond() {
-                return ticksPerMinute() * 1/60000;
-            }
-            function secondsPassed(ticks) {
-                return (60 * ticks) / ticksPerMinute();
-            }
-            function microsecondsPerQuarterNote() {
-                return Clock.MICROSECONDS_PER_MINUTE / state.tempo;
-            }
-            function updateTicker() {
-                state.tickInterval = tickInterval();
-                ticker.setInterval(state.tickInterval);
-            }
-
-            // clock.getPPQ = function() {
-            //  return state.ppq;
-            // }
-
-            // clock.setPPQ = function(ppq) {
-            //  state.ppq = ppq;
-            //  updateTicker()
-            // }
-
-            clock.advance = function(n) {
-                n = n || 1;
-                clock.setPosition( /*state.position + */n );
-            };
-
-            clock.getPosition = function() {
-                return state.position;
-            };
-
-            clock.setPosition = function(pos) {
-                state.position = pos;
-                clock.emit('position', state.position);
-            };
-
-            clock.getRunningTime = function() {
-                return state.runningTime;
-            };
-
-            clock.getStartTime = function() {
-                return state.startTime;
-            };
-
-            clock.getTempo = function() {
-                return state.tempo;
-            };
-
-            clock.setTempo = function(tempo){
-                state.tempo = tempo;
-                updateTicker();
-                clock.emit('tempo', tempo);
-            };
-
-            clock.isPlaying = function() {
-                return state.playing;
-            };
-
-            clock.start = function(){
-                clock.setTempo(state.tempo);
-                state.startTime = new Date().getTime();
-                state.nextTickAt = 0;
-                clock.setPosition( -1 );
-                clock.emit('start');
-                state.playing = true;
-                if (!!clock.IO && !!clock.isMaster) {
-                    clock.IO.sendMessage([MIDI.Constants.Start]);
+            clock.on('start', function(firstByte, clk) {
+                clock.updateTicks(0);
+                clock.State.playing = true;
+                clock.State.startTime = new Date().getTime();
+                if (clock.State.DEBUG) {
+                    console.log('Start', clk.State.tickCount);
                 }
-            };
-
-            clock.resume = function(){
-                clock.setTempo(state.tempo);
-                clock.emit('resume');
-                state.playing = true;
-                if (!!clock.IO && !!clock.isMaster) {
-                    clock.IO.sendMessage([MIDI.Constants.Continue]);
-                }
-            };
-
-            clock.stop = function(){
-                state.runningTime = state.startTime = 0;
-                clock.emit('stop');
-                state.playing = false;
-                if (!!clock.IO && !!clock.isMaster) {
-                    clock.IO.sendMessage([MIDI.Constants.Stop]);
-                }
-            };
-
-            clock.synchronize = function(masterClock) {
-                if (!!masterClock /*&& masterClock instanceof Clock*/) {
-
-                    prevState = state;
-
-                    clock.Master = masterClock;
-
-                    clock.setPosition(masterClock.getPosition());
-                    state.runningTime = masterClock.getRunningTime();
-                    state.startTime = masterClock.getStartTime();
-                    clock.setTempo(masterClock.getTempo());
-
-                    clock.Master.on('start', clock.start);
-                    clock.Master.on('resume', clock.resume);
-                    clock.Master.on('stop', clock.stop);
-                    clock.Master.on('tempo', clock.setTempo);
-                    clock.Master.on('position', clock.setPosition);
-                }
-            };
-
-            clock.unsynchronize = function() {
-                if(!!clock.Master /*&& masterClock instanceof Clock*/) {
-                    clock.Master.removeListener('start', clock.start);
-                    clock.Master.removeListener('start', clock.resume);
-                    clock.Master.removeListener('start', clock.stop);
-                    clock.Master.removeListener('tempo', clock.setTempo);
-                    clock.Master.removeListener('position', clock.setPosition);
-
-                    clock.Master = null;
-                    state = prevState;
-
-                    clock.setPosition(state.playing ? state.position : -1);
-                    state.runningTime = state.playing ? state.runningTime : 0;
-                    state.startTime = state.playing ? state.startTime : 0;
-                    clock.setTempo(state.tempo);
-                }
-            };
-
-            clock.on('position', function(pos) {
-                // console.log('tick:', pos);
             });
+            clock.on('continue', function(firstByte, clk) {
+                clock.State.playing = true;
+                if (clock.State.DEBUG) {
+                    console.log('Continue', clk.State.tickCount);
+                }
+            });
+            clock.on('stop', function(firstByte, clk) {
+                clock.State.playing = false;
+                if (clock.State.DEBUG) {
+                    console.log('Stop', clk.State.tickCount);
+                }
+            });
+        },
+        updateInterval: function() {
+            this.State.tickInterval = new Date().getTime() - this.State.lastTickTime;
+        },
+        updateTempo: function() {
+            this.State.tempo = MIDI.Utility.pulseIntervalToTempo(this.State.tickInterval, this.State.ppq);
+        },
+        updateTicks: function(tickVal) {
+            this.State.lastTickTime = new Date().getTime();
+            this.advance(tickVal);
+        },
+        advance: function(tickVal) {
+            this.State.tickCount = arguments.length ? tickVal : ++this.State.tickCount;
+        },
+        sendClock: function() {
+            this.emit('clock', MIDI.Constants.TimingClock, this);
+            if (this.Output) {
+                this.Output.send( [MIDI.Constants.TimingClock, 0, 0] );
+            }
+        },
+        startClock: function() {
+            this.emit('play', MIDI.Constants.Start, this);
+            this.emit('start', MIDI.Constants.Start, this);
+            if (this.Output) {
+                this.Output.send( [MIDI.Constants.Start, 0, 0] );
+            }
+        },
+        continueClock: function() {
+            this.emit('play', MIDI.Constants.Continue, this);
+            this.emit('continue', MIDI.Constants.Continue, this);
+            if (this.Output) {
+                this.Output.send( [MIDI.Constants.Continue, 0, 0] );
+            }
+        },
+        stopClock: function() {
+            this.emit('stop', MIDI.Constants.Stop, this);
+            if (this.Output) {
+                this.Output.send( [MIDI.Constants.Stop, 0, 0] );
+            }
+        },
+        linkInput: function(inputPort) {
+            var clock = this;
+            var oldHandler = inputPort.onmidimessage;
+            function MIDIMessageEventHandler(event) {
+                switch (event.data[0]) {
+                    case MIDI.Constants.TimingClock:
+                        clock.sendClock();
+                        break;
+                    case MIDI.Constants.Start :
+                        clock.startClock();
+                        break;
+                    case MIDI.Constants.Continue:
+                        clock.continueClock();
+                        break;
+                    case MIDI.Constants.Stop:
+                        clock.stopClock();
+                        break;
+                }
+                if (oldHandler) {
+                    oldHandler(event);
+                }
+            }
+            MIDIMessageEventHandler.oldHandler = oldHandler;
+            inputPort.onmidimessage = MIDIMessageEventHandler;
+            clock.Input = inputPort;
+        },
+        linkOutput: function(outputPort) {
+            var clock = this;
+            clock.Output = outputPort;
+        },
+        unlinkInput: function(inputPort) {
+            if (inputPort === clock.Input) {
+                clock.Input.onmidimessage = clock.Input.onmidimessage.oldHandler;
+                clock.Input = null;
+                return true;
+            }
+            return false;
+        },
+        unlinkOutput: function(outputPort) {
+            if (outputPort === clock.Output) {
+                clock.outputPort = null;
+                return true;
+            }
+            return false;
+        },
+        unlink: function(inputPort, outputPort) {
+            return unlinkInput(inputPort || this.Input) && unlinkOutput(outputPort || this.Output);
         }
     });
 
     Class.define(Clock, 'MICROSECONDS_PER_MINUTE', Class(60000000));
 
     MIDI.addClass("Clock", Clock);
-    MIDI.addClass("Ticker", Ticker);
 
+})();
+
+(function() {
+    var AudioClock = new Class({
+        inherits: MIDI.Clock,
+        setTempo: function(tempo) {
+            this.State.tempo = tempo || 120;
+        },
+        start: function() {
+            var me = this;
+
+            var audioCtx = new window.AudioContext() || new window.webkitAudioContext();
+            var sampleRate = audioCtx.sampleRate;
+            var pulseWidth = 2;
+            var clockFreq = (me.State.tempo / 60) * me.State.ppq;
+
+            // Create a ScriptProcessorNode with a bufferSize of 4096 and a single input and output channel
+            var pulseDetector = audioCtx.createScriptProcessor(4096, 1, 1);
+
+            var clockLead = context.createOscillator();
+            clockLead.type = "square"; // Square wave
+            clockLead.frequency.value = clockFreq; // Frequency in hertz
+            var leadGain = audioCtx.createGain();
+            leadGain.gain.value = 1;
+
+            var clockTrim = context.createOscillator();
+            clockTrim.type = "square"; // Square wave
+            clockTrim.frequency.value = clockFreq; // Frequency in hertz
+            var trimGain = audioCtx.createGain();
+            trimGain.gain.value = -1;
+
+            var trimDelay = audioCtx.createDelay(pulseWidth / sampleRate);
+
+            clockLead.connect(leadGain);
+            clockTrim.connect(trimDelay);
+            trimDelay.connect(trimGain);
+            leadGain.connect(pulseDetector);
+            trimGain.connect(pulseDetector);
+
+            var isUp = false;
+
+            clockLead.start(0);
+            clockTrim.start(0);
+
+            if (me.Output) {
+                me.Output.send( [MIDI.Constants.Start, 0, 0] );
+            }
+
+            // Give the node a function to process audio events
+            pulseDetector.onaudioprocess = function(audioProcessingEvent) {
+                //Update clock frequency based on tempo
+                clockFreq = (me.State.tempo / 60) * me.State.ppq;
+                clockLead.frequency.value = clockTrim.frequency.value = clockFreq;
+
+                // The input buffer is made up of both oscillators
+                var inputBuffer = audioProcessingEvent.inputBuffer;
+
+                // The output buffer will be an optional output of the pulse clock signal that is generated, to drive other devices
+                var outputBuffer = audioProcessingEvent.outputBuffer;
+
+                // Loop through the output channels (in this case there is only one)
+                for (var channel = 0; channel < inputBuffer.numberOfChannels; channel++) {
+                    var inputData = inputBuffer.getChannelData(channel);
+                    var outputData = outputBuffer.getChannelData(channel);
+
+                    // Loop through the 4096 samples
+                    for (var sample = 0; sample < inputBuffer.length; sample++) {
+                        // copy pulse at input to output, to drive other audio clocks for example
+                        outputData[sample] = inputData[sample];
+
+                        //Detect pulse to send MIDI clock message
+                        if (inputData[sample] > 0 && !isUp) {
+                            isUp = true;
+                            clock.State.tickInterval = new Date().getTime() - clock.State.lastTickTime;
+                            clock.State.lastTickTime = new Date().getTime();
+                            ++clock.State.tickCount;
+                            clock.emit('clock', MIDI.Constants.TimingClock, clock);
+                            if (me.Output) {
+                                me.Output.send( [MIDI.Constants.TimingClock, 0, 0] );
+                            }
+                        } else {
+                            isUp = false;
+                        }
+                    }
+                }
+            };
+
+        }
+    });
+
+    MIDI.addClass("AudioClock", AudioClock);
 })();
 
 (function() {
@@ -1322,8 +1408,8 @@
                 offset: 0,
 
                 cursor: -1,
-                loopStart: -1,
-                loopEnd: -1
+                startPoint: -1,
+                endPoint: -1
             };
 
             [{
@@ -1354,13 +1440,13 @@
                 enumerable: true
             });
 
-            Class.define(self, 'LoopStart', {
-                get: MIDI.Utility.stateValueGetter(_state, 'loopStart'),
+            Class.define(self, 'StartPoint', {
+                get: MIDI.Utility.stateValueGetter(_state, 'startPoint'),
                 enumerable: true
             });
 
-            Class.define(self, 'LoopEnd', {
-                get: MIDI.Utility.stateValueGetter(_state, 'loopEnd'),
+            Class.define(self, 'EndPoint', {
+                get: MIDI.Utility.stateValueGetter(_state, 'endPoint'),
                 enumerable: true
             });
         },
