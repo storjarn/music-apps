@@ -22,10 +22,11 @@
 
             var oldHandler = _input.onmidimessage;
             _input.onmidimessage = function(event) {
+                event.delta = getDeltaTime() - lastDeltaTime;
                 if (oldHandler) {
                     oldHandler.call(_input, event);
                 }
-                input.emit('message', getDeltaTime() - lastDeltaTime, event);
+                input.emit('message', event.delta, event);
             };
             _input.onmidimessage.oldHandler = oldHandler;
         },
