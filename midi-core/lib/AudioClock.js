@@ -1,6 +1,10 @@
 (function() {
     var AudioClock = new Class({
         inherits: MIDI.Clock,
+        init: function constructor() {
+            constructor.super.call(this);
+            this.isSlave = false;
+        },
         setTempo: function(tempo) {
             this.State.tempo = tempo || 120;
         },
@@ -21,19 +25,19 @@
             var leadGain = audioCtx.createGain();
             leadGain.gain.value = 1;
 
-            var clockTrim = context.createOscillator();
-            clockTrim.type = "square"; // Square wave
-            clockTrim.frequency.value = clockFreq; // Frequency in hertz
-            var trimGain = audioCtx.createGain();
-            trimGain.gain.value = -1;
+            // var clockTrim = context.createOscillator();
+            // clockTrim.type = "square"; // Square wave
+            // clockTrim.frequency.value = clockFreq; // Frequency in hertz
+            // var trimGain = audioCtx.createGain();
+            // trimGain.gain.value = -1;
 
-            var trimDelay = audioCtx.createDelay(pulseWidth / sampleRate);
+            // var trimDelay = audioCtx.createDelay(pulseWidth / sampleRate);
 
             clockLead.connect(leadGain);
-            clockTrim.connect(trimDelay);
-            trimDelay.connect(trimGain);
+            // clockTrim.connect(trimDelay);
+            // trimDelay.connect(trimGain);
             leadGain.connect(pulseDetector);
-            trimGain.connect(pulseDetector);
+            // trimGain.connect(pulseDetector);
 
             var isUp = false;
 
@@ -48,7 +52,8 @@
             pulseDetector.onaudioprocess = function(audioProcessingEvent) {
                 //Update clock frequency based on tempo
                 clockFreq = (me.State.tempo / 60) * me.State.ppq;
-                clockLead.frequency.value = clockTrim.frequency.value = clockFreq;
+                clockLead.frequency.value = clockFreq;
+                // clockTrim.frequency.value = clockFreq;
 
                 // The input buffer is made up of both oscillators
                 var inputBuffer = audioProcessingEvent.inputBuffer;
@@ -69,13 +74,7 @@
                         //Detect pulse to send MIDI clock message
                         if (inputData[sample] > 0 && !isUp) {
                             isUp = true;
-                            clock.State.tickInterval = new Date().getTime() - clock.State.lastTickTime;
-                            clock.State.lastTickTime = new Date().getTime();
-                            ++clock.State.tickCount;
-                            clock.emit('clock', MIDI.Constants.TimingClock, clock);
-                            if (me.Output) {
-                                me.Output.send( [MIDI.Constants.TimingClock, 0, 0] );
-                            }
+                            clock.sendClock();
                         } else {
                             isUp = false;
                         }

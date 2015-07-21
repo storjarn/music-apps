@@ -63,6 +63,7 @@
             clock.State = state;
             clock.Input = null;
             clock.Output = null;
+            clock.isSlave = true;
 
             clock.on('clock', function(firstByte, clk) {
                 clock.updateInterval();
@@ -97,7 +98,9 @@
             this.State.tickInterval = new Date().getTime() - this.State.lastTickTime;
         },
         updateTempo: function() {
-            this.State.tempo = MIDI.Utility.pulseIntervalToTempo(this.State.tickInterval, this.State.ppq);
+            if (clock.isSlave) {
+                this.State.tempo = MIDI.Utility.pulseIntervalToTempo(this.State.tickInterval, this.State.ppq);
+            }
         },
         updateTicks: function(tickVal) {
             this.State.lastTickTime = new Date().getTime();
