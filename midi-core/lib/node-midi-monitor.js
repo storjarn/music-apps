@@ -1,4 +1,7 @@
 var midi = require('midi');
+var moment = require('moment');
+require('./MIDI');
+require('./Constants');
 
 // Set up a new input.
 var input = new midi.input();
@@ -11,7 +14,10 @@ input.getPortName(0);
 
 // Configure a callback.
 input.on('message', function(deltaTime, message) {
-  console.log('m:' + message + ' d:' + deltaTime);
+  // console.log('m:' + message + ' d:' + deltaTime);
+  var msgType = MIDI.Utility.getEventName(message);
+  var channel = MIDI.Utility.getChannel(message);
+  console.log(moment().format('HH:mm:ss:SSS'), input.getPortName(0), msgType, 'Ch'+channel, deltaTime, message);
 });
 
 // Open the first available input port.

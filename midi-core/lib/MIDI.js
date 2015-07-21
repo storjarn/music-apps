@@ -1,5 +1,22 @@
+/* jshint newcap: false */
+;(function (root, factory) {
+    'use strict';
 
-(function() {
+    /* istanbul ignore next */
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['../../bower/ee-class/dist/Namespace.min'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('../../bower/ee-class/dist/Namespace.min'));
+    } else {
+        // Browser globals (root is window)
+        root.Namespace = factory(root.Namespace);
+    }
+}(this, function (Namespace) {
+    // 'use strict';
 
     MIDI = new Namespace('MIDI', null, {
         context: null,
@@ -45,6 +62,16 @@
             },
             pulseIntervalToTempo: function(interval, ppq) {
                 return 60000 / (interval * (ppq || 24));
+            },
+            getChannel: function(message) {
+                return MIDI.Utility.getLowNibble(message[0]) + 1;
+            },
+            getEventName: function(message) {
+                var msgType = MIDI.Constants.Events[MIDI.Utility.getHighNibble(message[0]).toString()];
+                if (msgType === 'NoteOn' && message[2] === 0) {
+                    msgType = 'NoteOff';
+                }
+                return msgType;
             }
         },
         initialize: function(success, errorHandler){
@@ -81,4 +108,7 @@
         }
     });
 
-})();
+    return MIDI;
+
+}));
+

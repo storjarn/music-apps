@@ -1,4 +1,25 @@
-(function() {
+/* jshint newcap: false */
+;(function (root, factory) {
+    'use strict';
+
+    /* istanbul ignore next */
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['./MIDI', '../../bower/ee-class/dist/Namespace.min'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(
+            require('./MIDI'),
+            require('../../bower/ee-class/dist/Namespace.min')
+        );
+    } else {
+        // Browser globals (root is window)
+        root.Namespace = factory(root.Namespace);
+    }
+}(this, function (MIDI, Namespace) {
+    'use strict';
 
     function _setup() {
         var _constants = {
@@ -951,5 +972,15 @@
     }];
 
     _setup();
+
+    return MIDI;
+
+}));
+
+
+
+(function() {
+
+
 
 })();
