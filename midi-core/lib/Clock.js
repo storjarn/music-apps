@@ -70,7 +70,12 @@
                 clock.updateTempo();
                 clock.updateTicks();
                 if (clock.State.DEBUG) {
-                    console.log('Clock', clk.State.tickCount);
+                    console.log('Clock', clock.State.tickCount);
+                }
+            });
+            clock.on('beat', function(clk) {
+                if (clock.State.DEBUG) {
+                    console.log('Beat', clock.State.tickCount / clock.State.ppq);
                 }
             });
             clock.on('start', function(firstByte, clk) {
@@ -78,19 +83,19 @@
                 clock.State.playing = true;
                 clock.State.startTime = new Date().getTime();
                 if (clock.State.DEBUG) {
-                    console.log('Start', clk.State.tickCount);
+                    console.log('Start', clock.State.tickCount);
                 }
             });
             clock.on('continue', function(firstByte, clk) {
                 clock.State.playing = true;
                 if (clock.State.DEBUG) {
-                    console.log('Continue', clk.State.tickCount);
+                    console.log('Continue', clock.State.tickCount);
                 }
             });
             clock.on('stop', function(firstByte, clk) {
                 clock.State.playing = false;
                 if (clock.State.DEBUG) {
-                    console.log('Stop', clk.State.tickCount);
+                    console.log('Stop', clock.State.tickCount);
                 }
             });
         },
@@ -98,7 +103,7 @@
             this.State.tickInterval = new Date().getTime() - this.State.lastTickTime;
         },
         updateTempo: function() {
-            if (clock.isSlave) {
+            if (this.isSlave) {
                 this.State.tempo = MIDI.Utility.pulseIntervalToTempo(this.State.tickInterval, this.State.ppq);
             }
         },
@@ -107,10 +112,17 @@
             this.advance(tickVal);
         },
         advance: function(tickVal) {
-            this.State.tickCount = arguments.length ? tickVal : ++this.State.tickCount;
+            // if (arguments.length) {
+                // this.State.tickCount = tickVal;
+            // } else {
+                ++this.State.tickCount;
+            // }
         },
         sendClock: function() {
             this.emit('clock', MIDI.Constants.TimingClock, this);
+            if (this.State.tickCount % this.State.ppq === 0){
+                this.emit('beat', this);
+            }
             if (this.Output) {
                 this.Output.send( [MIDI.Constants.TimingClock, 0, 0] );
             }

@@ -40,13 +40,8 @@
             var masterClock = new MIDI.AudioClock();
 
             var clock = window.clock = new MIDI.Clock();
-            var now = new Date().getTime();
+
             clock.on('clock', function(clockMessage, clock){
-                if (clock.State.tickCount % 24 === 0){
-                    console.log('Beat,', new Date().getTime() - now, 'ms long');
-                    now = new Date().getTime();
-                    document.getElementById('pulseIndicator').setAttribute('class', 'on');
-                }
                 if (clock.State.tickCount % 26 === 0){
                     document.getElementById('pulseIndicator').setAttribute('class', 'off');
                 }
@@ -58,6 +53,14 @@
                     return ret;
                 })();
             });
+
+            var now = new Date().getTime();
+            clock.on('beat', function(clock) {
+                console.log('Beat,', new Date().getTime() - now, 'ms long');
+                now = new Date().getTime();
+                document.getElementById('pulseIndicator').setAttribute('class', 'on');
+            });
+
             clock.linkOutput(mockOutput);
 
             if (useMockInput) {
@@ -84,7 +87,7 @@
                     // msg = {data: [generate(), generate(), generate()]};
                     // mockInput.onmidimessage(msg);
                     clearTimeout(tmr);
-                    go();
+                    tempoRun();
                 }, MIDI.Utility.tempoToPulseInterval(tempo));
             };
         }
