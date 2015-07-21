@@ -13,7 +13,7 @@
         module.exports = factory(require('../../bower/ee-class/dist/Namespace.min'));
     } else {
         // Browser globals (root is window)
-        root.Namespace = factory(root.Namespace);
+        root.MIDI = factory(root.Namespace);
     }
 }(this, function (Namespace) {
     // 'use strict';
