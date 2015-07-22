@@ -7,17 +7,20 @@
             }
         },
         connect: function(webMIDIOutput) {
-            var output = this;
-            var _output = output.Port = webMIDIOutput;
+            var _output = this.Port = webMIDIOutput;
         },
         disconnect : function() {
             this.Port = null;
         },
         send: function() {
-            this.Port.send.apply(this.Port, arguments);
+            if (this.Port instanceof MIDIOutput) {
+                this.Port.send.apply(this.Port, arguments);
+            }
         },
         clear: function() {
-            this.Port.clear.call(this.Port);
+            if (this.Port instanceof MIDIOutput) {
+                this.Port.clear.call(this.Port);
+            }
         }
     });
 

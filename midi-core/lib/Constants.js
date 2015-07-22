@@ -68,10 +68,9 @@
             ccs[i] = new Namespace(ccs[i].PropertyName, null, ccs[i]);
         }
 
-        _constants.ControllerMeta = ccs;
-
         var Constants = new Namespace('Constants', MIDI, _constants);
-        var Events = new Namespace('Events', Constants, _events);
+        var Events = new Namespace('Event', Constants, _events);
+        var Controller = new Namespace('Controller', Constants, ccs);
 
         return Constants;
     }

@@ -67,14 +67,31 @@
                 return 60000 / (interval * (ppq || 24));
             },
             getChannel: function(message) {
-                return MIDI.Utility.getLowNibble(message[0]) + 1;
+                if (message[0] < MIDI.Constants.System) {
+                    return MIDI.Utility.getLowNibble(message[0]) + 1;
+                }
+                return -1;
             },
             getEventName: function(message) {
-                var msgType = MIDI.Constants.Events[MIDI.Utility.getHighNibble(message[0]).toString()];
+                var msgType = MIDI.Constants.Event[MIDI.Utility.getHighNibble(message[0]).toString()];
                 if (msgType === 'NoteOn' && message[2] === 0) {
                     msgType = 'NoteOff';
+                } else if (msgType === 'ControlChange') {
+                    msgType = MIDI.Constants.Controller[message[1]].PropertyName;
                 }
                 return msgType;
+            },
+            getCurrentSeconds: function() {
+                if (typeof window !== 'undefined' && window.performance) {
+                    return performance.now() / 1000;
+                }
+                return new Date().getTime() / 1000;
+            },
+            next: function(process) {
+                return setImmediate(process);
+            },
+            whenever: function(process) {
+                return setTimeout(process, 1);
             }
         },
         initialize: function(success, errorHandler){
