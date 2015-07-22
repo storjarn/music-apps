@@ -18,6 +18,9 @@
 }(this, function (Namespace) {
     // 'use strict';
 
+    /**
+        @global
+     */
     MIDI = new Namespace('MIDI', null, {
         context: null,
         inputs: [],
@@ -76,34 +79,36 @@
         },
         initialize: function(success, errorHandler){
             errorHandler = errorHandler || function(err){ console.error(err); };
-            if (navigator.requestMIDIAccess) {
-                navigator.requestMIDIAccess().then(function(midi) {
-                    MIDI.context = midi;
+            if (typeof navigator !== 'undefined') {
+                if (navigator.requestMIDIAccess) {
+                    navigator.requestMIDIAccess().then(function(midi) {
+                        MIDI.context = midi;
 
-                    function getMIDIInputs() {
-                        var inputs = MIDI.context.inputs.values();
-                        for (var input = inputs.next(); input && !input.done; input = inputs.next()) {
-                            // input.value.onmidimessage = MIDIMessageEventHandler;
-                            MIDI.inputs.push(input.value);
+                        function getMIDIInputs() {
+                            var inputs = MIDI.context.inputs.values();
+                            for (var input = inputs.next(); input && !input.done; input = inputs.next()) {
+                                // input.value.onmidimessage = MIDIMessageEventHandler;
+                                MIDI.inputs.push(input.value);
+                            }
                         }
-                    }
 
-                    function getMIDIOutputs() {
-                        var outputs = MIDI.context.outputs.values();
-                        for (var output = outputs.next(); output && !output.done; output = outputs.next()) {
-                            MIDI.outputs.push(output.value);
+                        function getMIDIOutputs() {
+                            var outputs = MIDI.context.outputs.values();
+                            for (var output = outputs.next(); output && !output.done; output = outputs.next()) {
+                                MIDI.outputs.push(output.value);
+                            }
                         }
-                    }
 
-                    MIDI.context.onstatechange = function() {
-                        getMIDIInputs();
-                        getMIDIOutputs();
-                    };
+                        MIDI.context.onstatechange = function() {
+                            getMIDIInputs();
+                            getMIDIOutputs();
+                        };
 
-                    MIDI.context.onstatechange();
-                    success();
+                        MIDI.context.onstatechange();
+                        success();
 
-                }, errorHandler);
+                    }, errorHandler);
+                }
             }
         }
     });

@@ -17,7 +17,7 @@
             var clockFreq = (me.State.tempo / 60) * me.State.ppq;
 
             // Create a ScriptProcessorNode with a bufferSize of 4096 and a single input and output channel
-            var pulseDetector = audioCtx.createScriptProcessor(4096, 1, 1);
+            var pulseDetector = audioCtx.createScriptProcessor(/*4096, 1, 1*/);
 
             var clockLead = context.createOscillator();
             clockLead.type = "square"; // Square wave
@@ -39,10 +39,8 @@
             leadGain.connect(pulseDetector);
             // trimGain.connect(pulseDetector);
 
-            var isUp = false;
-
             clockLead.start(0);
-            clockTrim.start(0);
+            // clockTrim.start(0);
 
             if (me.Output) {
                 me.Output.send( [MIDI.Constants.Start, 0, 0] );
@@ -50,6 +48,8 @@
 
             // Give the node a function to process audio events
             pulseDetector.onaudioprocess = function(audioProcessingEvent) {
+                var isUp = false;
+
                 //Update clock frequency based on tempo
                 clockFreq = (me.State.tempo / 60) * me.State.ppq;
                 clockLead.frequency.value = clockFreq;
@@ -72,10 +72,15 @@
                         outputData[sample] = inputData[sample];
 
                         //Detect pulse to send MIDI clock message
-                        if (inputData[sample] > 0 && !isUp) {
-                            isUp = true;
-                            clock.sendClock();
+                        //If peak...
+                        if (inputData[sample] > 0) {
+                            //if not already peaked
+                            if (!isUp) {
+                                isUp = true;
+                                clock.sendClock();
+                            }
                         } else {
+                            //When down, stay down until next up
                             isUp = false;
                         }
                     }

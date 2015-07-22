@@ -32,6 +32,9 @@
         },
         disconnect : function() {
             this.Port.onmidimessage = this.Port.onmidimessage.oldHandler;
+            if (this.Port.onmidimessage.oldHandler) {
+                delete this.Port.onmidimessage.oldHandler;
+            }
             this.Port = null;
             this.off();
         }
