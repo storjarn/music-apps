@@ -46,9 +46,10 @@
                 me.Output.send( [MIDI.Constants.Start, 0, 0] );
             }
 
+            var isUp = false;
+
             // Give the node a function to process audio events
             pulseDetector.onaudioprocess = function(audioProcessingEvent) {
-                var isUp = false;
 
                 //Update clock frequency based on tempo
                 clockFreq = (me.State.tempo / 60) * me.State.ppq;

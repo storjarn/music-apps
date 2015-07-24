@@ -73,7 +73,12 @@
                 return -1;
             },
             getEventName: function(message) {
-                var msgType = MIDI.Constants.Event[MIDI.Utility.getHighNibble(message[0]).toString()];
+                var msgType = '';
+                if (message[0] < MIDI.Constants.System) {
+                    msgType = MIDI.Constants.Event[message[0].toString()];
+                } else {
+                    msgType = MIDI.Constants.Event[MIDI.Utility.getHighNibble(message[0]).toString()];
+                }
                 if (msgType === 'NoteOn' && message[2] === 0) {
                     msgType = 'NoteOff';
                 } else if (msgType === 'ControlChange') {
