@@ -1,0 +1,20 @@
+<HTML><HEAD><TITLE>MIDI Specification: Master Volume</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Master Volume</CENTER></FONT></H2></P>
+
+<P>This Universal SysEx message adjusts a device's master volume. Remember that in a multitimbral
+device, the <A HREF="http://www.borg.com/~jglatt/tech/midispec/volctl.htm">Volume controller</A> messages are used to control the volumes of
+the individual Parts. So, we need some message to control Master Volume. Here it is.
+
+<PRE><B><FONT SIZE=3>0xF0  <FONT COLOR=BLUE>SysEx</FONT>
+0x7F  <FONT COLOR=BLUE>Realtime</FONT>
+0x7F  <FONT COLOR=BLUE>The SysEx channel. Could be from 0x00 to 0x7F.
+      Here we set it to "disregard channel".</FONT>
+0x04  <FONT COLOR=BLUE>Sub-ID -- Device Control</FONT>
+0x01  <FONT COLOR=BLUE>Sub-ID2 -- Master Volume</FONT>
+0x<FONT COLOR=RED>LL</FONT>  <FONT COLOR=BLUE>Bits 0 to 6 of a 14-bit volume</FONT>
+0x<FONT COLOR=RED>MM</FONT>  <FONT COLOR=BLUE>Bits 7 to 13 of a 14-bit volume</FONT>
+0xF7  <FONT COLOR=BLUE>End of SysEx</FONT>
+</FONT></B></PRE>
+
+</FONT></BODY></HTML>

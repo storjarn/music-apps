@@ -1,0 +1,153 @@
+<HTML><HEAD><TITLE>The beginnings of MIDI</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000>
+
+MIDI mostly came about because keyboard players were buying synthesizers
+in increasing numbers from many different manufacturers, and they wanted
+to "sync" those various keyboards together, plus "play" them under
+"computer control" (since computer use was also increasing dramatically
+during that time). Companies were making analog sequencers, but each
+company's sequencer worked only with its own products. (See the article
+<A href="olddays.htm">The historical significance of computers/MIDI</A>
+for more explanation about what musicians wanted to do, and what
+problems they were facing back then). For example, Sequential Circuits
+made an analog sequencer that attached to a proprietary jack on the
+Prophet 5, and could be used to program the playback of a short phrase,
+but it wouldn't work on a Roland D-10 or Oberheim OBX-8 synth. And
+during the early 1980's, a lot of "pop dance music" was using sequenced
+phrases played on synths.
+
+<P>Two of the leading musical manufacturers back then were a California
+company called Sequential Circuits (who were making the best-selling
+synthesizer at the time -- early 1980's -- called the Prophet 5) and
+Roland, a japanese company who had been making popular musical keyboards
+for awhile, and were at the forefront of making musical interfaces for
+computers.
+
+<P>Indeed, Roland was one of the first companies to start making musical
+products that attached to computers. At the time, IBM had just released
+its first personal computer, the IBM PC, which gave a "serious
+endorsement" to personal computers. Also, Commodore had released the
+Commodore 64, one of the first really affordable "home computers", and
+sales were really starting to take off with personal computers. The
+Commodore 64 had a built-in analog synthesizer chip made by a musical
+company called Ensoniq. It wasn't very fancy, but nonetheless, musicians
+started playing around with it, and quickly began to discover that the
+programmability of digital computers, combined with a musical
+instrument, offered them a lot of potential solutions to those problems
+they were having back then.
+
+<P>Roland saw the potential musical use that computers offered. So
+Roland began work on a musical interface for the IBM PC. (Unlike the
+C-64, the IBM PC had no "fancy" built-in sound chip, so there was a void
+to be filled with a third party product). Roland envisioned a "digital
+sequencer" to replace the analog sequencers of the time, and it would be
+built around an IBM PC, which offered a lot of
+programmability/versatility using tools made by many other companies. Of
+course, since the PC had no built-in sound chip, and also, Roland wanted
+this digital sequencer to be able to work with Roland's entire line of
+new keyboards, Roland decided to build a hardware "musical interface"
+for the PC. Roland chose to make this an ISA card that plugged into one
+of the slots of an AT style IBM PC computer, to which an external box
+was attached that contained further circuitry. It had a lot of
+intelligent electronics in it, which primarily were designed to add
+features that turned a computer into a versatile sequencer. For example,
+it had a built-in metronome and also a tape sync jack so that the
+computer playback could be synced to a magnetic analog tape recorder
+such as a reel-to-reel or cassette recorder. It had built-in hardware
+timers to control the playback, and some filtering options of the
+digital data flowing between the computer and an external musical
+instrument. In designing this proprietary PC musical interface, Roland
+came up with a simple hardware circuit, and a fancy new, "digital
+language" that they planned to use with all of their upcoming musical
+keyboards. This digital language would allow the computer and musical
+instruments to transfer "control data" between them. This new interface
+would be known as a "Musical Instrument Digital Interface" or MIDI.
+(Roland loves anacronyms). And the PC card itself would become the
+MPU-401 ("Musical Processing Unit, model 401" -- gotta love those
+anacronyms), the first MIDI interface for a computer. (To this day, the
+MIDI interfaces built into some modern sound cards still offer hardware
+compatibility to the original MPU-401 since it became such a widely used
+MIDI interface for a computer).
+
+<P>Roland and Sequential Circuit representatives used to see each other
+at NAMM (a business trade show for the music industry), and were talking
+about how customers were wishing that they had some sequencer that
+worked with the keyboards from all manufacturers. And Roland said, "You
+know, we're working on this new peripheral for the IBM PC to turn it
+into a musical sequencer, using a hardware/software protocol in all of
+our upcoming keyboards. Would you be interested in supporting this? We
+could both benefit from it since you make such a popular synth, and
+we'll be making a musical sequencer for these increasingly popular
+personal computers". The SQ reps said "Sure. We've got some ideas of our
+own that we're adding to upcoming synths. Maybe we can incorporate these
+into one standard between us". So Roland sent some design specs to the
+SQ guys, who made some suggested changes and additions. They both
+decided to go ahead and adopt this "standard". Then they thought, "Why
+not see if we can get some of the other leading musical manufacturers to
+adopt it, as long as it's not really a proprietary standard anymore?".
+So, they contacted other popular musical manufacturers such as Yamaha
+and Oberheim, and got them onboard too. MIDI was perhaps the first true
+effort at joint development among a large number of musical manufacturers.
+
+<P>The first keyboard on the market with a MIDI interface was the
+Prophet 600 by Sequential Circuits in 1983. Of course, the Roland
+MPU-401 appeared shortly thereafter with some PC software from Roland
+that turned the PC into a musical sequencer. Roland made some MPU-401
+programming information available to other parties, and soon, there were
+other PC programs that supported the MPU-401 interface. (Indeed, those
+other programs proved to be more popular than Roland's initial MESA
+software. One of those products was called "Cakewalk", made by a small
+upstart known as "12 Tone Systems", who later changed their name to
+"Cakewalk" since that product became synonymous with the company). New
+Roland keyboards also sported a MIDI interface. Yamaha released the DX-7
+later that same year, their first keyboard with a MIDI interface. The
+DX-7 proved to be a huge hit with musicians. They loved the sound of its
+new, "FM synthesis", bought it in droves, and started to fool around
+with this new "MIDI interface" thing. Apple computer made a MIDI
+interface available for its Macintosh computer, and started promoting
+the computer in the music market during the mid-to-late 1980's since
+that was a market completely ignored by their biggest competitor IBM,
+and one that offered them many potential sales, being that musicians
+loved the flexibility and ease of use of the new, computer-based
+"digital sequencers". MIDI took off then. By 1985, virtually every new
+musical keyboard on the market had a MIDI interface.
+
+<P>Roland and SQ thought "Well, we don't want to be responsible for
+disseminating new additions to MIDI to every music/computer company that
+supports MIDI. We have too much other work to do. We don't have the time
+to prepare and mail documents to everyone else". So, all of the musical
+manufacturers supporting MIDI agreed to start a new organization called
+the MIDI Manufacturer's Association (ie, MMA). It would be the duty of
+this new organization to produce/disseminate the paper documents for the
+MIDI standard, and be the clearing house for new additions/changes to
+the specification. Members of the MMA would pay some dues to fund the
+cost of operating this new organization. (Dues were $50 a year, as I
+recall). And thus, the MMA was born.
+
+<P>It was through the MMA that new additions to the MIDI specification
+were channeled. For example, Opcode offered the MIDI File Format
+specification to the MMA, and thus, everyone started creating MIDI
+sequencer software that could read/write each others' data files. (Prior
+to that, each sequencer program had its own proprietary file format, and
+couldn't read each others' data files). Digidesign offered MIDI Time
+Code (MTC), and thus a standard was created for syncing the playback of
+various sequencers. (Prior to that, most sequencers also had proprietary
+sync protocols, for example, a whole mess of incompatible FSK sync
+interfaces).
+
+<P>In recent years, the MMA hasn't been doing much of anything except
+for selling photocopies of specifications that were written years ago,
+and some people have almost forgotten that it even exists. Consequently,
+there have been very few changes/additions to MIDI for about the past 5
+to 10 years. In fact, there have even been some proprietary things
+creeping in, such as proprietary redefinitions of MIDI status bytes used
+by multiple bus parallel and serial computer MIDI interfaces. Things
+often work in cycles though, so as musicians and manufacturers persue
+proprietary, solo endeavors and ultimately discover the perils of not
+persuing standards, then things may swing back the other way, and we may
+eventually see some problems with MIDI solved in a universal way (such
+as the fact that a single MIDI bus is limited to 16 channels -- too few
+to accomodate the newer "multi-timbral" synths that weren't around when
+MIDI was originally conceived, and also the slow-by-today's-standards
+32K serial baud rate of MIDI).
+
+</BODY></HTML>

@@ -1,0 +1,121 @@
+<HTML><HEAD><TITLE>MCI Devices</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Windows provides a High level API for playing both digital audio and MIDI. Windows also
+provides a high level API for recording digital audio, but not yet a corresponding API for
+recording MIDI. The goal of the high level API is for the operating system to do as much work
+as possible in playing or recording digital audio or MIDI data, and your program merely gives
+overall "instructions" to the operating system such as telling it the name of the MIDI or WAVE
+file to load and play.
+
+<P>Furthermore, one of the goals of the High level API is to allow the playback or recording to be
+done by the operating system in the background while your program goes on to do other things. In
+order to implement such a scheme, the Windows operating system incorporates a software entity (ie, a
+software library/driver/program/however-you-want-to-think-of-it) known as the "MCI Wave Device" which
+can play or record a digital audio waveform all by itself after receiving a few instructions from your
+program. It does all of the Low level API stuff on your behalf.
+The operating system also incorporates a software entity known as the "MCI Sequencer Device" which
+can play a MIDI song (ie, an entire song stored as a series of MIDI messages) all by itself after
+receiving a few instructions from your program.</P>
+
+<P>In fact, because multimedia programmers often have to support both digital audio and MIDI in
+their programs, Windows tries to make things even simpler by having you pass your instructions (ie,
+commands) to the MCI Wave Device in the same way (and using the same API function) as you pass
+instructions to the MCI Sequencer Device. In other words, if you learn how to send commands to the
+MCI Wave Device, then you already know how to send commands to the MCI Sequencer Device (or vice versa).
+(You also will know how to send commands to other MCI devices such as the Audio CD Player and Video Player).</P>
+
+<P>Indeed, many of the documented commands are the same for both. For example, you can tell the
+MCI Wave Device to "start playback" (of a waveform) just like you can tell the MCI Sequencer Device to
+"start playback" (of a MIDI song). It doesn't matter to you that these devices are dealing with
+entirely different data and/or audio hardware, because after all, those devices are managing the actual
+data and hardware entirely on their own. You need give them only some general instructions to follow,
+and one such command for both of them could indeed be to "start playback". In other words, if you know
+the commands to tell the MCI Wave Device to do something simple such as start playback, then you already
+know the same commands for the MCI Sequencer Device (or vice versa).</P>
+
+<HR NOSHADE><H2>Message or String interfaces</H2>
+
+In order to make it even easier for a programmer to use these devices, they offer two different ways to send
+them a command.
+
+<P>In one approach, you can pass them binary values, or addresses of structures filled in with values. For
+example, let's say that you want the MCI Wave Device to record a waveform. Prior to doing this, you need
+to tell the MCI Wave Device your desired sample rate, bit resolution (ie, 8 for 8-bit, 16 for 16-bit), and
+number of channels (ie, 1 for MONO, 2 for STEREO, etc). You can fill in a structure that has an unsigned
+long field where you store your desired sample rate, plus another unsigned long field where you store the
+number of channels of digital audio you wish recorded, and another field where you store your desired
+bit resolution. And then you call a function that passes this structure to the MCI Wave Device, as well as
+passing a "Command" value that indicates to the MCI Wave Device that it should expect this structure, and
+to use those values to <B>set</B> its record parameters. Passing binary values and structures to an MCI device is
+referred to as using the "Command <B>message</B> interface". You use the function mciSendCommand() to send
+commands using this approach.</P>
+
+<P>Furthermore, when you use mciSendCommand() to command the MCI Sequencer or Wave Audio Device to return some
+information to you, (for example if you ask it to tell you what bit resolution and sample
+rate is currently set for recording), then these devices will fill in structures with binary values. For
+example you can pass that above structure and have the Wave Audio device fill in its sample rate, channels,
+and bit resolution fields.</P>
+
+<P>In the other approach, you instead pass null-terminated strings. For example, let's take that same job
+of telling the MCI Wave Device to set itself up for recording a 11025 KHz sample rate, stereo, 8-bit waveform.
+You instead format a null-terminated string that looks like "<B>set</B> <I>bitspersample</I> 8 <I>channels</I> 2
+<I>samplespersec</I> 11025" where <B>set</B> is the command and the other (italicized) words are the record parameters
+followed by the desired value for each. It's really the same command that you issued above, but now it takes the
+form of a string instead of passed binary values/structures. Passing strings to an MCI device is referred
+to as using the "Command <B>string</B> interface". You use the function mciSendString() to send commands using
+this approach.</P>
+
+<P>When you use mciSendString() to command the MCI Sequencer or Wave Audio Device to return some information back
+to you, (for example if you ask it to tell you what bit resolution and sample
+rate is currently set for recording), then these devices will return strings like what you see above. For
+example it may return a string that looks like "bitspersample 8 channels 1 samplespersec 11025". Your
+program would then have to parse that string to extract the individual record parameters.</P>
+
+<P>Why 2 different approaches to do the same thing? The MCI Sequencer and Wave Audio devices are meant to
+be controlled by programs written in languages where it is easier to deal with simply sending (and
+receiving back) binary
+values and structures (such as C), as well as languages where it is much easier to deal with strings
+(such as Basic). And there are other cases where you may find it easier yourself to use strings, or easier
+to use binary values. You've got your choice (or you can use both).</P>
+
+<HR NOSHADE><H2>Overview of using the device</H2>
+
+To use the MCI Sequencer or Wave Audio Device, you need to first open that device. To open either of these
+devices, you issue an "open" command using mciSendString() or mciSendCommand() (depending upon whether you
+want to specify your open command by passing formatted strings, or binary values/structures,
+respectively).
+
+<P>After opening the device, you can then issue commands directly to it using mciSendString() or
+mciSendCommand(). Some commands you issue can cause the device to return data to you.</P>
+
+<P>After you're done using the device (and have no further use for it), you must close that device. To close
+the device, you send it a "close" command using mciSendString() or mciSendCommand().</P>
+
+<P>The Wave Audio and Sequencer Devices are referred to as <I>compound devices</I>. This is just a fancy way of
+saying that when you open the device, it has to be associated with a WAVE file or a MIDI file (for the Wave
+Audio or Sequencer Device respectively). In essense, when you open the device, you tell it what WAVE or MIDI
+file to also open. If you're going to subsequently do a play operation, this will be the file that gets
+played. If you're going to do a record operation, this will be file into which recorded data is stored. Indeed,
+for any operation that you do, this is the file that is operated upon.</P>
+
+<P>In fact, you can open either device several times (simultaneously) if you want to open several
+WAVE or MIDI files. Since you need to specify a particular WAVE or MIDI file each time that you open the
+device, the act of opening the device is sort of equivalent to opening a MIDI or WAVE file. The device
+ID (or alias) you obtain from each instance of opening the device is akin to a file handle. In essense,
+when you open the Wave Audio device, think of it as if you were opening a WAVE file that can perform
+operations upon itself, such as to playback any waveform that is stored in it (using whatever default
+Digital Audio Out hardware device is in the system), or to store (ie, record) the digital audio input
+(of the default Digital Audio In hardware device). When you open the Sequencer device, think of it as
+if you were opening a MIDI file that also can perform operations upon itself, such as to playback any
+MIDI data that is stored in it (using whatever default MIDI Out hardware device is in the system). You
+can also give commands to these files to have them perform other operations upon themselves.</P>
+
+<P>And of course, if you opened several files, you'd have to close each one. So too with opening multiple
+instances of the Wave Audio or Sequencer Devices.</P>
+
+<P>Although many of the commands are the same for both the Wave Audio and Sequencer Devices, and therefore
+this article could detail the common operations such as open, play, record, etc. for both devices, instead
+the Wave Audio Device is discussed further in <A HREF="highaud.htm#mci">High level Digital Audio API</A>, and
+the Sequencer Device is discussed further in <A HREF="highmidi.htm">High level MIDI API</A>.</P>
+
+</BODY></HTML>

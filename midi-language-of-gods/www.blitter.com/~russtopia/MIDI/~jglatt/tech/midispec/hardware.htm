@@ -1,0 +1,31 @@
+<HTML><HEAD><TITLE>MIDI Specification: Hardware</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+MIDI is an asynchronous serial interface. The baud rate is 31.25 Kbaud (+/- 1%). There is 1 start
+bit, 8 data bits, and 1 stop bit (ie, 10 bits total), for a period of 320 microseconds per serial
+byte.
+
+<P>The MIDI circuit is current loop, 5 mA. Logic 0 is current ON. One output drives one (and only
+one) input. To avoid grounding loops and subsequent data errors, the input is opto-isolated. It
+requires less than 5 mA to turn on. The Sharp PC-900 and HP 6N138 optoisolators are satisfactory
+devices. Rise and fall time for the optoisolator should be less than 2 microseconds.
+
+<P>The standard connector used for MIDI is a 5 pin DIN. Separate jacks (and cable runs) are used
+for input and output, clearly marked on a given device (ie, the MIDI IN and OUT are two separate
+DIN female panel mount jacks). 50 feet is the recommended maximum cable length. Cables are shielded
+twisted pair, with the shield connecting pin 2 at both ends. The pair is pins 4 and 5. Pins 1 and 3
+are not used, and should be left unconnected.
+
+<P>A device may also be equipped with a <B>MIDI THRU</B> jack which is used to pass the MIDI IN
+signal to another device. The MIDI THRU transmission may not be performed correctly due to the
+delay time (caused by the response time of the opto-isolator) between the rising and falling edges
+of the square wave. These timing errors will tend to add in the "wrong direction" as more devices
+are daisy-chained to other device's MIDI THRU jacks. The result is that there is a limit
+to the number of devices that can be daisy-chained.
+
+<H2><CENTER><FONT COLOR=RED>Schematic</FONT></CENTER></H2>
+
+<P><CENTER><IMG SRC="midi.gif"></CENTER>
+
+<P><CENTER>A schematic of a MIDI (IN and OUT) interface<CENTER>
+
+</FONT></BODY></HTML>

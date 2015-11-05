@@ -1,0 +1,26 @@
+<HTML><HEAD><TITLE>MIDI File Format: RMID files</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+The method of saving data in chunks (ie, where the data is preceded by
+an 8 byte header consisting of a 4 char ID and a 32-bit size field) is the
+basis for Interchange File Format. You should now read the article
+<A HREF="../aboutiff.htm">About Interchange File Format</A> for background information.
+
+<P>As mentioned, MIDI File format is a "broken" IFF. It lacks a file header
+at the start of the file. One bad thing about this is that a standard IFF
+parsing routine will choke on a MIDI file (because it will expect the first
+12 bytes to be the group ID, filesize, and type ID fields). In order to
+fix the MIDI File format so that it strictly adheres to IFF, Microsoft
+simply made up a 12-byte header that is prepended to MIDI files, and thereby
+came up with the RMID format. An RMID file begins with the group ID (4
+ascii chars) of 'R', 'I', 'F', 'F', followed by the 32-bit filesize field,
+and then the type ID of 'R', 'M', 'I', 'D'. Then, the chunks of a MIDI
+file follow (ie, the MThd and MTrk chunks). So, somewhere after the first 12 bytes of
+an RMID file, then you should find an embedded MIDI file (although there may be
+other "chunks" of data before it. Simply skip over those as you would any
+unknown chunk).
+
+<P>Note that chunks within a MIDI file are <U>not</U> padded out (with an
+extra 0 byte) to an even number of bytes. I don't know as if the RMID
+format corrects this aberration of the MIDI file format too.
+
+</FONT></BODY></HTML>

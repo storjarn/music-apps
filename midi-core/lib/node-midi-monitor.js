@@ -1,7 +1,7 @@
 var midi = require('midi');
 var moment = require('moment');
 require('./MIDI');
-require('./Constants');
+require('./Messages');
 
 // Set up a new input.
 var input = new midi.input();

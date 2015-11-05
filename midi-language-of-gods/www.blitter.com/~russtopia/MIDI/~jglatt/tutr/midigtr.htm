@@ -1,0 +1,208 @@
+<HTML><HEAD><TITLE>Using MIDI Guitars</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+<P>Over the course of the past few years, I've been attempting to help a
+guitarist rig up a midi studio with devices that would be controlled by a
+midi guitar. A midi guitar is simply a guitar fitted with electronic circuits
+which convert the guitarist's picking and fretting movements into appropriate MIDI
+messages.</P>
+
+<P>In a "normal" guitar, the "sound" of the strings is detected by magnetic
+pickups, and this electrical signal is amplified to the point that humans can
+readily hear it (usually well into the next city). Now, this analog signal is
+just fine for feeding into an amplifier, but of course, MIDI is a digital
+signal. You can't send the output of those pickups over a MIDI cable and
+expect a MIDI device to respond, just as you can't take the audio output of an
+electronic keyboard and run it into another unit's MIDI jack. In an
+electronic keyboard, when a musician depresses a key, this is detected and
+immediately converted to a MIDI message. This is relatively easy to do
+because each key makes its own "contact" with the circuitry that determines
+which note is being held. There is only one middle C on a keyboard. The rest
+of the keys are other notes. Contrast this with a guitar. Certain notes can
+be played in several different "places" on a guitar (ie, different frets on
+different strings). It's a lot more obtuse. Nevertheless, it's possible to
+put a pickup on every single fret of a guitar so that some electronic circuit
+can determine exactly what fret the musician is holding. Then, some circuit
+would need to detect which of the six strings are vibrating so it can be
+determined which notes on that fret are actually being played. This would
+have proven to be a reliable and efficient method of producing MIDI codes.
+So, is this what the music manufacturers did? No. Most decided to take a
+much cheaper, but infinitely inferior approach.</P>
+
+<P>The inferior method that the manufacturers chose involved "pitch to
+voltage conversion". Quite simply, instead of having the circuitry analyse
+what the musician was doing with his fretting and picking directly from the
+frets and strings, the circuitry got this information second-hand from the
+output of the magnetic pickups. Unlike on an electronic keyboard, where
+physically pressing the key generates the midi code, on a midi guitar, the
+circuitry has to analyze the "guitar sound" (ie, the pitch of the note being
+played) in order to generate the midi code for it. It takes a long time to do
+this (the circuitry has to analyze at least one entire cycle of the waveform).
+It's long enough that the human ear hears a delay between picking the note,
+and hearing the results of the generated midi code. This is very
+disconcerting. It's the primary reason that midi guitars have been almost
+universally shunned by guitarists. The manufacturers killed their own
+potential market with a bad design flaw, but this was probably destined to be
+because it's questionable as to whether guitarists would have supported a more
+expensive and less familiar, yet better, idea. (We keyboard players DID
+support technical gizmos in the mid-seventies, some of them rather unreliable,
+with the net result that we eventually got the best that could be offered.
+Nowadays, if you want to get involved in electronic music, you have to have
+some keyboarding skills. NOTE: A few esoteric and EXPENSIVE midi guitar
+systems were developed that didn't rely on pitch to voltage conversion;
+notably the SynthAxe. Again, these systems weren't purchased in enough
+quantity to warrant further development and price reduction).</P>
+
+<P>When a guitarist plays, sometimes unintended vibrations of a string occur
+(ie, a string next to the one that is picked also vibrates due to physically
+hitting it with the pick or hand, or through vibrations of the neck or adjacent
+strings, or the string will continue to vibrate some even after the finger is
+removed from the fret). This really isn't too distracting when you listen to
+the audio output of the guitar. Usually, you'll hear a very brief and/or soft
+pitch that is masked by the intended pitches. It's part of the character of a
+guitar performance, although excessive amounts of unintended string vibration
+usually result in a guitarist's performance being described as "sloppy" (or
+"heavy metal" if you're a teenager). Another disadvantage of the pitch to
+voltage is that these unintended pitches <B>ARE</B> converted to midi notes. It
+would take major processing power to harmonically analyze the output of the
+pickups and figure out whether a note might be intentional, or unintentional.
+(NOTE: These unintentional midi codes are often referred to as "glitches").
+The delay of converting GOOD pitches to voltages is long enough. Further
+processing of the pickups would just delay things to utterly unacceptable
+lengths. So, midi guitars don't bother doing this. The net result is that
+unless you have AN INCREDIBLY CLEAN PLAYING STYLE (ie, you can control the
+pick and your hand from touching unintended strings, and you don't pick or
+fret so hard that you cause vibrations), then you are going to generate lots
+of midi glitches.</P>
+
+<P>So, how do you adapt your playing style to render a clean midi output?
+Learn to play a keyboard. Seriously. But if you don't want to throw away your
+guitar technique, then you may have to modify it to suit the "pitch to voltage"
+midi guitars. First, in analyzing Mike's glitches, I noticed that the most
+common cause was due to string vibrations when he removed his fingers from the
+frets. Either the open string would vibrate (softly, but indefinitely until he
+touched the string again), or the string would produce a brief "retriggering"
+of the note that he just fretted (i.e. would play the same fretted pitch as a
+stacatto note) when he released it. Most of these glitches can be eliminated
+by NOT REMOVING YOUR FINGERS FROM THE STRINGS WHEN YOU RELEASE THE NOTES. In
+other words, you allow the string to raise off of the fret, but you keep your
+fingertips touching the strings. This will mute any string vibrations as you
+release the strings.
+
+<P>Another source of glitches is by hitting unintended strings with your hand
+or the pick. Clean up your playing style. Develop a "light" picking style.
+Mike was one of those guys who was taught to give the string a hard "twang"
+with the pick, and he inevitably would cause the guitar neck to vibrate, or
+brush the pick against an adjacent string.</P>
+
+<P>One last thing to consider is the delay between picking and when the midi
+note is generated. You have to learn to anticipate each note (ie, play each
+a fraction of a second before the beat). The net result is that the midi note
+will be generated ON the beat, where it should be. I remember reading a Robert
+Fripp interview in which he mentioned adapting his playing style to do this.
+Fripp is the only guitarist who has a clean enough style such that he can play
+a "pitch to voltage" midi guitar live without numerous glitches. (Holdsworth
+played the SynthAxe, which is an entirely different triggering system).</P>
+
+<P>By adopting the preceding guidelines, you can eliminate most glitches via
+your playing style.</P>
+
+<P>Now, if you don't have the patience or desire to "learn" to play a midi
+guitar without glitches, and you don't intend to play it live (ie, you just
+want to use it for sequencing), then there are certain features that you'll
+want to look for in sequencer software. These features concern "filtering"
+midi data (ie, removing only events with certain characteristics). The idea is
+that Mike would play his part as best he could, with glitches, and then use the
+sequencer's filtering routines to weed out the glitches from his recorded data.
+Mike is using a sequencer program that I myself wrote, and in the
+course of helping him overcome his glitch problems, I've discovered certain
+things about the midi output of pitch-to-voltage guitars,
+as well as what filtering algorithms work well to
+remove glitches.</P>
+
+<P>First, in order to eliminate the recorded delays caused by pitch to
+voltage conversion, it's necessary to quantise the data. (See my article on
+sequencing for an explanation of quantising). Now, I don't like robotic,
+computer perfect performances much. If you have a sequencer with high
+resolution (ie, > 240 ppqn), I recommend using quantising routines that
+correct only the most severe timing deviations, while leaving in some human
+nuances. Not only did this eliminate the delays, it also got rid of the
+"strumming" effect that you get from a pick (ie, yielded what you'd get if
+you finger-picked the strings) which is desirable if you're sending the midi
+data to something like a piano/strings/organ/synth etc patch. Keyboard players
+don't strum chords. So, look for a sequencer program that has quantise
+features, but to avoid robotic music, use one that offers flexible quantising.</P>
+
+<P>Next, I noticed that there were 2 common things about the midi data of a
+glitch. Sometimes only one of these 2 things were present; sometimes both.
+In any event, most glitches exhibited these characteristics while most "good"
+notes didn't. Some of the glitches were short, stacatto notes. Most likely,
+these were those glitches caused by retriggering of notes as he released
+strings from the frets. When I looked at the duration of a glitch (ie, the #
+of clock pulses between its note ON and its subsequent note OFF), it was
+usually only a few clocks. These glitches sounded like short bursts of sound,
+"blips", as Mike described them. (Hey, he's a guitarist, so that's the best
+that he can do). Normally, no good note would be held for this short a time.
+At 240 ppqn, a duration of a few clock pulses means that the note was
+something on the order of a 128th note. Not even Alan Holdsworth would tackle
+that. So, Mike applied a sequencer feature that allowed him to filter out
+all midi events that were, let's say, 5 or less clock pulses in duration.
+This eliminated a huge amount of his glitches.</P>
+
+<P>But, there still were more glitches. These glitches weren't "blips".
+They weren't stacatto. They sounded for a long time. Mike called these
+"screeches" (probably inspired by what he would do everytime that the
+sequencer program would crash before he could save
+his data). Most likely, these were glitches caused by open strings ringing as
+he picked or released a chord. One thing that I noticed is that the velocity
+of these notes were all rather low. The glitches were quieter (but still
+noticeable) than the good notes. So, Mike applied a sequencer feature that
+allowed him to
+filter out all midi notes with a velocity of less than, let's say, 31. It just
+so happens that his Yamaha (his preferred guitar), transmits midi notes with a
+limited set of preset velocities (ie, doesn't produce the full range of 0 to
+127, but rather velocities of 0, 7, 31, 64, etc). Mike struck his good notes
+hard, so their velocities were 120, but sympathetic vibrations caused midi
+notes with much lower velocities, typically the 7 or 31 values. This filtered
+out virtually all of the remaining glitches.</P>
+
+<P>Look for a sequencer program that allows you to filter notes that are of
+very low velocities, and also filter notes that are of very short durations.</P>
+
+<P>He could then easily delete (via editing the data) the remaining few
+glitches that managed to not have either of the two, telltale characteristics.</P>
+
+<P>One drawback that we found, was that occasionally, some of his good notes
+would also have low velocities. Maybe he didn't pick those strings quite as
+hard as he should have. When he filtered by velocity, he might rip out some
+good notes, with the net result that certain chords would sound "empty" (ie,
+missing intended notes). So, an important feature is that Mike can SAVE his
+filtered events to a separate sequencer track to check for good notes before
+he deletes that data. A lot of programs just throw the filtered stuff away.
+To make it even easier to "recover" those good notes from the velocity
+filtered track, you could create a CakeWalk CAL file (ie, macro) whereby
+you enter which chords fall upon which beats (ie, a fake sheet of your
+song, if you will) and let the sequencer remove only
+those notes that truly don't belong in your chord changes. You can then
+remerge the good notes in the velocity filtered track with your
+"good" track.</P>
+
+<P>So, although the part that Mike played was very ugly; full of glitches,
+he could invoke these filtering options on his recorded data, and within
+minutes end up with a part without glitches.</P>
+
+<P>Of course, there was one last thing. Since the Yamaha had preset
+velocity values for its midi notes, all of his good notes came out with the
+same velocity of 122 or 127. This sounded very artifical. If I played the same
+part on a midi keyboard, there would no doubt be more variety in the velocity
+values.  So, a randomizing feature for note velocity is useful to add variety.
+
+<P>When shopping for a sequencer program to be used with a midi guitar,
+these are some features that you might want to look for. Some programs don't
+filter by duration, some don't filter by velocity, some don't save filtered
+data so that you can further edit and filter it, some don't have "Human"
+quantising features or intelligent randomizing functions. Some don't have a
+scripting language to create a routine to weed out notes that don't "belong" in
+the chord changes.
+
+</BODY>
+</HTML>

@@ -1,0 +1,48 @@
+<HTML><HEAD><TITLE>MIDI Specification: Identity Request</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Identity Request</CENTER></FONT></H2></P>
+
+<P>Sometimes, a device may wish to know what other devices are connected to it. For example,
+a Patch Editor software running on a computer may wish to know what devices are connected to
+the computer's MIDI port, so that the software can configure itself to accept dumps from those
+devices.
+
+<P>The <B>Identity Request</B> Universal Sysex message can be sent by the Patch Editor software.
+When this message is received by some device connected to the computer, that device will respond
+by sending an <B>Identity Reply</B> Universal Sysex message back to the computer. The Patch
+Editor can then examine the information in the <B>Identity Reply</B> message to determine what
+make and model device is connected to the computer. Each device that understands the Identity
+Request will reply with its own Identity Reply message.
+
+<P>Here is the Identity Request message:
+
+<PRE><B><FONT SIZE=3>0xF0  <FONT COLOR=BLUE>SysEx</FONT>
+0x7E  <FONT COLOR=BLUE>Non-Realtime</FONT>
+0x7F  <FONT COLOR=BLUE>The SysEx channel. Could be from 0x00 to 0x7F.
+      Here we set it to "disregard channel".</FONT>
+0x06  <FONT COLOR=BLUE>Sub-ID -- General Information</FONT>
+0x01  <FONT COLOR=BLUE>Sub-ID2 -- Identity Request</FONT>
+0xF7  <FONT COLOR=BLUE>End of SysEx</FONT>
+</FONT></B></PRE>
+
+Here is the Identity Reply message:
+
+<PRE><B><FONT SIZE=3>0xF0  <FONT COLOR=BLUE>SysEx</FONT>
+0x7E  <FONT COLOR=BLUE>Non-Realtime</FONT>
+0x7F  <FONT COLOR=BLUE>The SysEx channel. Could be from 0x00 to 0x7F.
+      Here we set it to "disregard channel".</FONT>
+0x06  <FONT COLOR=BLUE>Sub-ID -- General Information</FONT>
+0x02  <FONT COLOR=BLUE>Sub-ID2 -- Identity Reply</FONT>
+0x<FONT COLOR=RED>ID</FONT>  <A HREF="id.htm">Manufacturer's ID</A>
+0x<FONT COLOR=RED>f1</FONT>  <FONT COLOR=BLUE>The f1 and f2 bytes make up the family code. Each</FONT>
+0x<FONT COLOR=RED>f2</FONT>  <FONT COLOR=BLUE>manufacturer assigns different family codes to his products.</FONT>
+0x<FONT COLOR=GREEN>p1</FONT>  <FONT COLOR=BLUE>The p1 and p2 bytes make up the model number. Each</FONT>
+0x<FONT COLOR=GREEN>p2</FONT>  <FONT COLOR=BLUE>manufacturer assigns different model numbers to his products.</FONT>
+0x<FONT COLOR=BROWN>v1</FONT>  <FONT COLOR=BLUE>The v1, v2, v3 and v4 bytes make up the version number.</FONT>
+0x<FONT COLOR=BROWN>v2</FONT>
+0x<FONT COLOR=BROWN>v3</FONT>
+0x<FONT COLOR=BROWN>v4</FONT>
+0xF7  <FONT COLOR=BLUE>End of SysEx</FONT>
+</FONT></B></PRE>
+
+</FONT></BODY></HTML>

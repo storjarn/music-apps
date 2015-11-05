@@ -1,0 +1,103 @@
+<HTML><HEAD><TITLE>Arranging for MIDI sound modules</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+<P>There have probably been times when you play back a MIDI arrangement that you're working on, and you find yourself saying "This lacks punch. It sounds flat and lifeless. It lacks depth". You decide that you need to add more musical parts to the arrangement (or more percussion, or sound effects, or whatever). But as you overdub more, new musical parts, all you seem to end up with is a musical "soup" where there are so many different parts happening that now you can barely hear what each instrument is playing (ie, a too "busy" arrangement), and yet you still haven't gotten a playback that sounds any less flat and lifeless. The problem is likely that you've taken the wrong approach to solve your problem. There may be nothing wrong with your musical arrangement. Rather, it could be that your mix (ie, the blending and processing of all your MIDI modules' sounds) needs some work.
+
+<P>Consider this example. Take an acoustic guitar and play it in a closet. What you're probably going to hear is a rather "claustrophobic" and "confined" sound. Even if you were listening to a recording of such, and weren't told that the guitarist was playing in a closet, you're going to know that the guitarist is playing in a small room because your ear can detect the characteristics of that room's sound (as recorded by the microphone). What are the characteristics? They're the echoes of the guitar's notes quickly bouncing off of the nearby walls and ceiling and being recorded with the microphone. Furthermore, a room can boost and muffle certain frequencies (ie, sort of like an acoustic "Tone" control). Your ear
+instinctively knows that such short, sparse echoes indicate a small room. And this <U>does</U> affect the way that you perceive the musical performance. It doesn't "sound" spacious. It doesn't sound "big". It doesn't sound "powerful". It sounds puny and cramped. Now, have that guitarist play <U>the exact same
+musical performance</U> in a large concert hall. Your ear is going to hear an entirely different sound, and you're going to get an entirely different impression of the performance. The complex "ambience" of the large hall will make the performance sound more powerful, bigger, and even more dynamic.
+
+<P>Musicians are often taught all about music theory and arranging techniques, but seldom taught about acoustics (ie, the principles of how sound is made and what affects it). And that often leads them to seek the solution for a "bland, flat, lifeless" mix by adding more musical parts rather than by what they may really need; more complexity in blending and processing the sounds of their MIDI modules.
+
+<P>You may playback a MIDI song file that someone else made, and hear a wonderfully "thick" and complex string sound out of your sound card. "Why don't I hear that string sound out of my card when I play my own MIDI song files? What do I have to do?", you may ask.
+
+<P>What may likely be happening is that the MIDI file is sending the same MIDI data to 2 or more similiar sounding String Patches (Presets, Instruments, whatever), and they are all playing the exact same notes
+simultaneously. These patches may be panned in stereo, and have different effects applied to them. But because these patches are all playing the exact same musical notes in perfect (to the human ear) sync and have tonal characteristics that blend together well, your ear doesn't hear separate Patches so much as it hears one, really complex Patch. This is an example of using the capabilities of a MIDI module to add depth to the musical performance (rather than adding more musical parts to the arrangement).
+
+<P>Here's an experiment. Follow these steps:
+<OL>
+<LI>Setup some <B>Analog</B> (ie, real) Strings Patch (on your sound module) to
+play upon MIDI Channel 1. (If you've got a GM Patch set, use Patch 49).
+<LI>Pan the Patch to the center.
+<LI>Set your controller keyboard to play only on channel 1.
+<LI>Play some notes and chords on the keyboard, and listen to the sound.
+</OL>
+
+<P>Now try this:
+<OL>
+<LI>Setup some <B>Synth</B> Strings Patch to play upon MIDI Channel 2. (For
+a GM Patch set, try Patch 51). Leave the Analog Strings Patch set to MIDI
+Channel 1.
+<LI>Pan the Analog Strings hard left (ie, so it only sounds upon the left speaker).
+<LI>Pan the Synth Strings hard right.
+<LI>Set your controller keyboard to play both channels 1 and 2 simultaneously.
+<LI>Play some notes and chords on the keyboard, and listen to the sound.
+</OL>
+
+<P>You'll note a fuller string sound with the second example (assuming that you don't have a crummy game audio card that uses the same waveform for both patches). That's because each note is playing 2 Patches simultaneously, but because they are similiar sounding Instruments and therefore blend well together, and because both Patches are playing in perfect sync with each other, your ear tends to perceive them as only one Patch. But because there are <u>some</u> differences in the sounds of the Patches, and because
+they are panned in stereo, your ear does detect that there is something more complex (and therefore "fuller", "thicker", etc) about this sound than with the first example. In essense, we've got a stereo string sound here, whereas before we had a mono string sound. We're getting into <b>Psycho-Acoustics</b> here, which include ways to fool the ear into hearing things a certain way.
+
+<P><B>Note:</B> Taking 2 of the "multitimbral parts" of a GM module, perhaps altering them in slightly different ways (ie, panning them in opposite directions, assigning different Patches to them, Fine Tuning them slightly apart, applying different levels of Reverb or Chorus, etc), and then <u>making them play the exact same MIDI data</u> is the basis for getting fuller, "stereo" sounds out of your MIDI modules. How do you get them to play the same MIDI data? Well, you can either assign both parts to the same MIDI channel if your multitimbral module supports that (which will make it impossible to setup different Patches using MIDI Program change. You'll have to set the Patches by hand). Or, you can set the Parts to 2 different MIDI channels, copy the track in your sequencer to another track (ie, duplicate it), and set
+the 2 sequencer tracks to those 2 different MIDI channels.
+
+<P>If you're still unfamiliar with the structure of multitimbral modules (ie, what a "Part" is), you may want to read the article <A HREF="multi.htm">"What's multitimbral?"</A>.
+
+<P>Of course, there is a price to pay for such stereo shenanigans. When you had 16 multitimbral Parts playing in mono (ie, each playing its own MIDI part), you could have 16 musical parts. Now, if you pair up Parts to play the same musical part, the multitimbral module can play less musical parts. And there's the module's voice limit (ie, polyphony) to consider. With a stereo sound, each MIDI note is going to use up twice as many voices as with a mono part.
+
+<P>Here are my favorite techniques for getting more complex or "stereo" sounds out of a sound module. All of them involve 2 Parts, usually panned in stereo (ie, one Part is hard left and the other is hard right). You can pan them not so far apart if you want to make the sound "tighter" or more focused toward center without losing much complexity. Also, who's to say that you can't add a third or fourth Part with slightly different settings, and make it play the same MIDI data, in order to thicken the sound even more? In any event, I think that, beyond 2 Parts with a wavetable-based card, you get diminishing returns.
+
+<P><B>Note:</B> In sophisticated MIDI modules, each Patch can often play several different waveforms panned in stereo with different filter and volume contours, etc, such that you can create a single, stereo Patch. Contrast this to a typical, low-cost GM module which typically uses only one, mono waveform per Patch. In the former case, you don't need to apply the techniques that I'm about to describe to 2 different (mono) Patches playing the same MIDI data. Rather, you can apply these techniques to create a stereo Patch itself, and then let it play the one sequencer track.
+
+<P>The following techniques should work on any modern MIDI module. You can mix and match these Techniques. For example, you can use both Technique 1 and Technique 2 on the same pair of Parts for an even more dramatic stereo effect.
+
+<P>In all of these examples, we'll assume using Parts 1 and 2 of your multitimbral module. One is panned hard left, and the other is hard right.
+
+<P><H3>Technique 1</H3></P><OL>
+<LI>Increase Part 1's tuning sharp by a few cents (ie, a small fraction of a half
+step. You don't want to be tuning in entire half-steps. Hopefully, your
+module has a "fine tuning" parameter).
+<LI>Decrease Part 2's tuning to an opposite, lower value (ie, flat).
+</OL>
+
+<P>This is my favorite when using the same Patch for both Parts. Sometimes, if I can't find another Patch that blends well with the desired Patch, or I want the sound to be distinctly perceived to be one Patch, I'll assign the same Patch to both Parts, pan in stereo, and alter the tuning. This is particularly good at improving a piano by using <b>Grand Piano</b> for both Parts and making a stereo piano. Of course, that doesn't mean that this Technique is any less effective combined with Technique 2. Indeed, the combo is the most effective way to get the fullest stereo sounds.
+
+<P>You can increase the difference between the 2 Parts' tunings for more depth to the sound, but the farther that you widen the difference, the more of a "detuned" sound you get (which may be what you want). Always make the tuning settings complimentary so that the ear hears a "centered" tuning.
+
+<P><H3>Technique 2</H3></P><OL>
+<LI>Pick out the desired Patch for Part 1.
+<LI>Now find a <u>different</u> Patch for Part 2, but one that blends well with (ie, sounds similiar to) Part 1.
+</OL>
+
+<P>When creating "stereo sounds" with a GM module, I often pair up patches 49/51 (String section), 17/18 (Organ), 5/12 (percussive electric piano), 26/27 (Clean guitar), 30/31 (Distorted guitar), and 34/35 (electric bass). There are lots of other good combos, particularly with the synth patches.
+
+<P><H3>Technique 3</H3></P><OL>
+<LI>Transpose one of the Parts 12 or 24 half-steps above the other Part
+(or -12 or -24 steps below).
+</OL>
+
+<P>If you want to create some sort of "overtone" sound, generally you'll make the higher transposed Part much softer volume than the lower Part; just enough to flavor the sound. It's also more subtle to not pan the Parts in stereo.
+
+<P><H3>Technique 4</H3></P><OL>
+<LI>Set both Part's Channel Pressure to control Brightness (ie, Filter cutoff), but use opposite polarity (if your module supports that). For example, set increasing Channel Pressure to make Part 1 brighter (ie, increase filter cutoff), then set increasing Channel Pressure to make Part 2 less bright (ie, decrease filter cutoff).
+</OL>
+
+<P>As varying MIDI Channel Pressure is sent to the module, each Part will respond differently and contrary, creating a sensation of "movement" to the sound.
+
+<P>Alternately, you could send only one Channel Pressure message to the Parts <u>before</u> playing any notes, and then do not allow any more Channel Pressure to be sent to the Parts. For example, if you send Channel Pressure with a value of 100 or so to both Parts, then Part 1 will be brighter than Part 2 throughout the performance of a song. The difference in the timbre of the 2 Parts yields a stereo effect that doesn't shift about. This is particularly useful for when both Parts use the same Patch.
+
+<P>In fact, Channel Pressure is often useful for controlling other things such as volume. For example, choose to make increased Channel Pressure raise the volume of one Patch while lowering the volume of the other Patch. (If you choose 2 different Patches, you may wish to pan the 2 Parts to the same position if you don't want to hear the sound "moving" across the stereo spectrum, but rather simply want the character of the sound to change "in place"). Channel Pressure can often control LFO speed and depth on some sound modules. The thing to remember when you want to use Channel Pressure to create a fuller, more spacious stereo blending of the two Parts is to set the Parts to do <u>different</u> (and often exactly opposite) things when you increase Pressure.
+
+<P>Note that besides Channel Pressure, some modules allow certain MIDI controllers (such as MOD Wheel) to control a variety of parameters (ie, volume, panning, brightness, etc). By using Channel Pressure along with other controllers to vary lots of parameters while playing, you can create complex (ie, spacious, "big" sounding) stereo effects, and thus liven up your arrangements without needing to add more musical parts to it.
+
+<P><H3>Technique 5</H3></P><OL>
+<LI>Add lots of Reverb to one Part, but no Reverb to the other Part.
+</OL>
+
+<P>This can yield a rather "spacey" sound since it's kind of unnatural, but that may be what you're after.
+
+<P>If your module's reverb unit is mono (ie, the reverb sound always ends up in the center), this is not as effective as it could be. In that case, to get something useful out of this Technique, you should combine it with one of the other Techniques.
+
+<P>This technique can be applied with other effects. For example, add Chorus to one Part, but no Chorus to the other Part. Again, a stereo effect unit is preferable to get the full benefit of that stereo sound.
+
+<P>A particularly good stereo effect can be gotten by panning a Patch hard left or right, and then panning a delay of it to the opposite side. With a single, short delay (ie, 20 to 30 milliseconds), this thickens the sound without creating a distinct echo that the human ear will detect as such. If you don't have a delay device, you can simulate that with two sequencer tracks; one of them delayed. (See the article <A HREF="effects.htm#delay">"Can I create effects with MIDI?"</A>).
+
+</BODY></HTML>

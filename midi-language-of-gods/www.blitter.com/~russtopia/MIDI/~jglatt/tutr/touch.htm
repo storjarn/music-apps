@@ -1,0 +1,132 @@
+<HTML><HEAD><TITLE>Channel and Key Pressure (Aftertouch)</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Some people ask "What's the difference between channel and key pressure?".
+
+<P>A keyboard that offers "Channel Pressure" (also known as "Polyphonic
+Pressure", or "Polyphonic Aftertouch", or just "Pressure", or some
+other epitath that certain manufacturers think makes more sense to
+the consumer than the MIDI Spec's official epitath of "Channel
+Pressure") means that the piano keyboard has pressure sensitivity
+that is an average of all of the keys that you're currently holding
+down. In other words, you don't have individual control of each key
+being held down. For example, let's say that you play a C triad
+(ie, in root position, that's C, E, and G notes played together).
+Now, let's also assume that you have your keyboard's pressure tied
+to the VCF (ie, Voltage Controlled Filter) filter cutoff, such that
+as press down harder on the keys, the "sound" gets "brighter", and
+as you ease up the pressure, the "sound" gets "more muffled". Now,
+as you're holding down those keys, you apply a little more pressure
+to the E key (ie, with that one finger holding down the E key). You
+don't increase your pressure on the other two keys (ie, other two
+fingers). What is the result with Channel Pressure? All 3 keys get
+a little brighter. Now let's say that you ease up the pressure on
+the G key. What's the result with Channel Pressure? All 3 keys get
+a little more muffled. With Channel Pressure, what you do to one
+key affects all sounding keys. (Of course, what the effect is
+depends upon what you've set Channel Pressure to affect. But, the
+important point to note is that Channel Pressure applies the effect
+to all sounding keys equally, and there is no individual control for
+each key being held down).</P>
+
+<P>Now, let's contrast that with "Key Pressure" (also known as
+"Polyphonic Pressure", or "Polyphonic Aftertouch", or just
+"Aftertouch"). A keyboard that offers this feature typically has
+many (ie, more than just one) pressure sensor on its piano keyboard.
+It usually has a sensor for each key. As you might guess, this
+translates to a bigger manufacturing cost, and so cheaper keyboards
+typically don't offer "Key Pressure". Because cheaper keyboards
+(which represent the majority of instruments purchased) don't
+implement Key Pressure, lots of manufacturers don't build sound
+modules that recognize it. (After all, what's the point of recognizing
+something that will never be sent to the sound module by the majority of
+instruments that will control it)? Let's take the above example of
+playing a C triad, but this time we use Key Pressure instead of
+Channel Pressure to control the VCF cutoff. As you're holding down
+the C triad, you apply a little more pressure to the E key (ie, with
+that one finger holding down the E key). You don't increase your
+pressure on the other two keys (ie, other two fingers). What is the
+result with Key Pressure? Only the E key gets a little brighter. The
+sound being made by the C and G keys doesn't get any brighter.
+Now let's say that you ease up the pressure on the G key. What's the
+result with Key Pressure? Only the G key get a little more muffled.
+The sound being made by the C and E keys is unaffected. With Key
+Pressure, what you do to one key only affects that one key. The
+sound of the other keys is not affected.</P>
+
+<P>What's the advantage of Key Pressure? Well, say that you're
+playing a string quartet arrangement (ie, playing all 4 instruments'
+lines simultaneously). At one point, while all 4 instruments are
+sustaining notes, you want to make the cello's note get a little
+brighter. With Key Pressure, you can zero in on that one note
+without also making the other instruments' notes brighter. That
+makes for a realistic imitation of a real string quartet, because
+the real instruments <U>would</U> have individual control over their tone
+and volume. With Key Pressure, a keyboard player has individual
+control over each one of the keys, and can therefore play ensemble
+arrangements more realistically (without having to try to remap
+portions of the keyboard to different channels, and restrict his
+playing to such).</P>
+
+<P>So, can you buy a keyboard controller that offers Key Pressure,
+and instantly be able to use that feature with your sound module?
+No. Your sound module has to be designed to recognize (and be able
+to do something with) Key Pressure. It definitely would be a waste
+of money to buy a keyboard controller that generates Key Pressure if
+you never get a sound module that utilizes such.</P>
+
+<P>Incidentally, it's possible for a keyboard to offer both Channel
+and Key Pressure, and even generate MIDI messages for both
+simultaneously. Almost all keyboards that offer Key Pressure also
+offer Channel Pressure, but I've never seen an example of the
+opposite. Cheap keyboards that represent themselves as "touch
+sensitive" (ie, Casio junk) refer to Channel Pressure (and sometimes
+the keyboards don't even generate MIDI messages for such -- they
+just use it for their internal "voices". Check that MIDI
+Implementation Chart!).</P>
+
+<P>Now, finally getting around to answering your question (I'll
+bet you thought that I'd never get there -- never ask a question of
+someone who has ever been a teacher if you want a quick answer),
+what's the best way to find out if your sound module does something
+with Key Pressure? Well, all modern equipment (from manufacturers
+who know something about MIDI) includes a paper called a "MIDI
+Implementation Chart". (Never buy any music equipment from
+a manufacturer that doesn't have designers who understand MIDI.
+You'll regret it if you do. Lack of a MIDI Implementation Chart is a
+good sign that you're dealing with such a manufacturer). Look for
+that chart. It should be somewhere in the manuals that come with the
+unit, usually at the end of the manual.</P>
+
+<P>There are 4 columns in the chart. At the top of the chart,
+you'll note that the middle 2 columns are labeled "Transmitted" and
+"Recognized". The "Recognized" column is the one that you want to
+look down for a sound module. Run your finger down that column until
+you come to the box that is in the same row as the row labeled
+"AfterTouch". (The labels for the rows are on the far left side of
+the chart). There should be 2 letters in this box. The first letter
+will be an X or an O. If this first letter is an X, then your sound
+module can't do anything with Key Pressure. Don't bother buying a
+keyboard controller with that feature. On the other hand, if the
+first letter is an O, then your sound module <U>can</U> do something with
+Key Pressure. (For exactly what you can do with Key Pressure, check
+to see if there are any REMARKS in the box to the right. If not,
+you'll have to look in another section of the manual that gives more
+detailed info about the unit's MIDI implementation. Look for Key
+Pressure).</P>
+
+<P>The second letter will also be an X or an O. If this second
+letter is an X, then your sound module can't do anything with
+Channel Pressure. Don't bother buying a keyboard controller with
+that feature. On the other hand, if the second letter is an O, then
+your sound module <U>can</U> do something with Channel Pressure. (For
+exactly what you can do with Channel Pressure, check to see if there
+are any REMARKS in the box to the right. If not, you'll have to look
+in another section of the manual that gives more detailed info about
+the unit's MIDI implementation. Look for Channel Pressure).</P>
+
+<P>Now, when you want to check whether a keyboard controller can
+generate Key Pressure, you're going to use the "Transmitted" column
+instead of the "Recognized" column. From there, follow the same
+instructions as above.</P>
+
+</BODY></HTML>

@@ -24,6 +24,7 @@
   "devDependencies": {},
   "scripts": {
     "start": "node index.js",
+    "midimonitor": "node ./midi-core/lib/node-midi-monitor.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

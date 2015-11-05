@@ -1,0 +1,23 @@
+<HTML><HEAD><TITLE>MIDI Specification: Ignoring MIDI Messages</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Ignoring MIDI Messages</CENTER></FONT></H2>
+
+<P>A device should be able to "ignore" all MIDI messages that it doesn't use, including currently undefined MIDI messages
+(ie Status is 0xF4, 0xF5, or 0xFD). In other words, a device is expected to be able to deal with <U>all</U> MIDI
+messages that it could possibly be sent, even if it simply ignores those messages that aren't applicable to the device's
+functions.
+
+<P>If a MIDI message is not a RealTime Category message, then the way to ignore the message is to throw away its Status
+and all data bytes (ie, bit #7 clear) up to the next received, non-RealTime Status byte. If a RealTime Category message is
+received interspersed with this message's data bytes (remember that all RealTime Category messages consist of only 1
+byte, the Status), then the device will have to process that 1 Status byte, and then return to the process of skipping the
+initial message. Of course, if the next received, non-RealTime Status byte is for another message that the device doesn't
+use, then the "skip procedure" is repeated.
+
+<P>If the MIDI message is a RealTime Category message, then the way to ignore the message is to simply ignore that one
+Status byte. All RealTime messages have only 1 byte, the Status. Even the two undefined RealTime Category Status bytes
+of 0xF9 and 0xFD should be skipped in this manner. Remember that RealTime Category messages do <U>not</U>
+cancel running status and also could be sent interspersed with some other message, so any data bytes after a RealTime
+Category message must belong to some other message.
+
+</FONT></BODY></HTML>

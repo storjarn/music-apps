@@ -22,7 +22,7 @@
     'use strict';
 
     function _setup() {
-        var _constants = {
+        var _messages = {
             NoteOff: 0x80,
             NoteOn: 0x90,
             PolyphonicAftertouch: 0xA0,
@@ -30,6 +30,7 @@
             ProgramChange: 0xC0,
             ChannelAftertouch: 0xD0,
             PitchBendChange: 0xE0,
+            //REALTime Messages
             System: 0xF0,
             //System
             ExclusiveStart: 0xF0,
@@ -53,26 +54,26 @@
         var _controllerMeta = {};
         var _events = {};
 
-        for(var key in _constants) {
-            if (!isNaN(parseFloat(_constants[key])) && isFinite(_constants[key])) {
-                _events[_constants[key].toString()] = key;
+        for(var key in _messages) {
+            if (!isNaN(parseFloat(_messages[key])) && isFinite(_messages[key])) {
+                _events[_messages[key].toString()] = key;
             }
         }
 
         for (i = 0; i < 16; ++i) {
-            _constants['Channel' + (i + 1)] = i;
+            _messages['Channel' + (i + 1)] = i;
         }
 
         for (i = 0; i < ccs.length; ++i) {
-            _constants[ccs[i].PropertyName] = i;
+            _messages[ccs[i].PropertyName] = i;
             ccs[i] = new Namespace(ccs[i].PropertyName, null, ccs[i]);
         }
 
-        var Constants = new Namespace('Constants', MIDI, _constants);
-        var Events = new Namespace('Event', Constants, _events);
-        var Controller = new Namespace('Controller', Constants, ccs);
+        var Messages = new Namespace('Messages', MIDI, _messages);
+        var Events = new Namespace('Event', Messages, _events);
+        var Controller = new Namespace('Controller', Messages, ccs);
 
-        return Constants;
+        return Messages;
     }
 
     var ccs = [{

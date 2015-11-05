@@ -13,7 +13,7 @@ module.exports = function(grunt) {
                     './midi-core/lib/MIDI.js',
                     './midi-core/lib/Input.js',
                     './midi-core/lib/Event.js',
-                    './midi-core/lib/Constants.js',
+                    './midi-core/lib/Messages.js',
                     './midi-core/lib/Clock.js',
                     './midi-core/lib/AudioClock.js',
                     './midi-core/lib/Track.js'

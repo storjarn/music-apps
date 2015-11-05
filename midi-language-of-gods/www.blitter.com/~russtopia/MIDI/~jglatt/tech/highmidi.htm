@@ -1,0 +1,141 @@
+<HTML><HEAD><TITLE>High Level MIDI API</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+If you don't want the hassle of timing out the playback of MIDI data, nor loading/parsing MIDI files, you could
+use Windows High level MCI functions. These functions can use the MCI Sequencer Device to play an entire MIDI file
+on its own, in the background (ie, while your app does other things). But, you lose control over MIDI playback
+other than being able to stop, start, pause, rewind, and fast-forward the playback. There's Windows MCI functions for
+setting up, and controlling the MCI Sequencer Device, for example using mciSendCommand to send commands to the
+MCI Sequencer Device such that it opens a MIDI file on disk, reads it in, and plays it back.
+
+<P>Before proceeding, you should now read <A HREF="mcidev.htm">MCI Devices</A>. This article gives necessary
+background information about the MCI API.</P>
+
+<H2><FONT COLOR="#FF8040">Opening the Sequencer Device</FONT></H2>
+
+To open the Sequencer Device, you need to issue an "open" command, using either using mciSendString() or
+mciSendCommand() (depending upon whether you want to specify your open command by passing formatted strings, or
+binary values/structures, respectively), and specify that you want the Sequencer device as the type of device
+opened. Of course, you also need to supply the name of a MIDI file that you want the Sequencer to open and
+perform operations upon.
+
+<P>If you're using mciSendString(), you literally include "type sequencer" as part of the command string to
+indicate that you're opening the Sequencer device.</P>
+
+<P>You can also specify an <I>alias</I>. This is just a string
+name that you use to identify the open device. Think of it as a string version of a device handle. After all,
+the string interface doesn't return binary values, so it can't return a handle. Instead it allows you to pick
+out a name, which you'll use with other commands you issue, in lieu of having a handle.</P>
+
+<P>Here then is an example
+of opening the Sequencer device using the Command String interface. The MIDI file that we ask it to open is
+named C:\WINDOWS\SONG.MID. The alias we give this instance of the Sequencer is A_Song. (ie, Whenever we
+subsequently use A_Song as the device name with other commands, we'll be performing operations on the
+C:\WINDOWS\SONG.MID file).</P>
+
+<PRE><B><FONT SIZE=3>TCHAR   buf[128];
+DWORD   err;
+
+<FONT COLOR=BROWN>/* Open a Sequencer device associated with the C:\WINDOWS\SONG.MID file */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mciSendString("open C:\\WINDOWS\\SONG.MID type sequencer alias A_Song", 0, 0, 0)))
+{
+    <FONT COLOR=BROWN>/* Error */</FONT>
+    printf("Sequencer device did not open!\r\n");
+    <FONT COLOR=GREEN>if</FONT> (mciGetErrorString(err, &buf[0], <FONT COLOR=GREEN>sizeof</FONT>(buf))) printf("%s\r\n", &buf[0]);
+}
+</B></FONT></PRE>
+
+<P>If you're using mciSendCommand(), then you need to initialize and pass a MCI_OPEN_PARMS structure.
+You set the lpstrDeviceType field of this structure to MCI_DEVTYPE_SEQUENCER.
+You also must pass mciSendCommand() the MCI_OPEN_TYPE and MCI_OPEN_TYPE_ID flags to indicate that you've
+set the lpstrDeviceType field to a predefined constant (MCI_DEVTYPE_SEQUENCER).</P>
+
+<P>If playing back a MIDI file, then you also need to specify the name of the MIDI file to open by setting the
+lpstrElementName field to point to the name of the desired file. You also must pass mciSendCommand() the
+MCI_OPEN_ELEMENT flag to indicate that you've set the lpstrElementName field. The Sequencer device does not
+support recording MIDI.</P>
+
+<P>The second arg will be MCI_OPEN to indicate an open command.</P>
+
+<P>Here then is an example of opening the Sequencer device using the Command Message interface.</P>
+
+<PRE><B><FONT SIZE=3>DWORD          err;
+MCI_OPEN_PARMS midiParams;
+TCHAR          buffer[128];
+
+<FONT COLOR=BROWN>/* Open a Sequencer device associated with the C:\WINDOWS\SONG.MID file */</FONT>
+midiParams.lpstrDeviceType = (LPCSTR)MCI_DEVTYPE_SEQUENCER;
+midiParams.lpstrElementName = "C:\\WINDOWS\\SONG.MID";
+<FONT COLOR=GREEN>if</FONT> ((err = mciSendCommand(0, MCI_OPEN, MCI_WAIT|MCI_OPEN_ELEMENT|MCI_OPEN_TYPE|MCI_OPEN_TYPE_ID, (DWORD)(LPVOID)&midiParams)))
+{
+    <FONT COLOR=BROWN>/* Error */</FONT>
+    printf("ERROR: Sequencer device did not open!\r\n");
+    <FONT COLOR=GREEN>if</FONT> (mciGetErrorString(err, &buffer[0], <FONT COLOR=GREEN>sizeof</FONT>(buffer))) printf("%s\r\n", &buffer[0]);
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    <FONT COLOR=BROWN>/* The device opened successfully. midiParams.wDeviceID now contains the device ID */</FONT>
+}
+</B></FONT></PRE>
+
+
+<H2><FONT COLOR="#FF8040">Playing the Sequencer Device</FONT></H2>
+
+To have the Sequencer device play its open MIDI file, you issue a play command to it.
+
+<P>If you're using mciSendCommand(), then you need to initialize and pass a MCI_PLAY_PARMS structure. (Actually,
+unless you use the MCI_NOTIFY, MCI_FROM, and/or MCI_TO flags, there is no initialization required). If you want
+to play only part of the MIDI file, then you can set the dwFrom and/or dwTo fields to the start and end positions
+respectively, and pass the MCI_FROM and/or MCI_TO flags respectively. The dwFrom and dwTo fields are normally
+expressed in terms of PPQN clocks. But you can utilize other means of expressing this
+offset, for example in terms of milliseconds, by first issuing an MCI_SET command (with the MCI_SET_TIME_FORMAT
+flag, and your desired choice of how to express such offsets).</P>
+
+<P>The second arg will be MCI_PLAY to indicate a play command.</P>
+
+<P>The first arg will be the device ID that you obtained when you opened the device.</P>
+
+<P>Here then is an example of playing a MIDI file on the Sequencer device using the Command Message interface.</P>
+
+<PRE><B><FONT SIZE=3>DWORD          err;
+MCI_PLAY_PARMS playParams;
+TCHAR          buffer[128];
+
+<FONT COLOR=BROWN>/* Play a Sequencer device. Assume that midiParams.wDeviceID was set according to our open example above */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mciSendCommand(midiParams.wDeviceID, MCI_PLAY, MCI_WAIT, (DWORD)(LPVOID)&playParams)))
+{
+    <FONT COLOR=BROWN>/* Error */</FONT>
+    printf("ERROR: Midi did not play!\r\n");
+    <FONT COLOR=GREEN>if</FONT> (mciGetErrorString(err, &buffer[0], <FONT COLOR=GREEN>sizeof</FONT>(buffer))) printf("%s\r\n", &buffer[0]);
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    <FONT COLOR=BROWN>/* The midi song has played from beginning to end */</FONT>
+}
+</B></FONT></PRE>
+
+You can download my <A HREF="../midi/software/dev/winapi/mcimidi1.zip">Message Midi Play</A> C
+example to show how to play a MIDI file using the Command Message interface. Included are the Project Workspace
+files for Visual C++ 4.0, but since it is a console app, any Windows C compiler should be able to compile it.
+Remember that all apps should include MMSYSTEM.H and link with WINMM.LIB (or MMSYSTEM.LIB if Win3.1). This is a
+ZIP archive. Use an unzip utility that supports long filenames.
+
+<H2><FONT COLOR="#FF8040">Closing the Sequencer Device</FONT></H2>
+
+To close the Sequencer device, you issue a close command to it.
+
+<P>If you're using mciSendCommand(), then you need to initialize and pass a MCI_GENERIC_PARMS structure. (Note that
+this structure is a subset of all of the other MCI structures that you pass to mciSendCommand(). In other words,
+you can substitute any of the other MCI structures for this one). Unless you use the MCI_NOTIFY flag, there is
+actually no initialization required.</P>
+
+<P>The second arg will be MCI_CLOSE to indicate a close command.</P>
+
+<P>The first arg will be the device ID that you obtained when you opened the device.</P>
+
+<P>Here then is an example of closing the Sequencer device using the Command Message interface.</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=BROWN>/* Close the Sequencer device. Assume that midiParams.wDeviceID was set according to our open example above */</FONT>
+mciSendCommand(midiParams.wDeviceID, MCI_CLOSE, MCI_WAIT, (DWORD)(LPVOID)&midiParams);
+</B></FONT></PRE>
+
+</BODY></HTML>

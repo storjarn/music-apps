@@ -1,0 +1,178 @@
+<HTML><HEAD><TITLE>MultiMedia File I/O API</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Windows' MultiMedia (File) I/O (MMIO) functions were created to provide programmers with some convenient routines to
+help read and write RIFF files, such as WAVE files. (You should read the article upon
+<A HREF="aboutiff.htm">Interchange File Format</A> before proceeding).
+
+<P>The MMIO functions allow file buffering (ie, much like the standard C functions such as fopen, fread, and fwrite), which
+is very handy given the fact that RIFF files often involve numerous reads and writes of a few bytes. Furthermore,
+the Windows functions take care of this file buffering completely transparently. (ie, Your program simply tells
+Windows to use file buffering, and Windows takes care of all details, including allocating a buffer if you do not
+wish to supply one yourself).</P>
+
+<P>The MMIO functions allow quick and relatively easy locating, reading, and writing of chunks. That spares your
+program from having to do a lot of file seeking and parsing.</P>
+
+<P>The MMIO functions can work with files on disks, or file images that have been completely loaded into memory.</P>
+
+<P>Finally, you can install your own "custom I/O" procedures (that are called by Windows MMIO functions such as
+mmioRead or mmioWrite) to support streaming data to devices other than disks or memory files. In that way, any
+program that uses MMIO functions to read/write data can be made to transparently stream that data to/from your device.</P>
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Opening a RIFF file for reading or writing</FONT></H2>
+
+<P>NOTE: For the sake of demonstration, the following examples will be shown with a WAVE file, although there are other
+types of RIFF files to which the MMIO functions are applicable.</P>
+
+<P>The first thing you must do is open a file for reading, writing, or both. This is accomplished by calling
+mmioOpen(). The first argument is a pointer to a filename.</P>
+
+<P>The second argument is a pointer to an MMIOOPEN
+structure. This does not need to be supplied unless you desire some special operations such as parsing a file
+image in memory, or forcing Windows to use a file buffer that you've allocated for I/O buffering, or supplying
+the address of a custom I/O procedure.</P>
+
+<P>The third argument is some flags OR'ed together. To open a file for reading, specify the flag MMIO_READ. To create a new file
+to which you'll be writing data, specify the flag MMIO_WRITE. To open a file that you'll be both reading and writing,
+specify the flag MMIO_READWRITE.</P>
+
+<P>The MMIO_EXCLUSIVE, MMIO_DENYWRITE, and MMIO_DENYREAD flags are file-sharing flags. For example, to
+prevent another program from simultaneously writing to the file while
+your program has it open, specify MMIO_DENYWRITE. MMIO_EXCLUSIVE denies other programs read or write access simultaneously.
+MMIO_DENYREAD prevents other programs from reading (but not writing) to the file simultaneously</P>
+
+<P>Specify the MMIO_ALLOCBUF flag if you wish Windows to allocate a buffer for buffered file I/O. The default size will
+be 8K, but if you wish a different size, then you must supply a MMIOOPEN structure with its cchBuffer field set to the
+desired buffer size in bytes. If cchBuffer is 0, the default buffer size is used. (If you are providing your own I/O
+buffer, do not set the MMIO_ALLOCBUF flag).</P>
+
+<P>There are some other flags that will be discussed later.</P>
+
+<P>If successful, mmioOpen() returns a handle to the open file. This handle can be used only with MMIO functions.</P>
+
+<P>So, to open the file C:\Windows\Chord.wav for reading:</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>HMMIO</FONT> hmmio;
+
+<FONT COLOR=BROWN>/* Open the file for reading with buffered I/O. Let windows use its default internal buffer */</FONT>
+<FONT COLOR=GREEN>if</FONT> (!(hmmio = mmioOpen("C:\\WINDOWS\\CHORD.WAV", 0, MMIO_READ|MMIO_ALLOCBUF)))
+{
+	printf("An error opening the file!\n");
+}
+<FONT></B></PRE>
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Locating and reading the Group Header</FONT></H2>
+
+<P>The first thing that you'll want to do after you open a file for reading is to check that it contains the desired type
+of data within it. For example, let's say that you want WAVE data. To check that there is a WAVE format within the open
+file (ie, it could be a collection of various types of data -- a CAT or LIST), and to locate the file pointer to the Group
+header (ie, the WAVE's RIFF header) and read in that Group Header, you need to allocate a "chunk information" (MMCKINFO)
+structure, set its fccType field to the ID that you wish to seek out (here it's 'WAVE'), and pass that structure to
+mmioDescend() with the flag MMIO_FINDRIFF. mmioDescend() then dives into the file and seeks to that RIFF WAVE header
+(if there is one in the file) and reads it in. (Windows docs refer to reading a chunk as "descending" into it).</P>
+
+<P>Note that there is an MMIO function, mmioFOURCC(), to help you initialize the fccType field with an IFF ID. An IFF ID
+is 4 characters, but treated as one unsigned long in Motorola (big endian) order.</P>
+
+<P>Here is an example of this:</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>MMCKINFO</FONT> mmckinfoParent;   <FONT COLOR=BROWN>/* for the Group Header */</FONT>
+
+<FONT COLOR=BROWN>/* Tell Windows to locate a WAVE Group header somewhere in the file, and read it in.
+ This marks the start of any embedded WAVE format within the file */</FONT>
+mmckinfoParent.fccType = mmioFOURCC('W', 'A', 'V', 'E'); 
+<FONT COLOR=GREEN>if</FONT> (mmioDescend(hmmio, (LPMMCKINFO)&mmckinfoParent, 0, MMIO_FINDRIFF))
+{
+	<FONT COLOR=BROWN>/* Oops! No embedded WAVE format within this file */</FONT>
+	printf("ERROR: This file doesn't contain a WAVE!\n");
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+	<FONT COLOR=BROWN>/* Here you may seek to, and read in other chunks */</FONT>
+}
+<FONT></B></PRE>
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Locating and reading a chunk</FONT></H2>
+
+<P>After you locate to the Group Header, the next thing that you'll likely want to do is read in the chunks of that
+group. For example, with the WAVE format, you'll at least want to read in the <B>fmt</B> chunk to get information about the
+WAVE, and then locate to the <B>data</B> chunk and read in the waveform data.</P>
+
+<P>You locate the file pointer to a chunk header in much the same way as locating to a Group header. But, you'll need a
+second "chunk information" structure. You set its fccType field to the chunk ID that you wish to seek out (here
+we'll seek out a 'fmt ' chunk), and pass that structure to mmioDescend() with the flag MMIO_FINDCHUNK, and also pass
+the MMCKINFO that you filled in above (with the Group Header). mmioDescend() then dives into the file and seeks to that
+chunk's header (if there is one in the file), and read it in. (NOTE: Only the 8 byte chunk header is read in -- not the
+chunk's data).</P>
+
+<P>Here is an example of reading the fmt chunk header:</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>MMCKINFO</FONT> mmckinfoSubchunk;   <FONT COLOR=BROWN>/* for finding chunks within the Group */</FONT>
+
+<FONT COLOR=BROWN>/* Tell Windows to locate the WAVE's "fmt " chunk and read in its header */</FONT>
+mmckinfoSubchunk.ckid = mmioFOURCC('f', 'm', 't', ' '); 
+<FONT COLOR=GREEN>if</FONT> (mmioDescend(hmmio, &mmckinfoSubchunk, &mmckinfoParent, MMIO_FINDCHUNK))
+{
+	<FONT COLOR=BROWN>/* Oops! The required fmt chunk was not found! */</FONT>
+	printf("ERROR: Required fmt chunk was not found!\n");
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+	<FONT COLOR=BROWN>/* Here you may read in the chunk's data */</FONT>
+}
+<FONT></B></PRE>
+
+<P>The mmckinfoSubchunk structure's cksize field now contains the chunk's chunkSize.</P>
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Reading a chunk's data</FONT></H2>
+
+<P>After reading in a chunk's header as above, you can then read in its data using the mmioRead() function.</P>
+
+<P>It just so happens that a WAVEFORMATEX structure can hold all the data in WAVE's fmt chunk verbatim. So, you need to make
+only one call to mmioRead() to load in that chunk's data, as so:</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>WAVEFORMATEX</FONT> waveFormat;   <FONT COLOR=BROWN>/* for reading a fmt chunk's data */</FONT>
+
+<FONT COLOR=BROWN>/* Tell Windows to read in the "fmt " chunk into a WAVEFORMATEX structure */</FONT>
+<FONT COLOR=GREEN>if</FONT> (mmioRead(hmmio, (HPSTR)&waveFormat, mmckinfoSubchunk.cksize) != (LRESULT)mmckinfoSubchunk.cksize)
+{
+	<FONT COLOR=BROWN>/* Oops! */</FONT>
+	printf("ERROR: reading the fmt chunk!\n");
+}
+<FONT></B></PRE>
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Ascending out of a chunk</FONT></H2>
+
+<P>After you've used mmioDescend() to locate and read in a chunk's header and/or data, if you plan to read any other chunks in
+the file, you need to "ascend" out of any chunk that you've mmioDescend()'ed into. You can't mmioDescend() into another
+chunk without first ascending out of any chunk you're currently reading. You use the mmioAscend() function to do so.
+You pass it the MMCKINFO that you used to mmioDescend() into the current chunk.</P>
+
+<P>For example, to ascend out of that fmt chunk whose data we were reading above:</P>
+
+<PRE><B><FONT SIZE=3>mmioAscend(hmmio, &mmckinfoSubchunk, 0); 
+<FONT></B></PRE>
+
+<P>The purpose of this function is to allow the mmio functions to do some necessary, internal bookkeeping with the file
+position pointer inbetween you moving it from chunk to chunk via mmioDescend().</P>
+
+<P>You can then use the same MMCKINFO with mmioDescend() to locate/read another chunk. (ie, You don't need a separate
+MMCKINFO with every chunk that you wish to read).</P>
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Closing a file</FONT></H2>
+
+<P>After you're done reading/writing to a file, you must close it. You do this by passing the handle which you obtained from
+mmioOpen() to the function mmioClose() as so:</P>
+
+<PRE><B><FONT SIZE=3>mmioClose(hmmio, 0); 
+<FONT></B></PRE>
+
+<HR NOSHADE>
+
+<P>You can download my <A HREF="../midi/software/dev/winapi/waveparse.zip">WaveParse</A> C
+example to show how to use the MMIO functions to open, read, and display some information about a WAVE file.
+Included are the Project Workspace files for Visual C++ 4.0, but since it is a console app,
+any Windows C compiler should be able to compile it. Remember that all apps should include MMSYSTEM.H and link with
+WINMM.LIB (or MMSYSTEM.LIB if Win3.1). This is a ZIP archive. Use an unzip utility that supports long filenames.</P>
+
+</BODY></HTML>

@@ -1,0 +1,813 @@
+<HTML><HEAD><TITLE>Roland Audio Card FAQ</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Here is a FAQ for Roland audio cards. After each question, the audio cards for which the answer is valid are listed.
+
+<P>Note that I have written two RAP-10 utilities and one SC-7 utility for Windows 95 (located on this web site under
+<A HREF="../progs/software.htm">Software Programs</A>) which allow you to easily alter some parameters that you would
+otherwise have to adjust via System Exclusive messages as described in this FAQ.</P>
+
+The questions covered are:</P>
+
+<P><A HREF="rap10use.htm#q1">Can I use software other than AudioTools?</A>
+<BR><A HREF="rap10use.htm#q2">Do I have to buy an MCB-10 for the RAP-10?</A>
+<BR><A HREF="rap10use.htm#q3">Can reverb/chorus/delay be added to digital audio?</A>
+<BR><A HREF="rap10use.htm#q4">How do I control digital audio parameters using my sequencer?</A>
+<BR><A HREF="rap10use.htm#q5">How can I adjust each individual drum's tuning, pan, etc?</A>
+<BR><A HREF="rap10use.htm#q9">How can I adjust master tuning?</A>
+<BR><A HREF="rap10use.htm#q6">How do I prevent the GM module from playing MIDI channels?</A>
+<BR><A HREF="rap10use.htm#q7">How do I enable aftertouch, and adjust what it affects?</A>
+<BR><A HREF="rap10use.htm#q8">Do I use the Windows MPU-401 device driver with my SCD-10 or SCD-15?</A>
+<BR><A HREF="rap10use.htm#q10">What are the pin connectors on the RAP-10 CDROM connector?</A>
+<BR><A HREF="rap10use.htm#q11">Why is the Volume fader greyed out on Win95's MultiMedia notebook for the RAP-10?</A>
+<BR><A HREF="rap10use.htm#q12">Is there a Windows NT or Windows 2000 driver for the RAP-10?</A>
+<BR><A HREF="rap10use.htm#q13">I tried your RAP-10 Win95 utilities, and I'm having troubles. Help?</A>
+<BR><A HREF="rap10use.htm#q14">How do I reset an SCC-1 (Sound Canvas) to GM mode?</A>
+</P>
+
+<HR>
+<P><H2><A NAME="q1">Can I use the RAP-10 with software other than AudioTools?</A></H2></P>
+
+<P><B>Covers RAP-10.</B></P>
+
+<P>Yes. Since the RAP-10 ships with a Windows MCI driver, you can use it with any Windows program that works with a
+<EM>Windows compatible soundcard</EM>, including CakeWalk. You can also utilize the RAP-10 driver with the Windows MIDI
+Mapper.</P>
+
+<P>Furthermore, since the RAP-10 supports the MPU-401 UART mode in hardware, you can use it with any MS-DOS software that
+requires an MPU-401 (UART mode only, not Intelligent mode).</P>
+
+<P>Frankly, Audio Tools is a very questionably written program. It appears to trap some access to the RAP-10 and therefore
+actually interferes with the operation of other MIDI software used with the RAP-10. Several people have reported
+that mysterious problems they've had with various MIDI software has disappeared merely by removing Audio Tools from
+their systems. My recommendation is that you do not install Audio Tools at all unless you absolutely need to use this
+software. If you're using Windows 95, you should investigate my freely available RAP-10 utilities (located on this web
+site under <A HREF="../progs/software.htm">Software Programs</A>).</P>
+
+<P>Alternately, you can set some RAP-10 parameters during bootup by creating a text file named <B>RAP10.INI</B> in your
+Windows directory. When Windows first boots up, the RAP-10 driver will read this text file. It contains several lines which
+set the Line/Mic Input, Monitor On/Off, Aux Volume, Mic/Line Volume, and WAVE playback of the RAP-10. Here are the lines of
+text that should appear in RAP10.INI</P>
+
+<PRE>
+Mic/Line Gain=Mic	;alternative = Line
+Monitor=On		;alternative = Off
+Aux Volume=127		;range = 0 to 255	
+Mic/Line Volume=127	;range = 0 to 255
+Wave Volume=60          ;range = 0 to ???
+</PRE>
+
+In other words, if you change the first line to:
+
+<P>Mic/Line Gain=Line</P>
+
+<P>then the RAP-10 will power up with LINE gain instead of MIC gain. One caveat -- in order to return to MIC gain,
+you'll have to edit that text file, changing it back to "Mic" and then reboot your computer. Setting Wave Volume is
+handy for reducing the RAP-10 volume at bootup so that Windows startup sounds don't rattle your walls.</P>
+
+<P><H2><A NAME="q2">Do I have to buy the expensive MCB-10 box to connect to
+the RAP-10 for MIDI IN and OUT jacks?<A></H2></P>
+
+<P><B>Covers RAP-10.</B></P>
+
+<P>No, the RAP-10's joystick port is 100% compatible with a Sound Blaster,
+so any "MIDI Adapter" that works for the SB will work for the RAP-10.
+For example, I bought a Media Vision MIDIMATE for about $15. The MCB-10
+is made out of cast iron, with a heavy duty cable and connectors, and is
+accordingly overkill and overpriced.</P>
+
+<P><H2><A NAME="q3">Can reverb, chorus, and delay really be added to the digital audio tracks?</A></H2></P>
+
+<P><B>Covers RAP-10, SCP-55B.</B></P>
+
+<P>Yes. Each digital audio track has its own level for adding reverb/delay
+and chorus, as does each "part" in the wavetable portion of the card. Each
+audio track also has its own volume, tuning (in cents, as well as
+transposing up or down in half steps), and pan (ie, the digital audio goes
+out the same stereo out jack as the wavetable voices).</P>
+
+<P><H2><A NAME="q4">What kind of control do I have over digital audio
+playback using a sequencer program like CakeWalk? I can use MCI commands,
+but then I have no control over the volume, panning, and effects (as
+applied to digital audio). Can I control these from CakeWalk just like I do
+using Audio Tools sliders (ie, Roland's bundled software)?</A></H2></P>
+
+<P><B>Covers RAP-10, SCP-55B.</B></P>
+
+<P>Yes, but instead of having convenient sliders a la Audio Tools, you'll
+have to manually enter System Exclusive MIDI events in your sequencer track.
+Nevertheless, unlike with other audio cards, you can fully control the
+digital audio playback with just about any sequencer program.</P>
+
+<P>In fact, you don't need MCI commands for that control. Roland had the
+foresight to add a SYSTEM EXCLUSIVE implementation to the RAP-10 and
+SCP-55 that allows you to adjust each digital audio track's volume, panning,
+brightness, chorus level, reverb level, pitch (both in cents as well as
+transposing by half-steps), and sample rate (11.025, 22.050, or 44.100
+KHz) BY SENDING IT SYSEX MESSAGES (which most all sequencers support). So
+for example, if you want to change the volume of a digital audio track
+(even while it's playing), you send a SYSEX message to the RAP-10. You
+just need to know those SYSEX messages, and you can insert them wherever
+you want in your CakeWalk track, and viola, there's all of the control
+that you wanted. (In fact, when you move the Audio Tools volume slider, all
+it's doing is sending those SYSEX messages to the RAP-10. There's no reason
+why you can't have CakeWalk or any other program that supports SYSEX do
+the same thing, but of course, you'll have to manually enter the desired
+SYSEX messages as events in a CakeWalk track. Come to think of it, you
+should be able to write some CAL routines that will really simplify the
+process, for example, asking you to type in a volume, and then the CAL
+routine will create the actual SYSEX event for it).</P>
+
+<P>Now, Roland didn't list the digital audio track's SYSEX messages in the
+owners manual. No problem. I'm a registered Roland developer,
+and have the RAP-10 technical docs right here. So, I'm going to tell you
+how to do this (in excruciating detail).</P>
+
+<P>I'll skip the part about how you enter a SYSTEM EXCLUSIVE event in
+CakeWalk. Consult your manual for that. Of course, you send the SYSEX
+messages to the RAP-10's MIDI (out) port, and the RAP-10 automatically
+recognizes and uses them. So, you may want to reserve a CakeWalk track for
+just these RAP-10 SYSEX events and set it to output to the RAP-10.</P>
+
+<P>Each digital audio parameter (ie, volume, panning, tuning, etc) has
+its own "address" where you adjust the setting. For example, there's a
+certain place (ie, address) within the RAP-10 that you reference to adjust
+digital audio VOLUME. There's a different place (ie, address) that you
+reference to adjust the digital audio PAN. The address that you specify
+tells the RAP-10 which digital audio parameter you wish to adjust. You
+specify the address within the SYSEX message itself. You also put the new
+value for that parameter within the same SYSEX message.</P>
+
+<P>Each digital audio track has its own addresses for volume, panning,
+etc. For example, the left track's volume is at a different address than
+the right track's volume. So, you have independent control over the two
+tracks' parameters. If you use the 2 tracks as 1 stereo track (ie, stereo
+WAVE), then there is a third set of addresses for that. (ie, Think of the
+RAP-10's stereo digital audio as a third, stereo track).</P>
+
+<P>The format (ie, template) for a SYSEX message is (in decimal bytes):</P>
+
+<P><B>240 65 16 86 18 [address] [value] [checksum] 247</B></P>
+
+<P>The address, value, and checksum are the parts of it that you have to
+fill in yourself (depending upon which parameter you're adjusting, and what
+value you're setting it to).</P>
+
+<P>The address for the LEFT digital audio track's VOLUME is the three
+bytes: 2 0 2. The value can be anything from 0 (inaudible) to 127
+(loudest).</P>
+
+<P>The checksum is one byte. It is calculated by adding the 3 address
+bytes and the value byte. If this is over 128, then subtract by 128 until
+you have a number less than 128. Take this number and subtract it from
+128. That's the checksum.</P>
+
+<P>OK, let's construct a SYSEX message to set the LEFT digital audio
+track's volume to 64 (ie, half volume). Take the above template, and put
+the "address" 2 0 2 in it, and the "value" 64 in it.</P>
+
+<P><B>240 65 16 86 18 2 0 2 64 [checksum] 247</B></P>
+
+<P>Now add up the address and value bytes. That's 2+0+2+64 = 68. This is
+less than 128. Subtract it from 128, and we have the checksum of 60.
+Here's the complete SYSEX message:</P>
+
+<P><B>240 65 16 86 18 2 0 2 64 60 247</B></P>
+
+<P>The address for the RIGHT digital audio track's VOLUME is the three
+bytes: 2 0 12.</P>
+
+<P>OK, let's construct a SYSEX message to set the RIGHT digital audio
+track's volume to 127 (ie, full volume). Take the above template, and put
+the "address" 2 0 12 in it, and the "value" 127 in it.</P>
+
+<P><B>240 65 16 86 18 2 0 12 127 [checksum] 247</B></P>
+
+<P>Now add up the address and value bytes. That's 2+0+12+127 = 141. This
+is more than 128, so we subtract 128 until we get a value less than 128.
+The value we get is 13. Subtract 13 from 128, and we have the checksum of
+115. Here's the complete SYSEX message:</P>
+
+<P><B>240 65 16 86 18 2 0 12 127 115 247</B></P>
+
+<P>Just place these SYSEX events wherever you want to change the volume
+for a digital audio track (ie, before the MCI "play" event, or after it if
+you want to change volume during playback). You can use as many of these
+SYSEX events as desirable (ie, for example if you want to slowly fade the
+audio out, then put lots of SYSEX events in a row, with decreasing values
+for the volume).</P>
+
+<P>If you use the digital audio tracks in stereo, then the volume is at
+address: 3 0 2.</P>
+
+<P>Here are the other parameters for the LEFT track. The Pan is at
+address 2 0 8. The value can be 1 (hard left) to 127 (hard right). 64 is
+center position. The Reverb/Delay Level is at address 2 0 9. The value
+is 0 (no reverb) to 127 (full reverb). The Chorus Level is at address
+2 0 10. The value is 0 to 127. The Transpose is at address 2 0 5. A value
+of 64 means no transpose. Higher values transpose the track UP in half
+steps. For example, 65 plays the digital audio track a half step up. Lower
+values transpose the track DOWN in half steps. 63 transposes the track
+down a half step. The Sample Rate is at address 2 0 4. The value is 0 for
+11KHz, 1 for 22KHz, or 2 for 44KHz. (I'm not going to bother detailing the
+last parameter which allows you to adjust the track's tuning in cents.
+This requires a slightly different SYSEX message format, and I don't want
+to get into that unless you NEED to know).</P>
+
+<P>Time for another example. Let's set the LEFT track's PAN to hard
+left. Take the template and plug in the address 2 0 8, and the value 1.
+Add up those 4 bytes. 11 is less than 128. Subtract 11 from 128 to get a
+checksum of 117. Here's the SYSEX message:</P>
+
+<P><B>240 65 16 86 18 2 0 8 1 117 247</B></P>
+
+<P>Here are the other parameters for the RIGHT track. The Pan is at
+address 2 0 18. The Reverb Level is at address 2 0 19. The Chorus Level is
+at address 2 0 20. The Transpose is at address 2 0 15. The Sample Rate is
+at address 2 0 14.</P>
+
+<P>If you use the 2 tracks in stereo, here are the other addresses for
+that. The Pan is at address 3 0 8. The Reverb Level is at address 3 0 9.
+The Chorus Level is at address 3 0 10. The Transpose is at address 3 0 5.
+The Sample Rate is at address 3 0 4.</P>
+
+<P>Unlike owners of other sound cards, the RAP-10 owner has all of this
+control over digital audio tracks using any sequencer that supports SYSTEM
+EXCLUSIVE events. Write yourself a few CAL routines (ie, for example, one
+that inserts a bunch of SYSEX events to pan a track across the stereo
+spectrum, etc) and you'll have an arsenal of special effects for your
+digital audio that don't require MCI (and don't exhibit some of the
+difficulties that you have in syncing MCI control with MIDI playback).</P>
+
+<P><H2><A NAME="q5">How I can tune each individual drum sound within a kit
+plus control the volume, panning, reverb. chorus etc? I'm not talking about
+the overall volume, panning, etc, of the entire kit, but setting individual
+volume, panning, etc for EACH DRUM SOUND.</A></H2></P>
+
+<P><B>Covers RAP-10, SCP-55B, SCC-1B, SC-7, SCD-10, SCD-15, and others.</B></P>
+
+<P>You need to use the <EM>Non-Registered Parameter Number</EM> controllers.
+For a generic discussion of what NRPN and RPN controllers are, and how they
+may be used, read the article <A HREF="rpn.htm">Using Registered and
+Non-Registered Parameter Number controllers</A> now.
+
+<P>The good news is that your Roland manual lists all of the various
+RPN and NRPN parameter numbers that the RAP-10 responds to. It shows an
+example template for each parameter number where the parameter number is
+already broken up into its 2 pieces. Look up the section where NRPN
+controller is discussed to see what parameter numbers Roland has defined
+for what purposes. (On Roland sound cards, often NRPN numbers are used only
+to adjust settings for individual drums of a kit. For adjusting things such
+as Reverb and Chorus levels, overall Pan and Volume, etc, there are
+dedicated controllers for that. For adjusting things such as Voice Reserve,
+Roland typically uses System Exclusive, rather than Controller messages).</P>
+
+<P>For example, let's discuss how to change the tuning on the Open HiHat
+drum sound, transposing it down a half step.</P>
+
+<P>If you look under the <EM>MIDI Implementation</EM> section of your
+manual (starting on pg 19), you search for the section on NRPN controller
+(starts on pg 19 and goes to pg 20). At the top of pg 20, you see that
+there are 5 parameters that can be controlled for each drum sound (ie, key):</P>
+
+<B>Pitch</B> (in half steps)
+<BR><B>Volume</B> (ie, TVA level)
+<BR><B>Pan
+<BR>Reverb level
+<BR>Chorus level</B>
+
+<P>Now, Roland already breaks up the "high bits" and "low bits" of the
+NRPN parameter number for you. In fact, the "high" and "low" bits aren't
+really related in the way that Roland uses them (ie, the "high" and "low"
+bits aren't ever meant to be pieced together to create a parameter number
+here). Rather, Roland uses the high bits to indicate which one of the above
+5 parameters you wish to adjust. The low bits indicate something else
+totally unrelated to that as you'll see.</P>
+
+<P>To adjust Pitch, the "high bits" of the NRPN number is 18 hex (ie,
+24 decimal). To adjust Volume, the "high bits" of the NRPN number would
+instead be 1A hex (ie, 26 decimal). For Pan, "high bits" is 1C hex (ie,
+28 decimal). For Reverb Level, "high bits" is 1D hex (ie, 29 decimal).
+For Chorus Level, "high bits" is 1E hex (ie, 30 decimal).</P>
+
+<P>For "low bits", you need to know the MIDI note number for the Drum
+Key that you want to adjust. For example, the Open HiHat is assigned to
+the A#1 key which is MIDI note number 46. (There is a table called
+<EM>Drum Set Table</EM> in your manual which lists the MIDI note numbers
+for all drum sounds). The desired MIDI note number is the "low bits".</P>
+
+<P>So, to tell the RAP-10 that we want to adjust Pitch for a drum sound,
+we send the NRPN with the "high bits" of 24. (I'm assuming MIDI channel
+10).</P>
+
+<P><B>185 98 24</B></P>
+
+<P>Then, to tell the RAP-10 that we want to adjust drum key 46 (ie, the
+Open HiHat), we send the NRPN with the "low bits" of 46.</P>
+
+<P><B>185 99 46</B></P>
+
+<P>Finally, to actually transpose the Pitch down a half step, we use the
+Data Entry Slider controller to set the tuning. A value of 64 is centered
+(ie, root pitch) tuning. So, if we want a half step down, we subtract one
+and send a value of 63. (Pan is calculated the same way -- 64 is centered
+panning, lower values move left, and higher values move right).</P>
+
+<P><B>185 6 63</B></P>
+
+<P>What if you want to set the Volume of the Cowbell to 80? First, to
+indicate that we want to adjust Volume, we send the NRPN "high bits" of 26.</P>
+
+<P><B>185 98 26</B></P>
+
+<P>Second, we need to know the MIDI note number for the Cowbell, which is
+56. We send that as the NRPN "low bits".</P>
+
+<P><B>185 99 56</B></P>
+
+<P>Finally, to actually set the Volume to 80, we use the Data Entry Slider controller.</P>
+
+<P><B>185 6 80</B></P>
+
+<P>Is that all there is to it? Well no. When the RAP-10 first powers up, it
+defaults to ignoring these NRPN messages. So, you have to enable NRPN
+recognition by sending the RAP-10 the following SYSTEM EXCLUSIVE message
+(values are in hexidecimal):</P>
+
+<P><B>F0 41 10 56 12 01 00 01 01 7D F7</B></P>
+
+<P>This only needs to be done once when the RAP-10 powers up (or always
+after the RAP-10 is sent a <EM>Turn General MIDI System On</EM> system exclusive message).</P>
+
+<P><H2><A NAME="q6">I can't use the RAP-10 and an external module at the
+same time since both will sound. How can I get the RAP-10 to stop responding
+to MIDI channels that I want only my external module to play?</A></H2></P>
+
+<P><B>Covers RAP-10, SCP-55B, SCC-1B, SCD-10, SCD-15, SC-7, and others.</B></P>
+
+<P>The RAP-10's built-in sound module is multi-timbral. It has 16 "Parts"
+(ie, 16 distinct entities inside of it, each of which can play one
+instrument at a time upon any one of the 16 MIDI channels). When the
+RAP-10 is powered up, the 16 parts are set to the default 16 MIDI
+channels (ie, Part 1 is the Drum Part, and is set to play all MIDI messages
+on channel 10, Part 2 plays messages on channel 1, Part 3 plays channel
+2, etc). You're undoubtably unaware that the 16 "Parts" of the RAP-10 can
+be turned off individually via SYSTEM EXCLUSIVE messages sent to the RAP-10.
+Alternately, a Part's MIDI channel can be changed via a SYSEX message sent
+to the RAP-10. For example, you can set both Part 2 and Part 3 to play MIDI
+messages upon channel 2. You can also disable a Part from sounding at all
+by setting its MIDI channel to "off". You need to send a SYSEX message to
+the RAP-10. If you have a sequencer program that supports SYSEX, you can
+manually enter a message in one of your "tracks" (and set that track to
+output to the RAP-10). (It's even better if you have a RAP-10 Editor program
+that has "controls" to change a Part's MIDI channel, and the Editor takes
+care of sending the appropriate SYSEX messages. Anyway, I wrote a RAP-10
+Editor for OS/2, and a Win95 RAP-10 Playback Panel, as I'm a registered Roland developer).</P>
+
+<P>Here's the template of the SYSEX message (with values expressed in
+decimal) to change a Part's MIDI channel:</P>
+
+<P><B>240 65 16 86 18 1 p# 0 ch sum 247</B></P>
+
+<P>You need to replace p# with the Part number whose MIDI channel you
+wish to change (where Part 1 is 0, Part 2 is 1,... Part 16 is 15. Note that
+the Drum Part is Part 1. The remaining 15 Parts, 2 to 16, are the 15
+instrumental parts). You need to replace ch with the desired MIDI channel
+(where Channel 1 is 0, Channel 2 is 1,...Channel 16 is 15, and to turn a
+Part off, specify ch = 16). Finally, you need to replace sum with the
+calculated checksum. The easiest way to come up with the checksum for this
+particular message is to add p# and ch, add 1, and subtract this from
+128.</P>
+
+<P>For example, to set Part 1 (ie, Drums) to MIDI channel 9, replace p#
+with 0 and replace ch with 8. Checksum is 128 - (8+0+1) or 119.</P>
+
+<P><B>240 65 16 86 18 1 0 0 8 119 247</B></P>
+
+<P>Normally, you'll want the 16 Parts each set to their own channel
+(ie, Drum Part set to Channel 10, Part 2 set to Channel 1, Part 3 set to
+Channel 2, etc.) which is the RAP-10's default setup. But then you'll
+probably want to turn off Parts that are set to MIDI channels reserved for
+your external gear. Use the above SYSEX message for that. For example,
+let's say that you want to turn off the Part set to MIDI channel 1. By
+default, Part 2 is set to MIDI channel 1. Replace p# with 1 and set ch to
+16 (ie, off). Checksum is 128 - (2+16+1) or 109.</P>
+
+<P><B>240 65 16 86 18 1 1 0 16 109 247</B></P>
+
+<P>Of course, at the end of your track, you may want to turn that Part
+back on (ie, set it back to channel 1).</P>
+
+<P><B>240 65 16 86 18 1 1 0 0 127 247</B></P>
+
+<P>The original Sound Canvas (SC-55), as well as some of the other SC models,
+use a slightly different System Exclusive message to change a Part. For
+example, in the SC-55, the SysEx message takes the form:
+
+<P><B>240 65 16 66 18 64 p#+16 2 ch sum 247</B></P>
+
+<P>Note that 86 is replaced by 66. This indicates a different model number
+than the RAP-10. Also, the 1 is replaced with 64. When you specify the
+part number, you need to add 16 to it. For example, if you want part 1,
+then you specify 17.</P>
+
+<P><H2><A NAME="q7">How do I turn on Aftertouch on my card? I'm looking in
+the manual which says that the card HAS aftertouch, but it defaults to off.</A></H2></P>
+
+<P><B>Covers RAP-10, SCP-55B, SCC-1B, SCD-10, SCD-15, SC-7, and others.</B></P>
+
+<P>First, let's talk about MIDI Aftertouch. There are two kinds of
+"aftertouch" or "pressure"; "Key Pressure", sometimes called "polyphonic
+aftertouch", and "Channel Pressure", sometimes called "monophonic aftertouch".</P>
+
+<P>While notes are playing, pressure can be applied to all of them. Many
+electronic keyboards have pressure sensing circuitry that can detect with
+how much force a musician is holding down keys. The musician can then
+vary this pressure, even while he continues to hold down the keys (and the
+notes continue sounding). The Channel Pressure message conveys the amount
+of overall pressure on the keys at a given point. Since the musician can
+be continually varying his pressure, devices that generate Channel
+Pressure typically send out many such messages while the musician is
+varying his pressure. Upon receiving Channel Pressure, many devices
+typically use the message to vary all of the sounding notes' VCA and/or
+VCF envelope sustain levels, or control LFO amount and/or rate being
+applied to the notes' sound generation circuitry. But, it's up to the
+device how it chooses to respond to received Channel Pressure (if at all).
+If the device is a MultiTimbral unit, then each one of its Parts may
+respond differently (or not at all) to Channel Pressure. The Part
+affected by a particular Channel Pressure message is the one assigned to
+the message's MIDI channel.</P>
+
+<P>What's the difference between Key Pressure (which I'll call "AfterTouch"
+here for brevity) and Channel Pressure? Well, AfterTouch messages are for
+individual keys (ie, an Aftertouch message only affects that one note
+whose number is in the message). Every key that you press down generates
+its own AfterTouch messages. If you press on one key harder than another,
+then the one key will generate AfterTouch messages with higher values than
+the other key. The net result is that some effect will be applied to the
+one key more than the other key. You have individual control over each
+key that you play. With Channel Pressure, one message is sent out for the
+entire keyboard. So, if you press one key harder than another, the
+controller will average out the difference, and then just pretend that
+you're pressing both keys with the exact same pressure. The net result is
+that some effect gets applied to all sounding keys evenly. You don't have
+individual control per each key. A controller normally uses either
+Channel Pressure or AfterTouch, but usually not both. Most MIDI
+controllers don't generate AfterTouch because that requires a pressure
+sensor for each individual key on a MIDI keyboard, and this is an
+expensive feature to implement. For this reason, many cheaper units
+implement Channel Pressure instead of Aftertouch, as the former only
+requires one sensor for the entire keyboard's pressure. Of course, a
+device could implement both Aftertouch and Channel Pressure, in which case
+the Aftertouch messages for each individual key being held are generated,
+and then the average pressure is calculated and sent as Channel Pressure.</P>
+
+<P>OK, back to the RAP-10. The RAP-10 only recognizes Channel Pressure, not
+Key Pressure. (RAP-10 Parts ignore all Key Pressure messages). All of
+the sounding notes of a Part are affected equally by a Channel Pressure
+message. (NOTE: The RAP-10 has 15 Parts plus a Rhythm Part, and these are
+by default assigned to the 16 available MIDI Channels. For example, Part 1
+is the Drum Part, and is assigned to handle everything on MIDI channel 10
+by default. Part 2 handles everything upon MIDI channel 1 by default.
+Part 3 handles MIDI channel 2. Etc. You CAN reassign parts to other
+channels. For example, you could have two RAP-10 Parts both playing
+everything upon channel 16. You can also turn Parts off, for example if you
+didn't want the RAP-10 to respond to particular MIDI channels at all).</P>
+
+<P>Channel Pressure can be used to control any or even ALL of the following 4 aspects of a Part:</P>
+
+<OL>
+<LI>Filter Cutoff Frequency (ie, Brightness) -- As pressure increases and decreases, the tone gets brighter or duller.
+
+<LI>LFO Rate (ie, Vibrato Speed) -- As pressure increases and decreases, the vibrato speeds up or slows down.
+
+<LI>LFO Depth (ie, Vibrato Amount) -- As pressure increases and decreases, the vibrato effect gets more or less pronounced.
+
+<LI>Volume -- As pressure increases and decreases, the volume (of all sounding notes for the Part) increases or decreases.
+</OL>
+
+<P>Each of the 15 Parts, and the Rhythm Part has its own Channel Pressure
+settings. For example, you can set Part 1 to get brighter as it receives
+increasing Pressure. You can set Part 2 to get duller as it receives
+increasing Pressure. You can set Part 3's Vibrato Amount to increase as it
+receives increasing Pressure, AND set Part 3's Volume to decrease as it
+receives increasing Pressure. Etc.</P>
+
+<P>The RAP-10 is designed such that you can alter virtually all of its
+settings (including digital audio playback settings) by sending System
+Exclusive MIDI messages to it. If you have some RAP-10 Patch Editor
+software such as my RAP-10 Editor for OS/2, then the software will likely
+have some graphical controls that allow you to set the desired effects of
+Channel Pressure for each Part. The software will take care of sending
+the proper System Exclusive messages to the RAP-10. If don't have such a
+tool (and check to see if Audio Tools allows setting Channel Pressure --
+it should, but I wouldn't know since I'm a developer, got my RAP-10 sans
+that Windows software, and wrote my own OS/2 stuff), don't fret. As long
+as you have a sequencer that lets you manually enter your own System
+Exclusive events, you can create and enter the desired messages for your
+sequencer to send to the RAP-10. I'm going to tell you what you need to
+know to set Channel Pressure for any Part.</P>
+
+<P>I'll skip the part about how you enter a SYSTEM EXCLUSIVE event in your
+sequencer. Consult your seq manual for that. Of course, you send the SYSEX
+messages to the RAP-10's MIDI (out) port, and the RAP-10 automatically
+recognizes and uses them. So, you may want to reserve a seq track for
+just these RAP-10 SYSEX events and set the track to output to the RAP-10.</P>
+
+<P>Each Part's Channel Pressure settings have their own "addresses" where you
+adjust the settings. For example, there's a certain place (ie, address)
+within the RAP-10 that you reference to adjust how Channel Pressure
+affects Part 1's Filter Cutoff Frequency. There's a different place (ie,
+address) that you reference to adjust how Channel Pressure affects Part
+1's LFO Rate. The address that you specify tells the RAP-10 which Channel
+Pressure parameter you wish to adjust for which Part. You specify the
+address within the SYSEX message itself. You also put the new value for
+that parameter within the same SYSEX message.</P>
+
+<P>The format (ie, template) for a SYSEX message is (in decimal bytes):</P>
+
+<P><B>240 65 16 86 18 [address] [value] [checksum] 247</B></P>
+
+<P>The address, value, and checksum are the parts of it that you have to fill
+in yourself (depending upon which parameter you're adjusting, and what
+value you're setting it to).</P>
+
+<P>The address to set Part 1's Filter Cutoff is the three bytes: 1 1 4.
+The value can be anything from 0 (increasing pressure makes the part very
+dull) to 127 (increasing pressure makes the part very bright). A value of
+64 is the middle value, meaning that pressure does not affect Part 1's
+Filter Cutoff at all.</P>
+
+<P>The checksum is one byte. It is calculated by adding the 3 address
+bytes and the value byte. If this is over 128, then subtract by 128 until
+you have a number less than 128. Take this number and subtract it from
+128. That's the checksum.</P>
+
+<P>OK, let's construct a SYSEX message to set Part 1's sound to made
+brighter with increasing pressure. We'll pick some number above 64, for
+example 90. Take the above template, and put the "address" 1 1 4 in it,
+and the "value" 90 in it.</P>
+
+<P><B>240 65 16 86 18 1 1 4 90 [checksum] 247</B></P>
+
+<P>Now add up the address and value bytes. That's 1+1+4+90 = 96. This is
+less than 128. Subtract it from 128, and we have the checksum of 32.
+Here's the complete SYSEX message:</P>
+
+<P><B>240 65 16 86 18 1 1 4 90 32 247</B></P>
+
+<P>Let your sequencer send the above message at the start of your song, and
+viola, Part 1's Filter Cutoff is now affected by Channel Pressure.</P>
+
+<P>Here's a chart showing the addresses of all Channel Pressure parameters
+for all 15 Parts and the Rhythm Part:</P>
+
+<PRE>
+Part 2                 Part 3                 Part 4
+  Brightness  1 1 4     Brightness  1 2 4      Brightness  1 3 4
+  Volume      1 1 5     Volume      1 2 5      Volume      1 3 5
+  LFO Rate    1 1 6     LFO Rate    1 2 6      LFO Rate    1 3 6
+  LFO Speed   1 1 7     LFO Speed   1 2 7      LFO Speed   1 3 7
+
+Part 5                 Part 6                 Part 7
+  Brightness  1 4 4     Brightness  1 5 4      Brightness  1 6 4
+  Volume      1 4 5     Volume      1 5 5      Volume      1 6 5
+  LFO Rate    1 4 6     LFO Rate    1 5 6      LFO Rate    1 6 6
+  LFO Speed   1 4 7     LFO Speed   1 5 7      LFO Speed   1 6 7
+
+Part 8                 Part 9                 Part 10
+  Brightness  1 7 4     Brightness  1 8 4      Brightness  1 9 4
+  Volume      1 7 5     Volume      1 8 5      Volume      1 9 5
+  LFO Rate    1 7 6     LFO Rate    1 8 6      LFO Rate    1 9 6
+  LFO Speed   1 7 7     LFO Speed   1 8 7      LFO Speed   1 9 7
+
+Part 11                Part 12                Part 13
+  Brightness  1 10 4    Brightness  1 11 4     Brightness  1 12 4
+  Volume      1 10 5    Volume      1 11 5     Volume      1 12 5
+  LFO Rate    1 10 6    LFO Rate    1 11 6     LFO Rate    1 12 6
+  LFO Speed   1 10 7    LFO Speed   1 11 7     LFO Speed   1 12 7
+
+Part 14                Part 15                Part 16
+  Brightness  1 13 4    Brightness  1 14 4     Brightness  1 15 4
+  Volume      1 13 5    Volume      1 14 5     Volume      1 15 5
+  LFO Rate    1 13 6    LFO Rate    1 14 6     LFO Rate    1 15 6
+  LFO Speed   1 13 7    LFO Speed   1 14 7     LFO Speed   1 15 7
+
+Rhythm (Part 1)
+  Brightness  1 0 4
+  Volume      1 0 5
+  LFO Rate    1 0 6
+  LFO Speed   1 0 7
+</PRE>
+
+So, for example, let's set the Drum Part's Volume to be increased with
+increasing Channel Pressure. Pick some value over 64, for example, 127.
+Now look up the address: 1 0 5. Plug these into the template, calculate
+the checksum, and our message is:
+
+<P><B>240 65 16 86 18 1 0 5 127 123 247</B></P>
+
+<P><H2><A NAME="q8">Do I use the Windows MPU-401 device driver with my SCD-10 or SCD-15?</A></H2></P>
+
+<P><B>Covers SCD-10, SCD-15, or other Roland daughterboard.</B></P>
+
+<P>No. The Roland daughterboard plugs into a Sound Blaster compatible
+daughterboard connector upon some host card (ie, the card that the Roland
+daughterboard plugs into). The computer (and software) communicates with
+the Roland card through the host's connector (ie, hardware). Unlike the
+SCC-1 or RAP-10 (or even the SCP-55B), the Roland daughterboard is not a
+standalone card, and doesn't directly attach to the computer's bus. The
+daughterboard connects to the host, and it is the host that directly
+connects to the computer's bus. Therefore, you only need to install the
+driver for the host card. For example, if you have a Sound Blaster, you
+install the Creative Labs drivers included with that card. It is the
+responsibility of the host's driver to pass any software's MIDI data to the
+daughterboard. Usually, the driver allows "switches" (ie, additional
+parameters that you can specify on the line with the driver's DEVICE
+statement in your <B>config.sys</B> file) that you can use to tell the
+driver to recognize a daughterboard, and use it for MIDI playback (ie,
+instead of some cheesy FM sounds built into the host). Or, you can use
+Win95's MultiMedia notebook (MIDI page) to select the "MIDI output" of
+your host card. (ie, The daughterboard is internally attached to the MIDI
+OUT jack of the host. Don't select any "WaveTable Synth" choice as that
+isn't the daughterboard. That's some built-in sound module on your host).
+In other words, most hosts are pretty dumb. They can't tell when a
+daughterboard is plugged in, and the driver will ignore it until you tell
+the driver to do otherwise.</P>
+
+<P>If you try to use the Windows MPU-401 driver, it will look for
+a standalone card (by default at base address 330 hex) that is MPU-401
+compatible (in hardware). Most of these hosts are not MPU-401 compatible
+in hardware, even though they may even have some sort of MPU-ish
+(ie, a very poor, incomplete MPU-401 emulation) ports at address 330. The
+net result is that the MPU-401 driver will either be trying to control
+hardware that isn't really designed to be controlled by that driver, and/or
+the MPU-401 driver will be mucking around with the hardware at the same
+time that the host's driver is mucking around with the same hardware. You
+should never have two drivers controlling the same hardware simultaneously.
+Otherwise, you can expect weird things to happen.</P>
+
+<P>Of course, if you did have a real MPU-401 compatible card, in addition
+to your host with a Roland daughterboard, then you'd be using 2 drivers;
+the Windows MPU-401 driver and the host's driver. But of course, the two
+cards would have to be set to use different base addresses and IRQ numbers,
+and you'd have to tell each driver what is the base address and IRQ of
+the card that it needs to control. (This is usually done when you install
+the Windows driver. A "setup" or "properties" screen for the driver allows
+you to specify base address and IRQ. Of course, you may also need to set
+jumpers on your card).</P>
+
+<P>Buying an SCD-10 or SCD-15 does <B>not</B> buy you an MPU-401
+compatible card like the SCC-1, RAP-10, MPU-401, SuperMPU, MusicQuest
+cards, etc. Even though the SCD-10 and SCD-15 may have the same waveforms,
+patch sets, effects, and even system exclusive implementations as the
+aforementioned MPU-401 compatibles, the daughterboards do not have the
+same hardware interface to the computer's bus (nor the same audio output
+section -- they use the host's audio output) as the standalones.
+If you're using Windows software, this shouldn't matter much to you. (Well,
+the likely higher noise output from the host's audio output section may
+make the SCC-1, RAP-10, or external Roland module more attractive, but the
+way that the card interfaces to the computer's bus is irrelevant as long
+as you have good drivers for the host).</P>
+
+
+
+<P><H2><A NAME="q9">How can I adjust master tuning on my RAP-10?</A></H2></P>
+
+<P><B>Covers RAP-10, SC-7, and probably the SCP-55B, SCC-1B, SCD-10, SCD-15, and others.</B></P>
+
+<P>The master tuning can span +/- 100 cents (ie, upto 100 cents above A440 tuning or 100 cents below A440 tuning). The
+parameter moves in .2 cents. In other words, each cent is divided into 5 steps -- that's how fine the resolution is on
+tuning.</P>
+
+<P>The value range for the parameter is 24 to 2024, with 1024 representing A440 tuning. So, if you specify a value of 1025,
+that's 2 cents higher than A440 tuning. 1026 is .4 cents higher than A440. 1029 is one cent higher than A440. Conversely,
+below 1024 lowers the tuning below A440. 1023 is .2 cents below A440. 1019 is one cent below A440.</P>
+
+<P>The template for the tuning system exclusive message is (in hexadecimal):</P>
+<PRE>
+F0 41 10 42 12 40 00 00 [tune1 tune2 tune3 tune4 checksum] F7
+</PRE>
+
+You need to figure out what tuning value you want. Convert it to hexidecimal. (You can use the Windows calculator in
+scientific mode to do that). Break up the hexadecimal value into 4 nibbles (ie, take the 4 digits separately. If you only
+see 3 displayed on the calculator, pad it out with an extra 0 on the left). And calculate the checksum. That gives you the
+system exclusive message.</P>
+
+<P>For example, assume that you want to raise the tuning 3 cents. Remember that every increment is .2 cents (ie, 1/5 of a
+cent), so to raise 3 cents, you're going to have to add 3 X 5 to 1024. The value will be 1039. Convert this to hexadecimal
+-- that's 040F. Break it up into 4 nibbles; that's 0, 4, 0, F. Plug these 4 values into the template above:</P>
+<PRE>
+F0 41 10 42 12 40 00 00 00 04 00 0F checksum F7
+</PRE>
+
+<P>All that's left is to calculate the checksum. For this tuning message, you do that by taking the 4 nibbles, convert
+them to decimal, add them together, then add 64. If this sum is over 128, then subtract by 128 until you have a number less
+than 128. Take this number and subtract it from 128. That's the checksum.</P>
+
+<P>For our example, the 4 nibbles plus 64 is 0 + 4 + 0 + 15 + 64 = 83. This is less than 128. We subtract from 128 to get a
+checksum of 45 (ie, 2D in hexadecimal). So the entire message is:</P>
+<PRE>
+F0 41 10 42 12 40 00 00 00 04 00 0F 2D F7
+</PRE>
+
+<P><H2><A NAME="q10">The audio out jack on my CDROM is a 4-pin connector, but the RAP-10 CDROM audio in jack has a 5-pin
+connector. Can I connect the two?</A></H2></P>
+
+<P><B>Covers RAP-10.</B></P>
+
+<P>There have been two different standards for CDROM audio connectors, a 4 and a 5 pin connector. The 4-pin connector is
+now more common, but the RAP-10 used a 5-pin connector. Fortunately, the signals for the pins are identical. It's just
+that some of the pins on the 5-pin jack aren't used. You merely need a cable that is wired to connect the 4-pin jack to
+the RAP-10's 5-pin jack. Here's the pin signals on the RAP-10 connector:
+
+<P>Pin #1  -  Not used
+<BR>Pin #2  -  Left 
+<BR>Pin #3  -  Ground 
+<BR>Pin #4  -  Right 
+<BR>Pin #5  -  Not used
+</P>
+
+
+<P><H2><A NAME="q11">Why is the Volume fader greyed out on Win95's MultiMedia notebook for the RAP-10?</A></H2></P>
+
+<P><B>Covers RAP-10.</B></P>
+
+<P>Unfortunately, the RAP-10 Windows driver does not support the Windows Mixer API. This means that there is no way for any
+program (or Win95) to set various RAP-10 settings via the Mixer API. For example, it's impossible for a program to set
+the RAP-10's Mic/Line input to Line or Mic level, or turn Monitor On or Off, or set Master Volume (which is why Win95
+disables that volume slider), or set Aux In or Mic volume. (Fortunately, master volume can be set by sending the RAP-10 a
+System Exclusive message. But the other parameters cannot be set by programs. The only way to set such parameters is to use
+Audio Tools, my RAP-10 Win95 utilities, or settings in a RAP10.INI file).
+
+<P><H2><A NAME="q12">Is there a Windows NT or Windows 2000 driver for the RAP-10?</A></H2></P>
+
+<P><B>Covers RAP-10.</B></P>
+
+<P>No, there is no RAP-10 driver for NT nor Windows 2000 (which is really Windows NT 5.0).</P>
+
+<P>Windows 3.1 drivers (which is what the RAP-10 driver is, and also explains why it isn't listed in Device Manager --
+Device Manager does not list legacy drivers) and Win95 sound drivers will not work under Windows NT/2000. WinNT has an
+entirely different driver model. (In Win98 and Windows 2000, MS supports a new driver model that works under both.
+But you'll need a new driver written to this specification. Older Win3.1 and Win95 drivers
+still will not work under Windows NT/2000).</P>
+
+<P>The best that you can do is to use the MPU-401 driver that ships with NT/2000. This will give you support for the RAP-10's
+MIDI In and Out, and internal GM module. But, you'll lose support for the RAP-10's 2 digital audio tracks (ie, WAVE
+recording and playback).</P>
+
+<P>There is an MPU-401 driver shipped with Win2000, but for some reason, MS didn't include an .INF file to install it.
+You can <A HREF="../midi/msmpu401.inf">Download the MSMPU401.INF file</A> to install this driver.
+Just save it to disk. Then go into Control Panel's "Add new hardware". Choose
+to install additional hardware beyond any PnP cards it detects.
+When it asks if your device is in the list of devices it knows, answer
+"No". Choose that you wish to select your own hardware from the
+list. Select the "hardware type" of "Sound, video, and game
+controllers". Click on "Have Disk" and browse to where you've
+saved this .INF file. Select that file and it will come up with an
+MPU-401 option. Select that and Win2000 should install its
+included MPU-401 driver.</P>
+
+<P><H2><A NAME="q13">I tried your RAP-10 utilities, but some of the parameters don't seem to be having any effect when
+I use CakeWalk. What's wrong?</A></H2></P>
+
+<P><B>Covers RAP-10.</B></P>
+
+<P>First of all, you should remove Audio Tools. Audio Tools interferes with the operation of other programs using the
+RAP-10.</P>
+
+<P>Because the RAP-10 driver doesn't support the Windows Mixer API, in order to get around this, I've had to bypass the
+driver and go right to the hardware. There are a couple caveats with this.</P>
+
+<P>What happens is that the RAP-10 driver reads any RAP10.INI text file at bootup, and from that point on, whenever any
+program opens the RAP-10 driver, the driver always sets the RAP-10 back to whatever setting it established at bootup.
+That's why you keep seeing CakeWalk (ie, actually the RAP-10 driver) defeating some settings made with SetMic (ie, mostly
+the Line/Mic switch, Monitor On/Off, and perhaps Aux In and Mic volume). SetMic is working behind the driver's back, but as
+soon as CakeWalk opens the driver (ie, before it begins digital audio play or record), the driver resets these RAP-10
+settings. As I said, due to the fact that the RAP-10 driver doesn't fully support the Windows API, there's no way for
+SetMic to cooperate with the driver and resolve this issue. Therefore, use of a RAP10.INI file may be your only solution,
+short of obtaining a new RAP-10 driver that supports the Windows mixer API.</P>
+
+<P><H2><A NAME="q14">The SCC-1 (Sound Canvas) has this MT-32 mode (which emulates an old Roland analog-synth computer card)
+that sounds cheesy, and some programs or midi files knock it into this mode. How do I reset the SCC-1 (Sound Canvas) to
+General MIDI mode?</A></H2></P>
+
+<P><B>Covers SCC-1.</B></P>
+
+<P>The SCC-1 was made prior to when a standard System Exclusive message was added to the MIDI specification to reset a
+module to General MIDI mode. Therefore, the SCC-1 uses a proprietary Roland Sysex message for this purpose. (Actually, the
+SCC-1 is reset into GS mode, which is the General MIDI patch set plus variations). This message is:</P>
+
+<P>F0 41 10 42 12 40 00 7F 00 41 F7</P>
+
+<P>Simply enter this message into your sequencer, and play it back into the SCC-1.</P>
+
+<P>Newer Roland cards such as the RAP-10 use the standard GM Reset Sysex message of:</P>
+
+<P>F0 7E <B>xx</B> 09 01 F7</P>
+
+<P>where <B>xx</B> is the Device ID (or 7F if you wish all modules to respond to this message).</P>
+
+<P><H2>Recommended Reading:</H2>
+<BR><A HREF="roland.htm">Roland Audio Card Specs</A>
+<BR><A HREF="midicard.htm">MIDI/Audio cards for a PC clone computer</A></P>
+</BODY></HTML>

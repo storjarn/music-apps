@@ -1,0 +1,802 @@
+<HTML><HEAD><TITLE>MIDI Stream API</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+To use the MIDI Stream API, you need to first call midiStreamOpen() once to open some MIDI stream device for output.
+(This is similiar to the Low level MIDI API's midiOutOpen). You pass the Device ID of that desired stream device. Then,
+you can subsequently call other Stream functions, such as midiStreamOut() to queue MIDI messages for playback upon that
+device, and midiStreamRestart() to start the actual playback. Windows and that device will take care of timing out each
+event and outputting its MIDI bytes.
+
+<P>After you're done outputting to a stream device (and have no further use for it), you must close that device.</P>
+
+<P>Think of a stream device like a file. You open it, you write to it (ie, queue MIDI events to it which Windows "plays"),
+and then you close it.</P>
+
+<HR><H2><FONT COLOR="#FF8040">Opening the default Stream for playback</FONT></H2>
+
+This is extremely similiar to the Low level MIDI API's midiOutOpen() (except that a pointer to the device ID is
+passed rather than the device ID directly passed, and also, there is one extra arg that is currently set to 1). To open
+the default device, use a Device ID of 0 as so:
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>unsigned long</FONT> result, deviceID;
+HMIDISTRM     outHandle;
+
+<FONT COLOR=BROWN>/* Open default MIDI Out stream device */</FONT>
+deviceID = 0;
+result = midiStreamOpen(&outHandle, &deviceID, 1, 0, 0, CALLBACK_NULL);
+<FONT COLOR=GREEN>if</FONT> (result)
+{
+   printf("There was an error opening the default MIDI stream device!\r\n");
+}
+</B></FONT></PRE>
+
+<H2><FONT COLOR="#FF8040">The most flexible way to choose a MIDI Stream device for input or output</FONT></H2>
+
+Windows Stream Manager is capable of streaming MIDI data to any one of the MIDI Output Devices on a system. So, in
+order to get a list of MIDI Out Devices that you can open with midiStreamOpen(), you simply do things exactly as you
+would with the low level's midiOutOpen(). You query all of the MIDI Output devices in the system using
+<A HREF="lowmidi.htm#3">midiOutGetDevCaps()</A>, and remember that the first device always has an ID of 0, and
+subsequent devices have ascending ID numbers.
+
+<P>Individual Windows 95 drivers for any installed cards may be specially written to directly support the Stream API.
+When you query a particular MIDI Output device (using midiOutGetDevCaps), you can check the dwSupport field of the
+MIDIOUTCAPS structure. If the driver directly supports the Stream API, the MIDICAPS_STREAM bit of dwSupport will be
+set. (Download my <A HREF="../midi/software/dev/winapi/middevs.zip">ListMidiDevs</A> C example to show
+how to query the MIDI Output devices for such support). Such a driver may offer special features such as allowing the
+Stream Manager to sync playback to incoming SMPTE or MIDI Time Code. Those features would be determined by what code
+has been added to the driver, as well as perhaps hardware support by the MIDI card itself.</P>
+
+<P>One caveat is that the MIDI Mapper cannot be opened as the output for a MIDI stream. The Windows MIDI Stream
+Manager supports only one MIDI output at a time (unless the card's driver directly supports the Stream API and
+adds some sort of routing feature based upon the MIDIEVENT's dwStreamID field. Currently, the Stream Manager doesn't
+support this routing).</P>
+
+<HR width="90%" color="#FF8040" size=10 NOSHADE>
+<H2><FONT COLOR="#FF8040">General overview of stream playback</FONT></H2>
+
+The process of passing the MIDI events that you want Windows to time out and output is similiar to passing a buffer of
+data to <A HREF="lowmidi.htm#2">midiOutLongMsg()</A>.
+In fact, you use a MIDIHDR structure, as well as calls to midiOutPrepareHeader() and
+midiOutUnprepareHeader(). But, you also use one or more MIDIEVENT structures, and the actual time out and output of
+the MIDI messages doesn't begin until you call midiStreamRestart(). (ie, Until you actually call midiStreamRestart,
+Windows simply queues the MIDI messages in the order you pass them).
+
+<P>Here's how you pass a MIDI message to be played back:</P>
+
+<OL><LI>Place one MIDI message into a structure called a MIDIEVENT.
+
+<P><LI>Place a pointer to this MIDIEVENT into the lpData field of a MIDIHDR structure. Also set the MIDIHDR's
+dwBufferLength and dwBytesRecorded fields to the size of this MIDIEVENT structure. Set the dwFlags field to 0.</P>
+
+<P><LI>Pass the MIDIHDR to midiOutPrepareHeader().</P>
+
+<P><LI>Pass the MIDIHDR to midiStreamOut().</P></OL>
+
+<P>The MIDI message is now queued for playback. If you haven't called midiStreamRestart() yet, then Windows does not
+yet start timing out and outputting this event. So, you can queue several MIDI messages prior to the start of playback by
+repeating the above steps, using a separate MIDIEVENT and MIDIHDR for each message.</P>
+
+<P>It's also possible to queue several MIDI messages using one MIDIHDR and one call to midiOutPrepareHeader() and
+midiStreamOut(). You do this by using an array of MIDIEVENT structures (ie, one for each of your MIDI messages). Place
+each MIDI message into one of the MIDIEVENT structures in that array. Then place a pointer to the entire array in
+the MIDIHDR's lpData field. Of course, the MIDIHDR's dwBufferLength and dwBytesRecorded fields are set to the size of the
+entire array of MIDIEVENT structures. It is much more efficient and memory-conserving to combine all MIDI messages that
+occur upon the same musical beat into one array of MIDIEVENTS, and cue them with one MIDIHDR.</P>
+
+<P>Note that after Windows finishes playing all of the events queued with a particular MIDIHDR, it sets the MHDR_DONE
+bit of the dwFlags field. This may be very useful later when you're dealing with processing MIDIHDRs as a result
+of being notified by Windows that a MIDIHDR's events have finished playing. Also note that a MIDIHDR has a dwUser
+field that you can use for your own purposes.</P>
+
+<P>Now it's certainly feasible to queue up all of the MIDI messages of a sequence prior to calling midiStreamRestart()
+by simply putting them into one gigantic array of MIDIEVENT structures, and passing the whole array in one call to
+midiStreamOut(). You can download my <A HREF="../midi/software/dev/winapi/stream.zip">Simple Stream</A> C
+example which illustrates this approach. Included are the Project Workspace files for Visual C++ 4.0, but since it is a
+console app, any Windows C compiler should be able to compile it. My code takes this approach in order to present the
+simplest possible example of using the Stream API to play a musical sequence, and therefore give you an easy
+introduction to how the Stream API works.</P>
+
+<P>But that approach is sort of like using the High level MIDI API. After all, by passing all of the data all at once,
+you then lose control over too much of the playback process. The whole point of the Stream API is to feed
+Windows a few events at a time so that the playback doesn't get too far ahead that you lose the sense of real-time
+control over individual events. If you want to be doing real-time mixing of several "tracks" of MIDI messages into a
+single stream, giving the user the option to mute one of the tracks at any time for example, then obviously you don't
+want to queue MIDI messages too far in advance.</P>
+
+<P>But, if you want a smooth playback, you obviously have to queue those events before they need to be played. The best
+approach to take is to use a sort of double-buffering scheme. In other words, you'll always have one "block" of MIDI
+messages queued while the current block of MIDI messages is playing. When the current block is finished playing (and
+the queued block starts playing), then you'll queue another block.</P>
+
+<P>You'll select a brief "time window", for example 1 quarter note. (ie, Assume our "musical beat" is a quarter note).
+Then, before playback is started with midiStreamRestart(), you'll place all of the MIDI messages whose timing falls
+within the first quarter note (ie, the first beat) into an array of MIDIEVENTS (and a MIDIHDR) and queue it with
+midiStreamOut(). You'll also place all of the MIDI messages whose timing falls within the second quarter note (ie,
+second beat) into another array of MIDIEVENTS (and another MIDIHDR) and queue it with
+midiStreamOut(). Then, you'll call midiStreamRestart() to start playback. As soon as the last MIDI message in the first
+array of MIDIEVENTS is finished playing, you'll place all of the MIDI messages whose timing falls within
+the third quarter note into that same array of MIDIEVENTS and queue it with midiStreamOut(). Of course, while you're
+doing this, the second queued array has been playing. After that array's last MIDI message is played, you'll use that
+array to queue another "block" of MIDI messages whose timing falls within the fourth quarter note. Etc. In this way,
+you always have data queued for continuous, smooth playback, but the playback is only 1 musical beat ahead of any
+real-time action the user instructs you to perform upon the data. So, for example, if he tells you to mute one of the
+tracks, maybe it won't effectively work out that way for one musical beat (some events on that track may already be
+queued for the next beat), but that's plenty close enough.</P>
+
+<P>So what if there happens to be no MIDI events that fall within the next musical beat? What do you queue? As you'll
+see in the next section, you can queue a single NOP event, timed to delay for an entire beat.</P>
+
+<HR width="90%" color="#FF8040" size=10 NOSHADE>
+<H2><FONT COLOR="#FF8040">The MIDIEVENT structure</FONT></H2>
+
+Now let's take a closer look at the MIDIEVENT structure to see how various MIDI messages are stored in it. The Stream
+API documents it as so:
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>typedef struct</FONT> { 
+    <FONT COLOR=GREEN>DWORD</FONT> dwDeltaTime;
+    <FONT COLOR=GREEN>DWORD</FONT> dwStreamID;
+    <FONT COLOR=GREEN>DWORD</FONT> dwEvent;
+    <FONT COLOR=GREEN>DWORD</FONT> dwParms[];
+} MIDIEVENT;
+</B></FONT></PRE>
+
+The dwDeltaTime field is just like the timing in <A HREF="midifile/vari.htm">MIDI File Format</A> (except that it's an
+unsigned long rather than a variable length quantity). It represents the amount of time to delay before outputting this
+MIDI message. You can specify the time in terms of PPQN clocks, or a SMPTE time. (When using the former, you can
+send "Tempo Events" to the stream device to change the tempo, or call a Stream function that allows you to change the
+tempo on the fly. When using the latter, Windows can sync the MIDI playback to streaming video or other SMPTE cues).</P>
+
+<P>Currently, the dwStreamID field isn't used and should be set to 0. (My own tests show that whatever value you
+stuff into this field is ignored, but unless you're using a driver that directly supports the MIDI Stream API and
+the driver uses this field, it is safest to set it to 0 in case some future version of Windows utilizes this field).</P>
+
+<P>Although declared as an unsigned long, the 4 bytes of the dwEvent field are actually individual pieces of
+information. The highest byte contains some flag bits and some bits that form an "event type" value. I'll refer to
+this as the Event Type byte.</P>
+
+<P>If this MIDIEVENT contains a normal MIDI Voice message such as a Note-On, Program Change, Aftertouch, or any of the
+other MIDI messages that are 3 or less bytes, then the Event Type byte is set to the value MEVT_SHORTMSG.</P>
+
+<P>In this case, the remaining 3 bytes of this field are the MIDI Status byte, the first MIDI data byte (if any), and
+the second MIDI data byte (if any). Note that this is packed up exactly the way that a MIDI message is passed to
+<A HREF="lowmidi.htm#1">midiOutShortMsg()</A>. Do not use running status. The stream device will implement running
+status when it outputs the MIDI messages.</P>
+
+<P>Here then is how you would initialize a MIDIEVENT with a Note-On MIDI message for middle C on channel 1 (with
+velocity of 0x40) and a delta time of 0 (gets output as soon as Windows finishes playing the previously queued event):</P>
+
+<PRE><B><FONT SIZE=3>MIDIEVENT mevt;
+
+mevt.dwDeltaTime = 0;
+mevt.dwStreamID = 0;
+mevt.dwEvent = ((<FONT COLOR=GREEN>unsigned long</FONT>)MEVT_SHORTMSG<<24) | 0x00403C90;
+</B></FONT></PRE>
+
+Note that since MEVT_SHORTMSG is really 0x00, we can simply the above by actually removing the setting of the Event
+Type byte (since its already 0 in our packed MIDI message):
+
+<P>mevt.dwEvent = 0x00403C90;</P>
+
+<P>What about that dwParms field? Well, if you look closely at the declaration, it isn't really there. There's no size
+for this dwParms array. Say what?!? That's right. There is no dwParms field on the above MIDIEVENT. The structure really
+has only 3 fields. It should have been declared as something like this (which I'll call MY_MIDI_EVT):</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>typedef struct</FONT> { 
+    <FONT COLOR=GREEN>DWORD</FONT> dwDeltaTime;
+    <FONT COLOR=GREEN>DWORD</FONT> dwStreamID;
+    <FONT COLOR=GREEN>DWORD</FONT> dwEvent;
+} MY_MIDI_EVT;
+</B></FONT></PRE>
+
+<P>So what was that dwParms field doing there? Well, here's where it gets tricky. There are other types of events that you
+can pass. For example, consider a System Exclusive event. It can have many more than 3 bytes. Where do you put all of those
+bytes? Well, <B>now</B> you use that extra dwParms array appended to the end. Its size is set to however many bytes
+you need to pass. In essense, you're appending the data to the end of the MIDIEVENT structure. That's right. <U>The
+size of the MIDIEVENT structure you pass will vary depending upon the type of event it contains.</U></P>
+
+<P>Let's take an example where we want to pass a System Exclusive event that consists of 7 bytes. Well, the first thing
+that we need to do is redeclare the MIDIEVENT structure, thereby creating a new structure. I'll call this MY_SYSEX_EVT.</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>typedef struct</FONT> { 
+    <FONT COLOR=GREEN>DWORD</FONT>         dwDeltaTime;
+    <FONT COLOR=GREEN>DWORD</FONT>         dwStreamID;
+    <FONT COLOR=GREEN>DWORD</FONT>         dwEvent;
+    <FONT COLOR=GREEN>unsigned char</FONT> dwParams[8];
+} MY_SYSEX_EVT;
+</B></FONT></PRE>
+
+See? I declared an array large enough to hold my extra bytes. Why did I use a size of 8 rather than 7? Well, the Stream
+API requires that the size of all MIDIEVENT structures passed to it be aligned on a doubleword boundary. So, if I'm
+going to stuff this MIDIEVENT into a buffer containing another MIDIEVENT that comes after it, I want that second
+MIDIEVENT to be properly aligned. In essense, I've added a pad byte above to make the structure's size a multiple of
+4, and thereby ensure that subsequent MIDIEVENT structures in the same array are properly aligned.
+
+<P>OK, now let's initialize it. For such a MIDIEVENT, its Event Type byte must be the value MEVT_LONGMSG. Furthermore,
+the remaining 3 bytes of the dwEvent field must be a 24-bit count of the number of bytes in our System Exclusive
+message (ie, 7 in this case).</P>
+
+<PRE><B><FONT SIZE=3>MY_SYSEX_EVT  mevt;
+<FONT COLOR=GREEN>unsigned char</FONT> sysEx[] = {0xF0, 0x7F, 0x7F, 0x01, 0x02, 0xF7};
+
+mevt.dwDeltaTime = 100; <FONT COLOR=BROWN>/* Just for the hell of it, delay 100 clocks before sending it */</FONT>
+mevt.dwStreamID = 0;
+mevt.dwEvent = ((<FONT COLOR=GREEN>unsigned long</FONT>)MEVT_LONGMSG<<24) | <FONT COLOR=GREEN>sizeof</FONT>(sysEx);
+memcpy(&mevt.dwParams[0], &sysEx[0], <FONT COLOR=GREEN>sizeof</FONT>(sysEx));
+</B></FONT></PRE>
+
+What other Event Types are there (besides the "short" type for MIDI messages of 3 bytes or less, and the "long" type
+for System Exclusive)? The most useful is a Tempo event. For such a MIDIEVENT, its Event Type byte must be the value
+MEVT_TEMPO. Furthermore, the remaining 3 bytes of the dwEvent field must be a Tempo value as
+a 24-bit value. It is expressed in microseconds per quarter note, just like in the
+<A HREF="midifile/tempo.htm">MIDI File Format's MetaTempo</A> event.
+
+<P>Another Event Type is a comment. Like a System Exclusive MIDIEVENT, the characters that form the comment are
+appended to the end of the MIDIEVENT structure itself. Its Event Type byte must be the value MEVT_COMMENT.
+Furthermore, the remaining 3 bytes of the dwEvent field must be a 24-bit count of the number of chars in
+the comment. Again, pad out the structure's size to a multiple of 4 if you're going to put it in an array with other
+MIDIEVENTs after it. Windows ignores comment events, so you can use them for your own purposes.</P>
+
+<P>Another Event Type is a NOP (no operation). It's a "short" type of event, like Tempo and regular MIDI Voice messages,
+so no extra fields are appended to the MIDIEVENT structure. Its Event Type byte must be the value MEVT_NOP.
+Furthermore, the remaining 3 bytes of the dwEvent field can be used for any purpose you wish. Windows
+ignores NOP events, so you can use them for your own purposes.</P>
+
+<P>The final Event Type is a version event. It has a MIDISTRMBUFFVER structure appended to the end of the MIDIEVENT
+structure. This extra structure just contains version information about the Stream. Its Event Type byte must be the
+value MEVT_VERSION. Furthermore, the remaining 3 bytes of the dwEvent field must be a 24-bit
+count of the size of the MIDISTRMBUFFVER structure.</P>
+
+<P>OK, I'm sure that there is one nagging question in your mind. If MIDIEVENT structures can be variable size, depending
+upon the Event Type, then how do you declare a static array of them? Well, you can't really (unless you happen to stick
+to only using the "short" types). What you'll need to do is just copy them into one large char buffer, using a pointer to
+that buffer, and do some creative casting. For example, here I copy two MIDIEVENTs into one buffer:</P>
+
+<PRE><B><FONT SIZE=3>MY_SYSEX_EVT * xevt;
+MY_MIDI_EVT *  mevt;
+<FONT COLOR=GREEN>unsigned char</FONT>  sysEx[] = {0xF0, 0x7F, 0x7F, 0x01, 0x02, 0xF7};
+<FONT COLOR=GREEN>unsigned char</FONT>  buffer[20];
+
+<FONT COLOR=BROWN>/* Format for a Note-On */</FONT>
+mevt = (MY_MIDI_EVT *)&buffer[0];
+mevt->dwDeltaTime = 0;
+mevt->dwStreamID = 0;
+mevt->dwEvent = 0x00403C90;
+mevt++;
+
+<FONT COLOR=BROWN>/* Format for a System Exclusive */</FONT>
+xevt = (MY_SYSEX_EVT *)mevt;
+xevt->dwDeltaTime = 100;
+xevt->dwStreamID = 0;
+xevt->dwEvent = ((<FONT COLOR=GREEN>unsigned long</FONT>)MEVT_LONGMSG<<24) | <FONT COLOR=GREEN>sizeof</FONT>(sysEx);
+memcpy(&xevt->dwParams[0], &sysEx[0], <FONT COLOR=GREEN>sizeof</FONT>(sysEx));
+</B></FONT></PRE>
+
+Of course, I should make sure that buffer is aligned upon a doubleword boundary (which you can do with your compiler's
+alignment directive).
+
+<P>But another approach to take is to simply declare your array to be an array of unsigned longs. After all, since
+all MIDIEVENT structures need to be padded out to a multiple of 4 bytes, then the net result is that each MIDIEVENT
+structure consists 3 or more unsigned longs. So, here's the above array initialized this way:</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>unsigned long</FONT>  buffer[] = { 0, 0, 0x00403C90, <FONT COLOR=BROWN>/* The Note-On */</FONT>
+                            0, 0, ((<FONT COLOR=GREEN>unsigned long</FONT>)MEVT_LONGMSG<<24) | 7, 0x017F7FF0, 0x00F70201}; <FONT COLOR=BROWN>/* The SysEx */</FONT>
+</B></FONT></PRE>
+
+Note the order of the packed SysEx bytes. Each unsigned long contains the next 4 bytes, and remember that we're using
+little endian order on each unsigned long.
+
+<P><HR width="90%" color="#FF8040" size=10 NOSHADE>
+<H2><FONT COLOR="#FF8040">Starting playback</FONT></H2>
+
+You start playback by calling midiStreamRestart() as so:
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>unsigned long</FONT>	err;
+
+err = midiStreamRestart(outHandle);
+<FONT COLOR=GREEN>if</FONT> (err)
+{
+    printf("An error starting playback!\n");
+}
+</B></FONT></PRE>
+
+Note that when playback begins, the stream device's current time is set to 0 (if the playback hasn't been paused).
+
+<H2><FONT COLOR="#FF8040">Stop the current playback</FONT></H2>
+
+You can stop a playback in progress by calling midiStreamStop() as so:
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>unsigned long</FONT>	err;
+
+err = midiStreamStop(outHandle);
+<FONT COLOR=GREEN>if</FONT> (err)
+{
+    printf("An error stopping playback!\n");
+}
+</B></FONT></PRE>
+
+This flushes all of the queued MIDIEVENTs, and you can subsequently midiOutUnprepareHeader() the MIDIHDRs. (The
+MHDR_DONE bit is set in the dwFlags field of all queued MIDIHDR structures).
+
+<P>It also turns off any notes that are still turned on. (By contrast, midiOutReset() turns off all notes regardless,
+and is more of a "panic" button type of response to turn off any "stuck notes").</P>
+
+<P>Calling this function when the output is already stopped has no effect, and doesn't return an error.</P>
+
+<P><B>WARNING! WARNING! WARNING!</B> The Windows Stream Manager appears to be severely broken. Calling midiStreamStop()
+(or midiStreamPause) does indeed stop playback, but it appears to also close the stream handle that you pass to it. The
+result is that a subsequent call to another function using that handle results in the Stream Manager returning an error
+that the handle is no longer valid. The only options you have are:</P>
+
+<OL>
+<LI>Open a stream device immediately before you intend to queue and play MIDI events. Play those events. Then close
+the stream device.
+
+<P><LI>Once you call midiStreamRestart(), never call midiStreamStop() or midiStreamPause(). Simply maintain your own
+clock variable and "play flag" variable that your callback can test to see whether it should continue queueing MIDI
+events for playback and increment its clock, or just do nothing. In other words, you're going to start up the stream
+once and leave it constantly running in the background, waiting for more MIDIEVENTs to be queued.</P>
+</OL>
+
+<H2><FONT COLOR="#FF8040">Pause/Resume the current playback</FONT></H2>
+
+You can pause a playback in progress by calling midiStreamPause() as so:
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>unsigned long</FONT>	err;
+
+err = midiStreamPause(outHandle);
+<FONT COLOR=GREEN>if</FONT> (err)
+{
+    printf("An error pausing playback!\n");
+}
+</B></FONT></PRE>
+
+If you wish to subsequently resume playback from the point at which it was paused, then call midiStreamRestart(). The
+stream device's time is not reset to 0, and playback resumes. If instead, you wish to stop the device and flush the
+queued MIDIEVENTs (perhaps in order to reset its time to 0 and start playback from the beginning of a sequence), then
+instead call midiStreamStop().
+
+<P>Calling this function when the output is already paused has no effect, and doesn't return an error.</P>
+
+<HR width="90%" color="#FF8040" size=10 NOSHADE>
+<H2><FONT COLOR="#FF8040">Setting/Querying the Tempo and Timebase</FONT></H2>
+
+Before playing queued MIDIEVENTs, you'll want to set the Timebase for the stream device. This is equivalent to the
+<A HREF="midifile/mthd.htm#division">MIDI File Format's Division</A>. It tells the stream device how to scale the dwDeltaTime
+field of each MIDIEVENT. (ie, Consider it a SMPTE time in 30 fps, or a time-stamp at 96 PPQN, or a time-stamp at
+120 PPQN, etc). You use midiStreamProperty() with the MIDIPROP_SET and MIDIPROP_TIMEDIV flags as the third arg.
+The second arg is a pointer to a MIDIPROPTIMEDIV structure whose dwTimeDiv field is initialized to your desired
+Timebase. For PPQN Timebases, just specify the PPQN value, for example 96 PPQN. For SMPTE, the low two bytes are
+as per the MIDI File Format's Division field when SMPTE is specified.
+
+<P>Here I set the Timebase to 96 PPQN (which is the default if you don't specify a Timebase):</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>unsigned long</FONT>   err;
+MIDIPROPTIMEDIV prop;
+
+prop.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIDIPROPTIMEDIV);
+prop.dwTimeDiv = 96;
+err = midiStreamProperty(outHandle, (LPBYTE)&prop, MIDIPROP_SET|MIDIPROP_TIMEDIV);
+<FONT COLOR=GREEN>if</FONT> (err)
+{
+    printf("An error setting the timebase!\n");
+}
+</B></FONT></PRE>
+
+Besides putting Tempo events in the stream in order to set tempo at any given time, you can also call
+midiStreamProperty() with the MIDIPROP_SET and MIDIPROP_TEMPO flags as the third arg to set tempo.
+The second arg is a pointer to a MIDIPROPTEMPO structure whose dwTempo field is initialized to your desired
+Tempo. Note that this is irrelevant when using a SMPTE Timebase.
+
+<P>Here I set the Tempo to 120 BPM (which is the default if you don't specify a Tempo):</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>unsigned long</FONT>   err;
+MIDIPROPTEMPO   prop;
+
+prop.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIDIPROPTEMPO);
+prop.dwTempo = 0x0007A120;
+err = midiStreamProperty(outHandle, (LPBYTE)&prop, MIDIPROP_SET|MIDIPROP_TEMPO);
+<FONT COLOR=GREEN>if</FONT> (err)
+{
+    printf("An error setting the tempo!\n");
+}
+</B></FONT></PRE>
+
+Of course, you can query a stream device's current timebase or tempo by using the MIDIPROP_GET flag instead of
+MIDIPROP_SET. Windows fills in the MIDIPROPTIMEDIV or MIDIPROPTEMPO you pass.
+
+<P>Here I query the current Tempo:</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>unsigned long</FONT>   err;
+MIDIPROPTEMPO   prop;
+
+prop.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIDIPROPTEMPO);
+err = midiStreamProperty(outHandle, (LPBYTE)&prop, MIDIPROP_GET|MIDIPROP_TEMPO);
+<FONT COLOR=GREEN>if</FONT> (err)
+{
+    printf("An error requesting the tempo!\n");
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    printf("Tempo = %u\n", prop.dwTempo);
+}
+</B></FONT></PRE>
+
+<HR width="90%" color="#FF8040" size=10 NOSHADE>
+<H2><FONT COLOR="#FF8040">Notification during playback</FONT></H2>
+
+I previously talked about how you want to queue up another array of MIDIEVENTs as soon as one array finishes playing.
+So how do you receive such notification from Windows? When you call midiStreamOpen(), you can tell it how you want
+Windows to notify you. In our above example, we specified CALLBACK_NULL (ie, we didn't want Windows to notify us).
+But there are other choices as follows:
+
+<OL><LI>CALLBACK_EVENT -- You allocate some Event with CreateEvent(), and Windows uses this to signal your app. (ie,
+Your app can wait on that Event signal, for example with WaitForSingleObject). You pass the handle of the Event as
+the 4th arg to midiStreamOpen().
+
+<P><LI>CALLBACK_THREAD -- Windows causes some suspended thread within your app to run. (ie, Your app's thread can
+suspend itself via SuspendThread). You pass the Thread ID of the desired thread to be run as the 4th arg to midiStreamOpen().</P>
+
+<P><LI>CALLBACK_WINDOW -- Windows sends a message to some open window in your app. The parameters for the message will
+contain additional information about what caused Windows to send that message. You pass the desired window's handle
+as the 4th arg to midiStreamOpen().</P>
+
+<P><LI>CALLBACK_FUNCTION -- Windows directly calls some function in your app. It passes args that contain
+additional information about what caused Windows to call your function. You pass a pointer to the desired function as
+the 4th arg to midiStreamOpen(). The 5th arg to midiStreamOpen() can be anything you desire, and this will be passed
+to your callback function each time that Windows calls your callback.</P></OL>
+
+<P>The latter two methods allow you to better determine what exactly caused Windows to notify you, because they supply
+additional information to you.</P>
+
+<P>So when does Windows notify you? Here are the times when Windows notifies you:</P>
+
+<OL><LI>When you open a Stream device via midiStreamOpen().
+
+<P><LI>When you close a Stream Device via midiStreamClose().</P>
+ 
+<P><LI>When midiStreamOut() encounters an event that has its MEVT_F_CALLBACK flag set.</P>
+ 
+<P><LI>When midiStreamOut() finishes playing a MIDIHDR's block of data.</P></OL>
+
+<P>Here's an example of setting the MEVT_F_CALLBACK flag of an event.</P>
+
+<PRE><FONT SIZE=3><B>xevt->dwEvent = ((<FONT COLOR=GREEN>unsigned long</FONT>)MEVT_LONGMSG<<24) | <FONT COLOR=GREEN>sizeof</FONT>(sysEx) | MEVT_F_CALLBACK;
+</B></FONT></PRE>
+
+<P>Now, after Windows plays that above event, it notifies you. For example, if you've chosen CALLBACK_FUNCTION method,
+Windows calls your callback function.</P>
+
+<P>Windows also will notify you when the last event in a MIDIHDR's block of events is played. This is the point at
+which you will queue the next array of MIDIEVENTs using that same array (and its associated MIDIHDR).</P>
+
+<P>In fact, you could strategically place NOP events with their dwDeltaTime set so that they just happen to fall upon
+each musical downbeat, and set the MEVT_F_CALLBACK flag of each of those event's dwEvent fields. Then, everytime that
+your callback is called, you can update a graphical display counting off the beat. (My
+<A HREF="../midi/software/dev/winapi/scall.zip">Stream Callback</A> C example shows that using
+CALLBACK_FUNCTION method).
+
+<HR><P>Here's an example of using the CALLBACK_EVENT method to play an array of MIDIEVENTs. This is a complete example
+that shows you all the bare minimum details you need to know to play a stream of MIDIEVENTs.</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=BROWN>/* The array of MIDIEVENTs to be output. We only have 2 */</FONT>
+<FONT COLOR=GREEN>unsigned long</FONT> myNotes[] = {0, 0, 0x007F3C90, <FONT COLOR=BROWN>/* A note-on */</FONT>
+192, 0, 0x00003C90}; <FONT COLOR=BROWN>/* A note-off. It's the last event in the array */</FONT>
+
+HANDLE          event;
+HMIDISTRM       outHandle;
+MIDIHDR         midiHdr;
+MIDIPROPTIMEDIV prop;
+<FONT COLOR=GREEN>unsigned long</FONT>   err;
+
+<FONT COLOR=BROWN>/* Allocate an Event signal */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((event = CreateEvent(0, FALSE, FALSE, 0)))
+{
+    <FONT COLOR=BROWN>/* Open default MIDI Out stream device. Tell it to notify via CALLBACK_EVENT and use my created Event */</FONT>
+    err = 0;
+    <FONT COLOR=GREEN>if</FONT> (!(err = midiStreamOpen(&outHandle, &err, 1, (DWORD)event, 0, CALLBACK_EVENT)))
+    {
+        <FONT COLOR=BROWN>/* Windows signals me once when the driver is opened. Clear that now */</FONT>
+        ResetEvent(event);
+
+        <FONT COLOR=BROWN>/* Set the timebase. Here I use 96 PPQN */</FONT>
+        prop.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIDIPROPTIMEDIV);
+        prop.dwTimeDiv = 96;
+        midiStreamProperty(outHandle, (LPBYTE)&prop, MIDIPROP_SET|MIDIPROP_TIMEDIV);
+
+        <FONT COLOR=BROWN>/* If you wanted something other than 120 BPM, here you should also set the tempo */</FONT>
+
+        <FONT COLOR=BROWN>/* Store pointer to our stream (ie, array) of messages in MIDIHDR */</FONT>
+        midiHdr.lpData = (LPBYTE)&myNotes[0];
+
+        <FONT COLOR=BROWN>/* Store its size in the MIDIHDR */</FONT>
+        midiHdr.dwBufferLength = midiHdr.dwBytesRecorded = <FONT COLOR=GREEN>sizeof</FONT>(myNotes);
+
+        <FONT COLOR=BROWN>/* Flags must be set to 0 */</FONT>
+        midiHdr.dwFlags = 0;
+
+        <FONT COLOR=BROWN>/* Prepare the buffer and MIDIHDR */</FONT>
+        err = midiOutPrepareHeader(outHandle,  &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR));
+        <FONT COLOR=GREEN>if</FONT> (!err)
+        {
+            <FONT COLOR=BROWN>/* Queue the Stream of messages. Output doesn't actually start
+               until we later call midiStreamRestart().
+             */</FONT>
+            err = midiStreamOut(outHandle, &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR));
+            <FONT COLOR=GREEN>if</FONT> (!err)
+            {
+                <FONT COLOR=BROWN>/* Start outputting the Stream of messages. This will return immediately
+                   as the stream device will time out and output the messages on its own in
+                   the background.
+                 */</FONT>
+                err = midiStreamRestart(outHandle);
+                <FONT COLOR=GREEN>if</FONT> (!err)
+
+                    <FONT COLOR=BROWN>/* Wait for playback to stop. Windows signals me using that Event I created */</FONT>
+                    WaitForSingleObject(event, INFINITE);
+            }
+
+            <FONT COLOR=BROWN>/* Unprepare the buffer and MIDIHDR */</FONT>
+            midiOutUnprepareHeader(outHandle, &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR));
+        }
+		
+        <FONT COLOR=BROWN>/* Close the MIDI Stream */</FONT>
+        midiStreamClose(outHandle);
+    }
+
+    <FONT COLOR=BROWN>/* Free the Event */</FONT>
+    CloseHandle(event);
+}
+</B></FONT></PRE>
+
+<HR>
+
+<P>If using the CALLBACK_FUNCTION method, then you need to write a function that has the following
+declaration (although you can name the function anything you like):</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>void</FONT> CALLBACK midiCallback(HMIDIOUT handle, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
+</B></FONT></PRE>
+
+As mentioned, you pass a pointer to this function as the 4th arg to midiStreamOpen(). The 5th arg to
+midiStreamOpen() can be anything you desire, and this will be passed to your callback function each time that
+Windows calls your callback.
+
+Windows calls your function whenever 1 of 4 possible things happen:
+
+<OL><LI>When you open a Stream device via midiStreamOpen(). In this case, the uMsg arg to your callback
+will be MOM_OPEN. The handle arg will be the same as what is returned to midiStreamOpen(). The dwInstance
+arg is whatever I passed to midiStreamOpen() as its dwInstance arg.
+
+<P><LI>When you close a Stream Device via midiStreamClose().In this case, the
+uMsg arg to your callback will be MOM_CLOSE. The handle arg will
+be the same as what was passed to midiStreamClose(). The
+dwInstance arg is the 5th arg you passed to midiStreamOpen() when you initially opened this handle.</P>
+
+<P><LI>When midiStreamOut() encounters an event that has its MEVT_F_CALLBACK flag set. In this case, the uMsg
+arg to your callback will be MOM_POSITIONCB. The handle arg will be the same as what is passed to midiStreamOut().
+The dwInstance arg is the 5th arg you passed to midiStreamOpen() when you initially opened this handle.
+The dwParam1 arg points to the MIDIHDR that you passed to midiStreamOut(). The dwOffset field of the MIDIHDR will
+indicate the byte offset into the buffer for the event that caused this callback to be called. See my note
+below.</P>
+ 
+<P><LI>When midiStreamOut() finishes playing a MIDIHDR's block of data. In this case, the uMsg arg to my
+callback will be MOM_DONE. The handle arg will be the same as what is passed to midiStreamOut().
+The dwInstance arg is the 5th arg you passed to midiStreamOpen() when you initially opened this handle.
+The dwParam1 arg points to the MIDIHDR that you passed to midiStreamOut().</P></OL>
+
+<P>NOTE: The dwParam2 arg is not used. This is reserved for future use.</P>
+
+<P>Here's an example of using the CALLBACK_FUNCTION method to play an array of MIDIEVENTs. This
+is a complete example that shows you all the bare minimum details you need to know to play a stream
+of MIDIEVENTs.</P>
+
+<PRE><B><FONT SIZE=3><FONT COLOR=BROWN>/* The array of MIDIEVENTs to be output. We only have 2 */</FONT>
+<FONT COLOR=GREEN>unsigned long</FONT> myNotes[] = {0, 0, 0x007F3C90, <FONT COLOR=BROWN>/* A note-on */</FONT>
+192, 0, 0x00003C90}; <FONT COLOR=BROWN>/* A note-off. It's the last event in the array */</FONT>
+
+HANDLE    Event;
+
+<FONT COLOR=GREEN>void</FONT> CALLBACK midiCallback(HMIDIOUT handle, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
+{
+    LPMIDIHDR   lpMIDIHeader;
+    MIDIEVENT * lpMIDIEvent;
+
+    <FONT COLOR=BROWN>/* Determine why Windows called me */</FONT>
+    <FONT COLOR=GREEN>switch</FONT> (uMsg)
+    {
+        <FONT COLOR=BROWN>/* Got some event with its MEVT_F_CALLBACK flag set */</FONT>
+        <FONT COLOR=GREEN>case</FONT> MOM_POSITIONCB:
+
+            <FONT COLOR=BROWN>/* Assign address of MIDIHDR to a LPMIDIHDR variable. Makes it easier to access the
+               field that contains the pointer to our block of MIDI events */</FONT>
+            lpMIDIHeader = (LPMIDIHDR)dwParam1;
+
+            <FONT COLOR=BROWN>/* Get address of the MIDI event that caused this call */</FONT>
+            lpMIDIEvent = (MIDIEVENT *)&(lpMIDIHeader->lpData[lpMIDIHeader->dwOffset]);
+
+            <FONT COLOR=BROWN>/* Normally, if you had several different types of events with the
+               MEVT_F_CALLBACK flag set, you'd likely now do a switch on the highest
+               byte of the dwEvent field, assuming that you need to do different
+               things for different types of events.
+            */</FONT>
+
+            <FONT COLOR=GREEN>break</FONT>;
+
+        <FONT COLOR=BROWN>/* The last event in the MIDIHDR has played */</FONT>
+        <FONT COLOR=GREEN>case</FONT> MOM_DONE:
+
+            <FONT COLOR=BROWN>/* Wake up main() */</FONT>
+            SetEvent(Event);
+
+            <FONT COLOR=GREEN>break</FONT>;
+
+
+        <FONT COLOR=BROWN>/* Process these messages if you desire */</FONT>
+        <FONT COLOR=GREEN>case</FONT> MOM_OPEN:
+        <FONT COLOR=GREEN>case</FONT> MOM_CLOSE:
+
+            <FONT COLOR=GREEN>break</FONT>;
+    }
+}
+
+<FONT COLOR=GREEN>int</FONT> main(<FONT COLOR=GREEN>int</FONT> argc, <FONT COLOR=GREEN>char</FONT> **argv)
+{
+    HMIDISTRM       outHandle;
+    MIDIHDR         midiHdr;
+    MIDIPROPTIMEDIV prop;
+    <FONT COLOR=GREEN>unsigned long</FONT>   err;
+
+    <FONT COLOR=BROWN>/* Allocate an Event signal */</FONT>
+    <FONT COLOR=GREEN>if</FONT> ((event = CreateEvent(0, FALSE, FALSE, 0)))
+    {
+        <FONT COLOR=BROWN>/* Open default MIDI Out stream device. Tell it to notify via CALLBACK_EVENT and use my created Event */</FONT>
+        err = 0;
+        <FONT COLOR=GREEN>if</FONT> (!(err = midiStreamOpen(&outHandle, &err, 1, (DWORD)midiCallback, 0, CALLBACK_FUNCTION)))
+        {
+            <FONT COLOR=BROWN>/* Set the timebase. Here I use 96 PPQN */</FONT>
+            prop.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIDIPROPTIMEDIV);
+            prop.dwTimeDiv = 96;
+            midiStreamProperty(outHandle, (LPBYTE)&prop, MIDIPROP_SET|MIDIPROP_TIMEDIV);
+
+            <FONT COLOR=BROWN>/* If you wanted something other than 120 BPM, here you should also set the tempo */</FONT>
+
+            <FONT COLOR=BROWN>/* Store pointer to our stream (ie, array) of messages in MIDIHDR */</FONT>
+            midiHdr.lpData = (LPBYTE)&myNotes[0];
+
+            <FONT COLOR=BROWN>/* Store its size in the MIDIHDR */</FONT>
+            midiHdr.dwBufferLength = midiHdr.dwBytesRecorded = <FONT COLOR=GREEN>sizeof</FONT>(myNotes);
+
+            <FONT COLOR=BROWN>/* Flags must be set to 0 */</FONT>
+            midiHdr.dwFlags = 0;
+
+            <FONT COLOR=BROWN>/* Prepare the buffer and MIDIHDR */</FONT>
+            err = midiOutPrepareHeader(outHandle,  &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR));
+            <FONT COLOR=GREEN>if</FONT> (!err)
+            {
+                <FONT COLOR=BROWN>/* Queue the Stream of messages. Output doesn't actually start
+                   until we later call midiStreamRestart().
+                 */</FONT>
+                err = midiStreamOut(outHandle, &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR));
+                <FONT COLOR=GREEN>if</FONT> (!err)
+                {
+                    <FONT COLOR=BROWN>/* Start outputting the Stream of messages. This will return immediately
+                       as the stream device will time out and output the messages on its own in
+                       the background.
+                     */</FONT>
+                    err = midiStreamRestart(outHandle);
+                    <FONT COLOR=GREEN>if</FONT> (!err)
+
+                    <FONT COLOR=BROWN>/* Wait for playback to stop. Windows calls my callback, which will set this signal */</FONT>
+                    WaitForSingleObject(event, INFINITE);
+                }
+
+                <FONT COLOR=BROWN>/* Unprepare the buffer and MIDIHDR */</FONT>
+                midiOutUnprepareHeader(outHandle, &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR));
+            }
+		
+            <FONT COLOR=BROWN>/* Close the MIDI Stream */</FONT>
+            midiStreamClose(outHandle);
+        }
+
+        <FONT COLOR=BROWN>/* Free the Event */</FONT>
+        CloseHandle(event);
+    }
+
+	<FONT COLOR=GREEN>return</FONT>(0);
+}
+</B></FONT></PRE>
+
+<B>NOTE:</B> If you happen to have two or more events that occur upon the same beat (or close enough such that Windows
+doesn't even have time to call your callback once before both events time out), and both their MEVT_F_CALLBACK flags are
+set, then Windows only calls your callback once for all of those events. The dwOffset of the MIDIHDR would reference
+the last such event. Therefore, don't bother setting the MEVT_F_CALLBACK flag of more than one event that occurs upon
+a given time.
+
+<P>Furthermore, while Windows calls your callback, it continues timing out the next event in the background. If it
+happens that the next event happens to have its MEVT_F_CALLBACK flag also set, and it times out while your callback
+is still processing that previous MEVT_F_CALLBACK event, then Windows will call your callback again. In other words,
+if you're not sure that you've placed enough time inbetween each of your MEVT_F_CALLBACK flagged events in order to
+do what you need to get done in your callback, then you had better make sure your callback handles reentrancy
+properly. (ie, Don't use global variables whose value changes, or use some sort of mechanism to arbitrate
+access to those variables such as a Mutex). For practical purposes, you should avoid setting the MEVT_F_CALLBACK flag
+of an event whose time makes it occur less than 25 milliseconds after the previous event with its
+MEVT_F_CALLBACK flag set. Microsoft recommends the following approach to handling a situation where MEVT_F_CALLBACK
+events are timing out quicker than your callback can finish its work: "The callback should use the MIDIHDR's dwOffset
+to decide what to do. If it is expecting this to reference a particular location (ie, event) but it instead references
+a location somewhere further along in the array of MIDIEVENTs, it means that your callback is not keeping up or that the
+MEVT_F_CALLBACK flagged events are scheduled too closely together for the capabilities of the computer. The best thing
+to do in this case is to just throw the callback away because there will be another one in the queue that will be
+delivered just as soon as processing of the current callback is completed."</P>
+
+<HR width="90%" color="#FF8040" size=10 NOSHADE>
+<H2><FONT COLOR="#FF8040">Querying the current playback time</FONT></H2>
+
+You can retrieve the current playback time by calling midiStreamPosition(). It fills in an MMTIME structure.
+
+<P>Before calling midiStreamPosition(), you set the wType field of the MMTIME structure to indicate the time
+format you desire returned. After calling midiStreamPosition(), you should check the wType field. Some stream devices may
+not support returning certain time formats, for example, a SMPTE format. In that case, midiStreamPosition()
+will set the wType field to the closest supported format, and return that time.</P>
+
+<P>The allowable time formats (ie, for the wType field) are:</P>
+
+<PRE>
+TIME_BYTES      Current byte offset from beginning of the playback.
+TIME_MIDI       MIDI time (ie, MIDI Song Position Pointer).
+TIME_MS         Time in milliseconds.
+TIME_SAMPLES    Number of waveform-audio samples (for syncing to WAVE playback).
+TIME_SMPTE      SMPTE time.
+TIME_TICKS      PPQN clocks.
+</PRE>
+
+Here I query the current Time. (Note that the Time is set to 0 when playback starts, except for a paused playback
+that is resumed).
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>unsigned long</FONT>	err;
+MMTIME          time;
+
+<FONT COLOR=BROWN>/* Request millisecond time returned */</FONT>
+time.wType = TIME_MS;
+err = midiStreamPosition(outHandle, &time, <FONT COLOR=GREEN>sizeof</FONT>(MMTIME));
+<FONT COLOR=GREEN>if</FONT> (err)
+{
+    printf("An error requesting the time!\n");
+}
+<FONT COLOR=GREEN>else switch</FONT> (time.wType)
+{
+    <FONT COLOR=GREEN>case</FONT> TIME_BYTES:
+        printf("%u bytes have been played so far.\n", time.cb);
+        <FONT COLOR=GREEN>break</FONT>;
+
+    <FONT COLOR=GREEN>case</FONT> TIME_MIDI:
+        printf("Midi Song Position Pointer = %u\n", time.midi.songptrpos);
+        <FONT COLOR=GREEN>break</FONT>;
+
+    <FONT COLOR=GREEN>case</FONT> TIME_MS:
+        printf("Millisecond Time = %u\n", time.ms);
+        <FONT COLOR=GREEN>break</FONT>;
+
+    <FONT COLOR=GREEN>case</FONT> TIME_SAMPLES:
+        printf("%u digital audio samples have been played so far.\n", time.sample);
+        <FONT COLOR=GREEN>break</FONT>;
+
+    <FONT COLOR=GREEN>case</FONT> TIME_SMPTE:
+        printf("SMPTE Time (%u fps) = %u:%u:%u:%u\n", time.smpte.fps, time.smpte.hour, time.smpte.min, time.smpte.sec, time.smpte.frame);
+        <FONT COLOR=GREEN>break</FONT>;
+
+    <FONT COLOR=GREEN>case</FONT> TIME_TICKS:
+        printf("PPQN Clocks = %u\n", time.ticks);
+}
+</B></FONT></PRE>
+
+<H2><FONT COLOR="#FF8040">Outputting MIDI data immediately while a Stream is playing</FONT></H2>
+
+Note that you can call midiOutShortMsg() or midiOutLongMsg() while the Stream (ie, queued MIDI events) is playing. In
+such a case, the MIDI data you send via these two functions will be output as soon as possible. (But don't utilize
+running status with midiOutShortMsg. Always specify the full MIDI message with Status).
+
+<P><HR width="90%" color="#FF8040" size=10 NOSHADE>
+<H2><FONT COLOR="#FF8040">Stream recording</FONT></H2>
+
+Currently, the Stream API does not support recording. If you need to do MIDI recording, you'll have to use the
+<A HREF="lowmidi.htm">Low level MIDI API</A> and a MultiMedia Timer instead of the Stream API.
+
+</BODY></HTML>

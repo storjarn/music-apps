@@ -1,0 +1,387 @@
+<HTML><HEAD><TITLE>High Level Digital Audio API</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+If you don't want the hassle of loading/parsing WAVE files, nor handling buffers of digital audio data, then you can use the Windows High level Digital Audio API. These functions can use the MCI Wave Audio Device to play or record an entire WAVE file on its own, in the background (ie, while your app does other things). But, you lose control over Digital Audio playback/recording other than being able to stop, start, pause, rewind, and fast-forward the playback/recording. There's Windows MCI functions for setting up, and controlling the MCI Wave Audio Device, for example using mciSendCommand() to send commands to the the MCI Wave Audio Device such that it opens a WAVE
+file on disk, reads it in, and plays it back.
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Very simple digital audio playback: PlaySound()</FONT></H2>
+
+Windows has a function called PlaySound(). Calling this function causes Windows to play an entire, digital audio
+waveform that has been loaded into memory upon the default Digital Audio Output device. (The default device is
+whatever device the user has picked out for Audio playback upon the Audio page of Control Panel's MultiMedia
+utility). It's the easiest method for
+playing a waveform, but offers the least amount of control, for example, you can only start and stop the playback.
+(ie, You can't set the playback to start at a certain location in the waveform). Of course, as its name implies,
+it is only concerned with playing, not recording, digital audio.
+
+<P>PlaySound() can open some waveform file (on disk), and load the waveform data into memory prior to
+playback. PlaySound() completely manages opening, loading, and closing the file, Of course, one of the args you
+pass to PlaySound() lets it know which WAVE file to play.
+
+<P>Furthermore, it has the option of doing this in the background. (ie, PlaySound can return immediately while
+Windows goes off and does all of the work of loading and playing that waveform file in the background). Of course,
+one of the args you pass to PlaySound() lets it know whether you want this option (or other options to be discussed
+later).
+
+<P>But there are a few caveats to this approach
+
+<OL><LI>The waveform must be stored in <A HREF="wave.htm">WAVE File Format</A>. This is the standard format for
+digital audio on an Intel based PC. PlaySound does not deal with raw waveform data (ie, stored without the appropriate
+WAVE File Format headers). It also cannot play AIFF or MPEG audio files.
+
+<P><LI>The entire waveform must be able to fit into available memory. If you need to play a waveform larger
+than available memory (by loading it in smaller "blocks"), then you'll either have to use the other High level
+options (ie, the <A HREF="highaud.htm#mci">Wave Audio device</A>) described later, or use the
+<A HREF="lowaud.htm">Low level Digital Audio API</A>.
+
+<P><LI>Because the entire waveform has to be completely loaded before playback even starts, with large files, this
+can result in a significant delay before the audio actually starts. An exception to this is using the SND_MEMORY
+flag described later.
+
+<P><LI>The PlaySound function can't really be used simultaneously by multiple threads in the same process. It
+provides no means to arbitrate your threads' calls to PlaySound(), so unless you do that yourself, results
+may be unpredictable.</OL>
+
+<P><B><FONT COLOR="#FF8040">Playing WAVE files on disk</FONT></B>
+
+<P>In order to tell PlaySound() to load and play a particular WAVE file on disk, you pass a pointer to the
+filename, and also set the SND_FILENAME flag. PlaySound() will completely load and play the WAVE file, and
+then return when that playback is finished.
+
+<P>Here I play the file C:\WINDOWS\CHORD.WAV and wait for it to finish:
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>if</FONT> (!PlaySound("C:\\WINDOWS\\CHORD.WAV", 0, SND_FILENAME))
+{
+    printf("The sound didn't play!");
+}
+</B></FONT></PRE>
+
+<FONT COLOR=GREEN><B>NOTE</B></FONT>: It is possible to omit the SND_FILENAME flag. In this case, Windows first searches the WIN.INI file for any
+[Sound] key names (described later) that match the name you've passed, and then if none match, it searches
+for a matching filename on disk. But to avoid possible name collisions with WIN.INI [Sound] keys, I recommend
+using the SND_FILENAME flag.
+
+<P><B><FONT COLOR="#FF8040">Background playback</FONT></B>
+
+<P>If you want PlaySound() to return immediately (so that your program can go on to do other things) while Windows
+loads/plays the file in the background, then also specify the SND_ASYNC flag.
+
+<P>Here I play the file C:\WINDOWS\CHORD.WAV in the background:
+
+<PRE><B><FONT SIZE=3><FONT COLOR=GREEN>if</FONT> (!PlaySound("C:\\WINDOWS\\CHORD.WAV", 0, SND_ASYNC | SND_FILENAME))
+{
+    printf("The sound didn't play!");
+}
+
+<FONT COLOR=BROWN>/* Now I can do other things while that waveform is playing */</FONT>
+</B></FONT></PRE>
+
+<B><FONT COLOR="#FF8040">Stopping playback</FONT></B>
+
+<P>Of course, Windows stops the playback automatically when it gets to end of the waveform (unless you loop it as
+described later).
+
+<P>But what if you want to stop playback prematurely? (ie, You're a premature audiojaculator). First of all, you
+must use the SND_ASYNC flag (ie, specify an asyncronously playing waveform). After all, if you don't, then
+PlaySound() doesn't return until the waveform is completely finished playing.
+
+<P>As noted, when you specify the SND_ASYNC flag, then the call to PlaySound() returns while Windows loads and plays
+the waveform in the background. Your program can then go on to do other things. One of the things that it can do is
+make another call to PlaySound() to play another WAVE file. So what happens to that first waveform that has been
+playing in the background? Windows stops playing it and starts playing the new WAVE that you've specified. In
+conclusion, one way to prematurely stop a waveform from playing is to simply call PlaySound() again to play another
+waveform. An exception to this is if your second call to PlaySound() specifies the SND_NOSTOP flag as described
+later.
+
+<P>Alternately, if you want to prematurely stop a waveform's playback without starting another waveform playing, then
+simply call PlaySound(), passing a 0 as the first arg. Here, I stop any currently playing waveform:
+
+<PRE><FONT SIZE=3><B>PlaySound(0, 0, 0);</B></FONT>
+</PRE>
+
+NOTE: You must make this above call from the same thread that started the wave playing.
+
+<P><FONT COLOR="#FF8040"><B>Preventing premature playback stop</B></FONT>
+
+<P>So what if you don't wish to prematurely stop the playback of some asyncronously playing waveform when you make
+another call to PlaySound()? Simply specify the SND_NOSTOP flag. Does this mean that the two waveforms then overlap in
+playback? (ie, Does the second waveform start playing along with the first, thus mixing the two waveforms' playback?)
+You wish! Unfortunately, it just means that if some asyncronously playing waveform is still playing when you call
+PlaySound() with the SND_NOSTOP flag, then PlaySound() returns immediately with a 0 indicating an error. It
+doesn't interrupt the previous playing waveform in order to play the new waveform. (For easy,
+real-time mixing of digital audio, you should look at the <A HREF="directx.htm">DirectSound API</A>). So, SND_NOSTOP
+simply allows you to prevent one call to PlaySound() from inadvertently cutting off the playback of a previous call
+to PlaySound().
+
+<FONT COLOR="#FF8040"><P><B>Waveform looping</B></FONT>
+
+<P>You can also have PlaySound() continuously loop the playback (ie, as soon as Windows gets to the end of the
+waveform, it immediately starts playing again from the start of the waveform). You specify the SND_LOOP flag.
+In this case, you must also specify the SND_ASYNC flag so that PlaySound() returns immediately. The looping then
+continues (in the background) until you call PlaySound() again, either to play another waveform, or to stop the
+currently playing waveform.
+
+<P>Here is an example of playing a looped waveform in the background:
+
+<PRE><B><FONT SIZE=3>BOOL result;
+
+<FONT COLOR=BROWN>/* Tell Windows to load and continuously loop the waveform */</FONT>
+result = PlaySound("C:\\WINDOWS\\CHORD.WAV", 0, SND_LOOP | SND_ASYNC | SND_FILENAME);
+
+<FONT COLOR=BROWN>/* Go do something else here while the waveform is looping */</FONT>
+
+<FONT COLOR=BROWN>/* Now finally stop the looped playback (without playing another waveform) */</FONT>
+<FONT COLOR=GREEN>if</FONT> (result) PlaySound(0, 0, 0); 
+</B></FONT></PRE>
+
+<FONT COLOR="#FF8040"><B>What happens in the case of an error</B></FONT>
+
+<P>If the WAVE file does not exist, or doesn't fit into the available memory, PlaySound() plays the default
+"system sound". What is that? That is whatever WAVE file the user has set to play as the "Default Sound" via
+the Control Panel's <I>Sound</I> utility. (ie, The user can set various WAVE files to play for various "operations"
+he performs. For example, he can set a WAVE file of a door opening to play every time that he opens a Desktop
+folder. These are referred to as "system sounds", and are set via the Sound utility). Of course, if the user
+hasn't set a WAVE file for the Default Sound, then PlaySound plays nothing. It simply returns 0 indicating an
+error.
+
+<P>If you don't want PlaySound() to play the Default Sound when it can't find or load your desired WAVE file,
+then specify the SND_NODEFAULT flag. In this case, if PlaySound() can't find/load your desired file, it plays
+nothing, and simply returns a 0 to indicate an error.
+
+<P><FONT COLOR="#FF8040"><B>WIN.INI [Sound] keys</B></FONT>
+
+<P>PlaySound() can also play sounds referred to by a keyname under the [Sound] section of the WIN.INI file. To play
+one of these "sound events", pass a pointer to the name of the key that identifies the sound and don't specify
+the SND_FILENAME flag. For example, let's assume that the [Sound] section of the WIN.INI file looks like this:
+
+<P>[Sound]<BR>
+MouseClick = C:\WINDOWS\CHORD.WAV
+
+<P>To play the sound associated with the "MouseClick" key (ie, the WAVE file named "C:\WINDOWS\CHORD.WAV") and to
+wait for the sound to complete before returning, you do:
+
+<PRE><FONT SIZE=3><B>PlaySound("MouseClick", 0, SND_NODEFAULT);</B></FONT>
+</PRE>
+
+The names of some [Sound] keys that you'll find on all Win32 platforms are:
+
+<P>SystemAsterisk<BR>
+SystemExclamation<BR>
+SystemExit<BR>
+SystemHand<BR>
+SystemQuestion<BR>
+SystemStart
+
+<P>There may be other [Sound] keys. In fact, your program can add more keys to WIN.INI's [Sound] section using
+WriteProfileString(). For example, maybe your installer will add a key name of JoeCompanyWavePlayerStart
+with its value set to "C:\START.WAV". Then, when your program starts up, it can call PlaySound() passing
+the string "JoeCompanyWavePlayerStart". An advantage of this is that the user can easily reassign different
+WAVE files to the various keys you've added, by editing the WIN.INI file. (ie, It's a text file).
+
+<P>But on Win32, you can add keys to the registry instead of the WIN.INI file, and group them under your
+own heading. Instead of having to edit the WIN.INI file, the user can use Control Panel's Sound utility to
+edit your keys. (ie, All of your keys will be listed under your heading, and you can give a more meaningful
+label to each key as well). The net result is that when they are
+displayed in Control Panel's Sound utility, the user sees all of your keys grouped under a heading of your
+choice with descriptive names. It makes it a lot easier for him to edit those WAVE associations. You can download
+my <A HREF="../midi/software/dev/winapi/wavereg.zip">Playsound Registry</A> C example to show how
+to add such registry keys and then play the waves associated with them. Included are the Project Workspace
+files for Visual C++ 4.0, but since it is a console app, any Windows C compiler should be able to compile it.
+Remember that all apps should include MMSYSTEM.H and link with WINMM.LIB (or MMSYSTEM.LIB if Win3.1). This is
+a ZIP archive. Use an unzip utility that supports long filenames.
+
+<P><FONT COLOR="#FF8040"><B>Playing embedded WAVE resources</B></FONT>
+
+<P>PlaySound() can even be used to load and play a WAVE resource embedded in your program's executable. To do so,
+specify the SND_RESOURCE flag. In this case, the first arg is a pointer to a string that specifies the ID of your
+embedded resource,
+
+<P>Of course, when you create your executable, you should make sure that you embed the desired WAVE file in it as a
+resource.
+
+<P>For example, assume that you have the following WAVE resource in your resource file (referencing the
+C:\WINDOWS\CHORD.WAV file)
+
+<PRE><B><FONT SIZE=3>IDR_WAVE1   WAVE    DISCARDABLE    "c:\\windows\\chord.wav"
+</B></FONT></PRE>
+
+<P>And furthermore, let's say that the IDR_WAVE1 symbol is defined to be the value 129.
+
+<P>Here is how you play that WAVE resource:
+
+<PRE><FONT SIZE=3><B>PlaySound("#129", 0, SND_RESOURCE | SND_NODEFAULT);</B></FONT>
+</PRE>
+
+Download my <A HREF="../midi/software/dev/winapi/waveres2.zip">Playsound Resource C example</A>
+to show how to play a WAVE resource. Included are the Project Workspace files for Visual C++ 4.0. This example
+is a plain C program that any Windows compiler should be able to compile.
+
+<P>If the WAVE isn't embedded in your executable, for example, it's in a resource embedded in a Dynamic Link Library,
+then pass a handle to that object (ie, for example, a handle to the DLL) as the second arg to PlaySound(). One good
+use of waveforms embedded in DLLs, is that you can have different "libraries" of WAVE files, and easily switch between
+them just by referencing different DLLs. For example, you can have a DLL that contains 8-bit versions of your
+waveforms versus a DLL that contains 16-bit versions of the same. You don't have to use different filenames for
+the waveforms -- just different filenames for the DLLs (ie, LoadLibrary() different DLLs depending upon which versions of waves to use).
+
+<P><FONT COLOR="#FF8040"><B>Playing WAVEs already in memory</B></FONT>
+
+<P>PlaySound() can play a WAVE file that is already loaded into memory. To do so, specify the SND_MEMORY flag. In
+this case, the first arg is a pointer to the memory buffer containing the waveform.
+
+<P>Doing this eliminates most all of the delay prior to playback that you may get using other PlaySound() methods.
+
+<P>One caveat is that the memory buffer you pass to PlaySound() must contain the image of a complete WAVE File Format
+file. It can't just be raw waveform data.
+
+<P>Download my <A HREF="../midi/software/dev/winapi/wavemem.zip">Playsound Memory</A> C example to show
+how to play a WAVE file in memory. Included are the Project Workspace files for Visual C++ 4.0, but since it is a
+console app, any Windows C compiler should be able to compile it.
+
+<P><HR width="80%" color="#FF8040" size=10 NOSHADE>
+
+<P>If you need a more sophisticated way of playing/recording digital audio data than PlaySound() offers (but don't
+want to resort to the Low level Digital Audio API), then you need to utilize the MCI Wave Audio Device. This is
+a part of Windows that manages a lot of the playback/recording process. But because it offers you a bit more
+direct control over the playback/recording, needless to say, it requires a bit more programming than using the
+very simple approach of PlaySound().
+
+<P>The Wave Audio device supports playing a WAVE file, without requiring that it fit into available RAM. And
+for large WAVE files, it can start playback quicker than PlaySound() because the Wave Audio device loads/plays
+the waveform in "smaller blocks" (ie, spools the waveform data into RAM) rather than loading it entirely into RAM
+prior to playback.
+
+<P>Before proceeding, you should now read <A HREF="mcidev.htm">MCI Devices</A>. This article gives necessary
+background information about the MCI Wave Audio Device.
+
+<H2><FONT COLOR="#FF8040"><A NAME="mci">Opening</A> the Wave Audio Device</FONT></H2>
+
+To open the Wave Audio Device, you need to issue an "open" command, using either using mciSendString() or
+mciSendCommand() (depending upon whether you want to specify your open command by passing formatted strings, or
+binary values/structures, respectively), and specify that you want the Wave Audio device as the type of device
+opened. Of course, you also need to supply the name of a WAVE file that you want the Wave Audio to open and
+perform operations upon.
+
+<P>If you're using mciSendString(), you literally include "type waveaudio" as part of the command string to
+indicate that you're opening the Wave Audio device.
+
+<P>You can also specify an <I>alias</I>. This is just a string
+name that you use to identify the open device, Think of it as a string version of a device handle. After all,
+the string interface doesn't return binary values, so it can't return a handle. Instead it allows you to pick
+out a name, which you'll use with other commands you issue, in lieu of having a handle.
+
+<P>Here then is an example
+of opening the Wave Audio device using the Command String interface. The WAVE file that we ask it to open is
+named C:\WINDOWS\CHORD.WAV. The alias we give this instance of the Wave Device is A_Chord. (ie, Whenever we
+subsequently use A_Chord as the device name with other commands, we'll be performing operations on the
+C:\WINDOWS\CHORD.WAV file).
+
+<PRE><B><FONT SIZE=3>TCHAR   buf[128];
+DWORD   err;
+
+<FONT COLOR=GREEN>if</FONT> ((err = mciSendString("open C:\\WINDOWS\\CHORD.WAV type waveaudio alias A_Chord", 0, 0, 0)))
+{
+    <FONT COLOR=BROWN>/* Error */</FONT>
+    printf("Wave Audio device did not open!\r\n");
+    <FONT COLOR=GREEN>if</FONT> (mciGetErrorString(err, &buf[0], <FONT COLOR=GREEN>sizeof</FONT>(buf))) printf("%s\r\n", &buf[0]);
+}
+</B></FONT></PRE>
+
+If you're using mciSendCommand(), then you need to initialize and pass a MCI_WAVE_OPEN_PARMS structure.
+You set the lpstrDeviceType field of this structure to MCI_DEVTYPE_WAVEFORM_AUDIO.
+You also must pass mciSendCommand() the MCI_OPEN_TYPE and MCI_OPEN_TYPE_ID flags to indicate that you've
+set the lpstrDeviceType field to a predefined constant (MCI_DEVTYPE_WAVEFORM_AUDIO).
+
+<P>If playing back a WAVE file, then you also need to specify the name of the WAVE file to open by setting the
+lpstrElementName field to point to the name of the desired file. You also must pass mciSendCommand() the
+MCI_OPEN_ELEMENT flag to indicate that you've set the lpstrElementName field. If recording a WAVE, you
+have the option to specify the name now, or do so later with a Save operation.
+
+<P>The second arg will be MCI_OPEN to indicate an open command.
+
+<P>Here then is an example of opening the Wave Audio device using the Command Message interface.
+
+<PRE><B><FONT SIZE=3>DWORD               err;
+MCI_WAVE_OPEN_PARMS waveParams;
+TCHAR               buffer[128];
+
+<FONT COLOR=BROWN>/* Open a Wave Audio device associated with the C:\WINDOWS\CHORD.WAV file */</FONT>
+waveParams.lpstrDeviceType = (LPCSTR)MCI_DEVTYPE_WAVEFORM_AUDIO;
+waveParams.lpstrElementName = "C:\\WINDOWS\\CHORD.WAV";
+<FONT COLOR=GREEN>if</FONT> ((err = mciSendCommand(0, MCI_OPEN, MCI_WAIT|MCI_OPEN_ELEMENT|MCI_OPEN_TYPE|MCI_OPEN_TYPE_ID, (DWORD)(LPVOID)&waveParams)))
+{
+    <FONT COLOR=BRWON>/* Error */</FONT>
+    printf("ERROR: Wave Audio device did not open!\r\n");
+    <FONT COLOR=GREEN>if</FONT> (mciGetErrorString(err, &buffer[0], <FONT COLOR=GREEN>sizeof</FONT>(buffer))) printf("%s\r\n", &buffer[0]);
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    <FONT COLOR=BROWN>/* The device opened successfully. waveParams.wDeviceID now contains the device ID */</FONT>
+}
+</B></FONT></PRE>
+
+<H2><FONT COLOR="#FF8040">Playing the Wave Audio Device</FONT></H2>
+
+To have the Wave Audio device plays its open WAVE file, you issue a play command to it.
+
+<P>If you're using mciSendCommand(), then you need to initialize and pass a MCI_PLAY_PARMS structure. (Actually,
+unless you use the MCI_NOTIFY, MCI_FROM, and/or MCI_TO flags, there is no initialization required). If you want
+to play only part of the waveform, then you can set the dwFrom and/or dwTo fields to the start and end positions
+respectively, and pass the MCI_FROM and/or MCI_TO flags respectively. The dwFrom and dwTo fields are normally
+expressed in terms of sample offset (ie, a byte offset). But you can utilize other means of expressing this
+offset, for example in terms of milliseconds, by first issuing an MCI_SET command (with the MCI_SET_TIME_FORMAT
+flag, and your desired choice of how to express such offsets).
+
+<P>The second arg will be MCI_PLAY to indicate a play command.
+
+<P>The first arg will be the device ID that you obtained when you opened the device.
+
+<P>Here then is an example of playing a WAVE on the Wave Audio device using the Command Message interface.
+
+<PRE><B><FONT SIZE=3>DWORD          err;
+MCI_PLAY_PARMS playParams;
+TCHAR          buffer[128];
+
+<FONT COLOR=BROWN>/* Play a Wave Audio device. Assume that waveParams.wDeviceID was set according to our open example above */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mciSendCommand(waveParams.wDeviceID, MCI_PLAY, MCI_WAIT, (DWORD)(LPVOID)&playParams)))
+{
+    <FONT COLOR=BROWN>/* Error */</FONT>
+    printf("ERROR: Wave did not play!\r\n");
+    <FONT COLOR=GREEN>if</FONT> (mciGetErrorString(err, &buffer[0], <FONT COLOR=GREEN>sizeof</FONT>(buffer))) printf("%s\r\n", &buffer[0]);
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    <FONT COLOR=BROWN>/* The wave has played from beginning to end */</FONT>
+}
+</B></FONT></PRE>
+
+You can download my <A HREF="../midi/software/dev/winapi/waveaud1.zip">MCI Wave Play</A> C
+example to show how to play a WAVE file using the Command Message and String interfaces. Included are the Project Workspace
+files for Visual C++ 4.0, but since it is a console app, any Windows C compiler should be able to compile it.
+Remember that all apps should include MMSYSTEM.H and link with WINMM.LIB (or MMSYSTEM.LIB if Win3.1). This is
+a ZIP archive. Use an unzip utility that supports long filenames.
+
+<H2><FONT COLOR="#FF8040">Closing the Wave Audio Device</FONT></H2>
+
+To close the Wave Audio device, you issue a close command to it.
+
+<P>If you're using mciSendCommand(), then you need to initialize and pass a MCI_GENERIC_PARMS structure. (Note that
+this structure is a subset of all of the other MCI structures that you pass to mciSendCommand(). In other words,
+you can substitute any of the other MCI structures for this one). Unless you use the MCI_NOTIFY flag, there is
+actually no initialization required.
+
+<P>The second arg will be MCI_CLOSE to indicate a close command.
+
+<P>The first arg will be the device ID that you obtained when you opened the device.
+
+<P>Here then is an example of closing the Wave Audio device using the Command Message interface.
+
+<PRE><B><FONT SIZE=3><FONT COLOR=BROWN>/* Close the Wave Audio device. Assume that waveParams.wDeviceID was set according to our open example above */</FONT>
+mciSendCommand(waveParams.wDeviceID, MCI_CLOSE, MCI_WAIT, (DWORD)(LPVOID)&waveParams);
+</B></FONT></PRE>
+
+<H2><FONT COLOR="#FF8040">Recording with the Wave Audio Device</FONT></H2>
+
+<P>You can download my <A HREF="../midi/software/dev/winapi/waverec.zip">MCI Wave Record</A> C
+example to show how to record a WAVE file using the Command Message and String interfaces. Included are the Project Workspace
+files for Visual C++ 4.0, but since it is a console app, any Windows C compiler should be able to compile it.
+
+</BODY></HTML>

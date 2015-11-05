@@ -1,0 +1,36 @@
+<HTML><HEAD><TITLE>MIDI Specification: Aftertouch</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Aftertouch</CENTER></FONT></H2>
+
+<P>Category: Voice
+
+<P><FONT COLOR=GREEN>Purpose</FONT>
+
+<P>While a particular note is playing, pressure can be applied to it. Many electronic keyboards have pressure sensing
+circuitry that can detect with how much force a musician is holding down a key. The musician can then vary this pressure,
+even while he continues to hold down the key (and the note continues sounding). The Aftertouch message conveys the
+amount of pressure on a key at a given point. Since the musician can be continually varying his pressure, devices that
+generate Aftertouch typically send out many such messages while the musician is varying his pressure. Upon receiving
+Aftertouch, many devices typically use the message to vary a note's VCA and/or VCF envelope sustain level, or control LFO
+amount and/or rate being applied to the note's sound generation circuitry. But, it's up to the device how it chooses to
+respond to received Aftertouch (if at all). If the device is a MultiTimbral unit, then each one of its Parts may respond
+differently (or not at all) to Aftertouch. The Part affected by a particular Aftertouch message is the one assigned to the
+message's MIDI channel.
+
+<P>It is recommended that Aftertouch default to controlling the LFO amount (ie, a vibrato effect).
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0xA0 to 0xAF where the low nibble is the MIDI channel.
+
+<P><FONT COLOR=GREEN>Data</FONT>
+<P>Two data bytes follow the Status.
+
+<P>The first data is the note number. There are 128 possible notes on a MIDI device, numbered 0 to 127 (where Middle C is
+note number 60). This indicates to which note the pressure is being applied.
+
+<P>The second data byte is the pressure amount, a value from 0 to 127 (where 127 is the most pressure).
+
+<P><FONT COLOR=GREEN>Errata</FONT>
+<P>See the remarks under <A HREF="pressure.htm">Channel Pressure</A>.
+
+</FONT></BODY></HTML>

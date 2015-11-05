@@ -1,0 +1,1447 @@
+<HTML><HEAD><TITLE>Understanding the MIDI Implementation in your Roland manual</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Before proceeding with this article, you may want to read my article on
+<A HREF="rolarc.htm">The architecture of Roland Sound Modules</A>. It has a general overview of the design
+of typical Roland Sound Modules.
+
+<P>In the typical Roland user's manual, there is a chapter entitled <B>MIDI Implementation</B>. This chapter
+lists the details of how the unit responds to MIDI messages sent to it, as well as what MIDI messages
+the unit is capable of generating (if any) and sending to some other MIDI device (such as a sequencer).</P>
+
+<P>I'm now going to walk you through the MIDI Implementation chapter of the Roland JV-90, to show you how to
+interpret a typical Roland MIDI Implementation chapter. The JV-90 has a built-in multi-timbral sound module
+which is capable of responding to many different MIDI messages. It also has a keyboard which is capable of
+generating many different kinds of MIDI messages (to its built-in sound module or other MIDI units).
+Many Roland sound modules share somewhat similiar
+architectures, and Roland tends to use the same syntax in its user manuals, so this exercise is applicable to
+many Roland sound modules. Although the Roland remarks and MIDI particulars I'll be showing you here are specific
+to the JV-90, you'll likely find many similiarities to the MIDI Implementation chapter in the manual for other
+Roland modules.</P>
+
+<P>I'll be showing you exactly what is printed in the manual, and then adding my own comments immediately to the left
+of each line that I've taken from the manual. My comments will have a different color background than the line from
+the manual. Here's a typical example:</P>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50% BGCOLOR="FFFFFF">The exact line in the manual:</TD><TD WIDTH=50% BGCOLOR="FFFFFF">My comment about this line:</TD></TR>
+<TR><TD WIDTH=50%><B>Control Change</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">This indicates the start of the sub-section where all of the MIDI controllers are listed.
+</TD></TR></TABLE>
+
+<P>The MIDI Implementation chapter is divided into 4 main sections.</P>
+
+<P>The first main section is entitled <A HREF="rolmidi.htm#rec">RECEIVE DATA</A>. This is the section that tells
+what MIDI messages your unit
+can understand being sent to it by another device, and what it can do with each of those received messages.
+(ie, This section lists what MIDI messages it can receive and do something with).</P>
+
+<P>The second main section is entitled <A HREF="rolmidi.htm#tran">TRANSMIT DATA</A>. This lists all of the MIDI
+messages that your unit
+is capable of generating when you operate it. (ie, It lists all of the MIDI messages that your unit can create
+and send to other MIDI units). Upon Roland sound modules that can't function as a controller of
+other devices, or which have no capability to dump their settings to another device, there may be no
+TRANSMIT DATA section. (ie, The sound module has no capability to generate MIDI messages on its own).</P>
+
+<P>Each of these main sections is divided into subsections, where each subsection is dedicated to a type of
+MIDI message, starting with "Note Off" type of MIDI messages, and going all of the way to "System Exclusive"
+(and sometimes "System Realtime" messages such as MIDI Start, Stop, and Clock if the unit has some sort of
+onboard sequencer or arpeggiator). For example, the first subsection will most likely be entitled "Note Off",
+and it will list information about what your unit does when it receives or transmits Note Off messages.</P>
+
+<P>Incidentally, an "H" appended to some numeric value means that it is expressed as hexadecimal, not a decimal,
+number. For example, 7FH means 7F hexadecimal, which is 127 decimal. Use your Windows calculator in scientific mode to
+easily enter hex values and convert them to decimal, and vice versa).</P>
+
+<P>The third and fourth main sections are dedicated to giving the excruciating details of the JV-90's System Exclusive
+data dumps. The JV-90 can dump all of its patch, performance, effects, etc, settings over MIDI using System Exclusive
+messages. Those settings can then be saved
+upon some storage device. The JV-90 can also accept such a dump to restore its settings to those previously saved values.
+In fact, every single parameter on the JV-90 which can be changed manually by you from the JV-90's front panel can also
+be changed over MIDI by sending a System Exclusive message to the JV-90. This System Exclusive message will contain
+info that tells what parameter to change, and what its new value should be.</P>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%><H2><A NAME="rec">1</A>. RECEIVE DATA</H2></TD><TD WIDTH=50% BGCOLOR="#99CCCC">This indicates the start of the RECEIVE DATA main section.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Channel Voice Message</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This indicates that what follows is info about the types of messages that can be broadcast upon particular MIDI
+channels. Such types of messages are Note Off and On, Aftertouch, Channel Pressure, all of the Controller messages,
+Program Change, and Pitch Wheel.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Note off</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Note Off messages it receives.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a MIDI Note Off message. There are two versions of it. Both have 3 bytes. The
+Status is the first byte. The Second is the note number. The third is the velocity amount for the note.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>8n<B>H</B></TD><TD WIDTH=16%>kk<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the first version of a Note Off message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The kk means that it can be any note number within
+a range of values. The allowable range of values will be shown later. The vv means that it can be any velocity within
+a range of values. The allowable range of values will be shown later.</TD></TR>
+<TR><TD WIDTH=16%>9n<B>H</B></TD><TD WIDTH=16%>kk<B>H</B></TD><TD WIDTH=17%>00<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the second version of a Note Off. It's actually a Note On message with the velocity byte always set to 0.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Note Off messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>kk = Note number</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for note number is 0 to 127. (ie, The JV-90 can recognize the full range of note
+numbers).</TD></TR>
+<TR><TD WIDTH=24%>vv = velocity</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for velocity is 0 to 127. (ie, The JV-90 can recognize the full range for note
+velocity).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>In the Performance mode, ignored when the MIDI receive switch is OFF at each Part.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 handles MIDI Note Off messages it receives. All this is saying is that if you turn
+a Part off, it no longer "plays" MIDI Note Off messages. Duh!</TD></TR>
+<TR><TD WIDTH=49%>In the Rhythm Part, ignored when "ENV Mode" is "NO-SUSTAIN" at each Rhythm Tone.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Another comment about how the JV-90 handles MIDI Note Off messages it receives. All this is saying is that unless you set
+a particular drum sound to sustain, then the drum kit doesn't really concern itself with Note Off messages.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Note on</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Note On messages it receives.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a MIDI Note On message. It has 3 bytes. The
+Status is the first byte. The Second is the note number. The third is the velocity amount for the note.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>9n<B>H</B></TD><TD WIDTH=16%>kk<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The kk means that it can be any note number within
+a range of values. The allowable range of values will be shown later. The vv means that it can be any velocity within
+a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Note On messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>kk = Note number</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for note number is 0 to 127. (ie, The JV-90 can recognize the full range of note
+numbers).</TD></TR>
+<TR><TD WIDTH=24%>vv = velocity</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for velocity is 0 to 127. (ie, The JV-90 can recognize the full range for note
+velocity).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>In the Performance mode, ignored when the MIDI receive switch is OFF at each Part.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 handles MIDI Note On messages it receives. All this is saying is that if you turn
+a Part off, it no longer "plays" MIDI Note On messages. Duh!</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Control Change</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Controller messages it receives. This subsection is typically quite
+long because it is divided up into numerous sub-subsections, where each sub-subsection is a different MIDI Controller, for
+example Bank Select, Mod Wheel, Pan, Volume, etc.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Bank Select MSB/LSB</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Bank Select Controller messages it receives (both the coarse message and the
+fine message).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Bank Select Controller message. There are two messages -- one for coarse adjustment and one for
+fine adjustment. Both have 3 bytes. The Status is the first byte. The Second is the controller number. The third is
+the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>00<B>H</B></TD><TD WIDTH=17%>mm<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Bank Select message for coarse adjust. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 00. The mm means that
+the coarse value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>20<B>H</B></TD><TD WIDTH=17%>ll<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Bank Select message for fine adjust. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 20. The ll means that
+the fine value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1  - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>mm = MSB of bank number</TD><TD WIDTH=25%>:50<B>H</B> - 54<B>H</B> (80 - 84)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range for coarse value. There are 5 allowable values, 80, 81, 82, 83, and 84. The chart below shows
+you which one of those coarse values, when used in conjunction with one of the allowable fine values, selects which bank.</TD></TR>
+<TR><TD WIDTH=24%>ll = LSB of bank number</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for the fine value is 0 to 127.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>The Bank Select is suspended until receiving a program change.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 handles Bank Select messages it receives. All this is saying is that until you actually
+follow up the Bank Select messages with a Program Change message, the patch doesn't change.</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Program bank sel" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Another comment about how the JV-90 handles Bank Select messages it receives. All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Program bank sel". If you set this to off, then the
+JV-90 ignores Bank Select messages it receives.</TD></TR>
+<TR><TD WIDTH=49%>In the patch mode, selected a bank of the patch memory. In the performance mode, selected a bank of the performance part memory. And specified the control channel, selected a bank of the performance part memory.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+If you're in patch mode, and the JV-90 receives a Bank Select, it will use this (in conjunction with a following Program
+Change message) to select a new patch that the keyboard plays. If you're in Performance mode, and the JV-90 receives a Bank
+Select, what happens depends upon whether you have the Control Channel enabled and then whether the Bank Select is
+transmitted on that channel. If so, then the Bank Select is used to change to another Performance among several Banks
+of Performances. Otherwise, the Bank Select is used to change the patch assigned to one of the Parts in the currently
+selected Performance. Which part? Well, the part that is assigned to the same MIDI channel as the Bank Select message was
+sent upon.</TD></TR>
+<TR><TD WIDTH=49%>The bank number specified as follow.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is just telling you that below this is now a chart that shows you what specific coarse and fine bank numbers to use,
+in conjunction with what Program Change numbers, to select specific patches in certain components upon the JV-90. For
+example, what Bank Select fine and coarse numbers do you use, and what Program Change number do you use, to select the
+first patch in the "Preset B" bank? According to the chart below, that would be a coarse bank number of 81, a fine bank
+number of 1, and a Program Change number of 65. The article <A HREF="bank.htm">Changing patches over MIDI using Bank
+Select Controller</A> has a more indepth explanation and example using the below JV-90 Patch chart. The JV-90's use of
+Bank Select controller is similiar to other Roland Sound Modules, and may help you in understanding how to utilize your
+own manual's Patch chart.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=75%>
+<TR><TD WIDTH=8%>80</TD><TD WIDTH=8%>0</TD><TD WIDTH=15%>1 - 64</TD><TD WIDTH=20%>Internal</TD><TD WIDTH=20%>(#1 - #64)</TD></TR>
+<TR><TD WIDTH=8%>80</TD><TD WIDTH=8%>0</TD><TD WIDTH=15%>65 - 128</TD><TD WIDTH=20%>Data Card</TD><TD WIDTH=20%>(#1 - #64)</TD></TR>
+<TR><TD WIDTH=8%>81</TD><TD WIDTH=8%>0</TD><TD WIDTH=15%>1 - 64</TD><TD WIDTH=20%>JV-80 Preset A</TD><TD WIDTH=20%>(#1 - #64)</TD></TR>
+<TR><TD WIDTH=8%>81</TD><TD WIDTH=8%>0</TD><TD WIDTH=15%>65 - 128</TD><TD WIDTH=20%>JV-80 Preset B</TD><TD WIDTH=20%>(#1 - #64)</TD></TR>
+<TR><TD WIDTH=8%>81</TD><TD WIDTH=8%>1</TD><TD WIDTH=15%>1 - 64</TD><TD WIDTH=20%>Preset A</TD><TD WIDTH=20%>(#1 - #64)</TD></TR>
+<TR><TD WIDTH=8%>81</TD><TD WIDTH=8%>1</TD><TD WIDTH=15%>65 - 128</TD><TD WIDTH=20%>Preset B</TD><TD WIDTH=20%>(#1 - #64)</TD></TR>
+<TR><TD WIDTH=8%>81</TD><TD WIDTH=8%>2</TD><TD WIDTH=15%>1 - 64</TD><TD WIDTH=20%>Preset C</TD><TD WIDTH=20%>(#1 - #64)</TD></TR>
+<TR><TD WIDTH=8%>81</TD><TD WIDTH=8%>2</TD><TD WIDTH=15%>65 - 128</TD><TD WIDTH=20%>Preset D</TD><TD WIDTH=20%>(#1 - #64)</TD></TR>
+<TR><TD WIDTH=8%>82</TD><TD WIDTH=8%>0</TD><TD WIDTH=15%>1 - 64</TD><TD WIDTH=20%>Data Card</TD><TD WIDTH=20%>(#1 - #64)</TD></TR>
+<TR><TD WIDTH=8%>83</TD><TD WIDTH=8%>0</TD><TD WIDTH=15%>1 - 128</TD><TD WIDTH=20%>PCM Card</TD><TD WIDTH=20%>(#1 - #128)</TD></TR>
+<TR><TD WIDTH=8%>84</TD><TD WIDTH=8%>0</TD><TD WIDTH=15%>1 - 128</TD><TD WIDTH=20%>Expansion Board</TD><TD WIDTH=20%>(#1 - #128)</TD></TR>
+<TR><TD WIDTH=8%>84</TD><TD WIDTH=8%>1</TD><TD WIDTH=15%>1 - 128</TD><TD WIDTH=20%>Expansion Board</TD><TD WIDTH=20%>(#129 - #256)</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Modulation</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Modulation Controller messages it receives.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Modulation Controller message. The JV-90 uses only the message for coarse adjustment. It has
+3 bytes. The Status is the first byte. The Second is the controller number. The third is the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>01<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Modulation message for coarse adjust. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 01. The vv means that
+the coarse value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = Modulation depth</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range for coarse value. Supports the full coarse range of Mod depth.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>The effect of the modulation depends on the value of "Mod1 - 4" of the patch tone.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 handles Modulation messages it receives. All this is saying is that the modulation
+can be set to affect upto 4 different Tone parameters simultaneously, for example the Tone's tuning in order to achieve
+a vibrato effect, and/or the Tone's filter cutoff to achieve a growl effect, etc.</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Receive Modulation" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Modulation". If you set this to off, then the
+JV-90 ignores Modulation messages it receives.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Portamento time</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Portamento time Controller messages it receives.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Portamento time Controller message. The JV-90 uses only the message for coarse adjustment. It has
+3 bytes. The Status is the first byte. The Second is the controller number. The third is the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>05<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Portamento time message for coarse adjust. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 05. The vv means that
+the coarse value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1  - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = Portamento time</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range for coarse value. Supports the full coarse range of Portamento time.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>You can adjust the portamento time of the patch common.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 Portamento time setting. All this is saying is that there is
+a setting in the "Patch Common" screen to set the default Portamento time for a patch (although the Portamento time can
+be changed at any time by a Portamento time controller message).</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Receive Control change" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Control change". If you set this to off, then the
+JV-90 ignores Portamento time messages it receives.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Volume</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Volume Controller messages it receives.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Volume Controller message. The JV-90 uses only the message for coarse adjustment. It has
+3 bytes. The Status is the first byte. The Second is the controller number. The third is the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>07<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Volume message for coarse adjust. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 07. The vv means that
+the coarse value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = Volume</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range for coarse value. Supports the full coarse range of Volume.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>You can adjust the volume of specified channel.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about Volume controller messages. All this is saying is that this volume
+controls the volume of all Note messages upon the same channel as the Volume controller is sent upon.</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Receive Volume" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Volume". If you set this to off, then the
+JV-90 ignores Volume messages it receives.</TD></TR>
+<TR><TD WIDTH=49%>In the performance mode, ignored when volume receive switch is OFF at each part.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that you can choose to have an individual Part (of a Performance) ignore Volume controller messages
+(whereas the other Parts in the same Performance perhaps may not). There is such a setting in one of the screens for editing
+a Performance.</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Volume switch" of the patch tone is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that you can choose to have a Tone (used in a patch) itself ignore Volume controller messages
+(whereas the other Tones in the same patch perhaps may not). There is such a setting in one of the screens for editing a Tone.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Pan</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Pan Controller messages it receives.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Pan Controller message. The JV-90 uses only the message for coarse adjustment. It has
+3 bytes. The Status is the first byte. The Second is the controller number. The third is the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>0A<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Pan message for coarse adjust. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 0A. The vv means that
+the coarse value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = Pan</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range for coarse value. Supports the full coarse range of Pan.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>"0" represents left end, "64" represents the center, and "127" represents the right end.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about Pan controller messages. All this is saying is that a 0 value pans the sound all of the way to
+the left speaker. 64 pans it center. (And therefore values inbetween 64 and 0 would pan it increasingly to the left). 127 pans
+it all of the way to the right speaker. (And therefore values inbetween 65 and 127 would pan it increasingly to the right).</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Receive Control change" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Control change". If you set this to off, then the
+JV-90 ignores Pan messages it receives.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Expression</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Expression Controller messages it receives.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for an Expression Controller message. The JV-90 uses only the message for coarse adjustment. It has
+3 bytes. The Status is the first byte. The Second is the controller number. The third is the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>0B<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Expression message for coarse adjust. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 0B. The vv means that
+the coarse value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = Expression</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range for coarse value. Supports the full coarse range of Expression.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>The effect of the expression depends on the value of "Exp1 - 4" of the patch tone.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 handles Expression messages it receives. All this is saying is that the expression
+can be set to affect upto 4 different Tone parameters simultaneously, for example the Tone's tuning in order to achieve
+a vibrato effect, and/or the Tone's filter cutoff to achieve a growl effect, etc.</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Receive Control change" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Control change". If you set this to off, then the
+JV-90 ignores Expression messages it receives.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Hold 1</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Hold 1 Controller messages it receives.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Hold 1 Controller message. It has
+3 bytes. The Status is the first byte. The Second is the controller number. The third is the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>40<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Hold 1 message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 40. The vv means that
+the coarse value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = Control value</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127) 0 - 63 = OFF 64 - 127 = ON</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range. Any value from 0 to 63 means that the Hold pedal is off. Any value from
+64 to 127 means Hold pedal is on.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Notes played can be sustained for as long as the time that elapses between turning hold on and turning hold off.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that notes get sustained for as long as the Hold 1 pedal is on. Duh!</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Receive Control change" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Control change". If you set this to off, then the
+JV-90 ignores Hold 1 messages it receives.</TD></TR>
+<TR><TD WIDTH=49%>In the rhythm part (part8), ignored when "ENV mode" is "NO - SUSTAIN" at each rhythm tone.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that for any drum sound that you set to "NO SUSTAIN", then the Hold 1 pedal has no effect upon
+the drum sound (ie, can't be used to sustain the drum sound).</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Hold - 1 switch" of the patch tone is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that you can choose to have a Tone (used in a patch) itself ignore Hold 1 controller messages
+(whereas the other Tones in the same patch perhaps may not). There is such a setting in one of the screens for editing a Tone.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Portamento</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Portamento (On/Off) Controller messages it receives.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Portamento Controller message. It has
+3 bytes. The Status is the first byte. The Second is the controller number. The third is the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>41<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Portamento message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 41. The vv means that
+the coarse value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = Control value</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127) 0 - 63 = OFF 64 - 127 = ON</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range. Any value from 0 to 63 means that the Portamento is off. Any value from
+64 to 127 means Portamento is on.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Switched over "Portamento sw" of patch common.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 handles received Portamento messages. All this is saying is that the Portamento
+On/Off controller message overrides the default setting in the patch common screen for whether portamento is turned on or
+off.</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Receive Control change" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Control change". If you set this to off, then the
+JV-90 ignores Portamento messages it receives.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Effect1 depth (Reverb send level)</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Effect1 Controller messages it receives. The JV-90 uses this
+controller to turn the reverb on or off.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Effect1 Controller message. It has
+3 bytes. The Status is the first byte. The Second is the controller number. The third is the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>5B<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Effect1 message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 5B. The vv means that
+the coarse value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = Control value</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127) 0 - 63 = OFF 64 - 127 = ON</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range. Any value from 0 to 63 means that Reverb is off. Any value from
+64 to 127 means Reverb is on.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>In the patch mode, switched over reverb switch of the system common.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 handles received Effect1 messages. All this is saying is that, when you're in patch
+play mode, the Effect1 controller message overrides the default setting in the system common screen for whether reverb is
+turned on or off for the patch.</TD></TR>
+<TR><TD WIDTH=49%>In the performance mode, switched over reverb switch of the performance.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Each part (of a performance) has a default setting for whether its reverb is turned on or off. The Effect1 controller
+message overrides this default setting.</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Receive Control change" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Control change". If you set this to off, then the
+JV-90 ignores Effect1 messages it receives.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Effect3 depth (Chorus send level)</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Effect3 Controller messages it receives. The JV-90 uses this
+controller to turn the Chorus on or off.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Effect3 Controller message. It has
+3 bytes. The Status is the first byte. The Second is the controller number. The third is the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>5D<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Effect1 message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 5D. The vv means that
+the coarse value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = Control value</TD><TD WIDTH=25%>:00<B>H</B>... 7F<B>H</B> (0 - 127) 0 - 63 = OFF 64 - 127 = ON</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range. Any value from 0 to 63 means that Chorus is off. Any value from
+64 to 127 means Chorus is on.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>In the patch mode, switched over chorus switch of the system common.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 handles received Effect3 messages. All this is saying is that, when you're in patch
+play mode, the Effect3 controller message overrides the default setting in the system common screen for whether chorus is
+turned on or off for the patch.</TD></TR>
+<TR><TD WIDTH=49%>In the performance mode, switched over chorus switch of the performance.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Each part (of a performance) has a default setting for whether its chorus is turned on or off. The Effect3 controller
+message overrides this default setting.</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Receive Control change" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Control change". If you set this to off, then the
+JV-90 ignores Effect3 messages it receives.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>RPN MSB/LSB</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Registered Parameter Number Controller messages it receives (both
+the coarse message and the fine message). See the article <A HREF="rpn.htm">Registered and Non-registered Parameter
+Number controllers</A> for more information on using Data Entry in conjunction with RPN or NRPN.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for an RPN Controller message. There are two messages -- one for coarse adjustment and one for
+fine adjustment. Both have 3 bytes. The Status is the first byte. The Second is the controller number. The third is
+the value for the controller (ie, the low or high bits of the parameter number).</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>65<B>H</B></TD><TD WIDTH=17%>mm<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the RPN message for coarse adjust. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 65. The mm means that
+the coarse value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>64<B>H</B></TD><TD WIDTH=17%>ll<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the RPN message for fine adjust. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 64. The ll means that
+the fine value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+</TABLE>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>mm = MSB of the specified parameter by RPN</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The Registered Parameter numbers that the JV-90 recognizes will be listed later in the manual.</TD></TR>
+<TR><TD WIDTH=49%>ll = LSB of the specified parameter by RPN</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The Registered Parameter numbers that the JV-90 recognizes will be listed later in the manual.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Data entry MSB/LSB</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Data entry (slider) Controller messages it receives (both
+the coarse message and the fine message). See the article <A HREF="rpn.htm">Registered and Non-registered Parameter
+Number controllers</A> for more information on using Data Entry in conjunction with RPN or NRPN.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for an Data entry Controller message. There are two messages -- one for coarse adjustment and one for
+fine adjustment. Both have 3 bytes. The Status is the first byte. The Second is the controller number. The third is
+the value for the controller (ie, the low or high bits of a value for some RPN or NRPN).</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>06<B>H</B></TD><TD WIDTH=17%>mm<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Data entry message for coarse adjust. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 06. The mm means that
+the coarse value can be any value within a range of values.</TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>26<B>H</B></TD><TD WIDTH=17%>ll<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Data entry message for fine adjust. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 26. The ll means that
+the fine value can be any value within a range of values.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+</TABLE>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>mm = MSB of the value of the parameter specified with RPN</TD></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The "high" bits of the value for some RPN.</TR>
+<TR><TD WIDTH=49%>ll = LSB of the value of the parameter specified with RPN</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The "low" bits of the value for some RPN.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>** RPN **</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The chart that follows lists all of the Registered Parameter Numbers that the JV-90 understands. It understands 4 RPNs --
+Pitch Range, Fine Tuning, Coarse Tuning, and RPN Reset. The values of any of these 4 RPN settings can be changed with
+Data entry controller messages.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=12%>RPN</TD><TD WIDTH=12%>Data entry</TD><TD WIDTH=30%>Description</TD><TD WIDTH=46% BGCOLOR="#99CCCC">The chart had 3 columns. The first shows you the coarse and fine controller numbers to send (via the 2 RPN controllers) in order to select this Parameter. The second shows you the allowable range of coarse and fine values to which you can set this Parameter (using the 2 Data Slider controllers). The last column tells you what the parameter is, gives additional info about its range of allowable values, and any remarks about the Parameter.</TD></TR>
+</TABLE>
+<HR WIDTH=50% NOSHADE ALIGN="LEFT">
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=12%>MSB LSB</TD><TD WIDTH=12%>MSB LSB</TD><TD WIDTH=30%></TD><TD WIDTH=46% BGCOLOR="#99CCCC"></TD></TR>
+</TABLE>
+<HR WIDTH=50% NOSHADE ALIGN="LEFT">
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=12%>00<B>H</B> 00<B>H</B></TD><TD WIDTH=12%>mm<B>H</B> --</TD><TD WIDTH=30%>Pitch bend sensitivity</TD><TD WIDTH=46% BGCOLOR="#99CCCC">This is the Parameter to set the range of the pitch wheel.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>mm : 00<B>H</B> - 0C<B>H</B> (0 - 12 semitones)</TD><TD WIDTH=46% BGCOLOR="#99CCCC">You can set its value anywhere between 0 and 12, where 0 means no pitch wheel transpose at all, and 12 gives you the maximum range of up and down an octave. For example, a 2 gives you a range up and down a whole step.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>ll : Ignored</TD><TD WIDTH=46% BGCOLOR="#99CCCC">The Data Slider fine controller is not used to set pitch range. Only the Data Slider coarse controller (ie, 06) is used to set the range.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>(Up to one octave)</TD><TD WIDTH=46% BGCOLOR="#99CCCC">As noted, the maximum value is 12, which gives a range of up and down an octave.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>* You can adjust "Bend range up" and "Bend range down" at the same time</TD><TD WIDTH=46% BGCOLOR="#99CCCC">When you send a value for Pitch bend range, it sets both the amount that the wheel transposes up as well as down by the same amount. In other words, you can't set it to transpose up an octave, but down only a whole step.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>* In the Rhythm part, this message is not recognized.</TD><TD WIDTH=46% BGCOLOR="#99CCCC">You can't set the pitch wheel transpose range for the drum part. You can set it only for the other parts of a performance (and each part has its own range setting), or a patch.</TD></TR>
+<TR><TD WIDTH=12%>00<B>H</B> 01<B>H</B></TD><TD WIDTH=12%>mm<B>H</B> ll<B>H</B></TD><TD WIDTH=30%>Fine tuning</TD><TD WIDTH=46% BGCOLOR="#99CCCC">This is the Parameter to set the Master tuning in cents.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>mm, ll : 20<B>H</B>, 00<B>H</B> - 40<B>H</B>, 00<B>H</B> - 60<B>H</B>, 00<B>H</B> (-50 - 0 - +50 cents)</TD><TD WIDTH=46% BGCOLOR="#99CCCC">You can set its value a maximum of 50 cents up or down. For -50 cents, you send a coarse value of 20 and fine value of 00. For centered tuning (ie, 0 offset), send coarse = 40 and fine = 00. For +50 cents, send coarse = 60 and fine = 00.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>* In the patch mode, adjusted the master tune.</TD><TD WIDTH=46% BGCOLOR="#99CCCC">When in patch play mode, you set the master tune. (ie, When you switch patches, the same tuning setting will stick until you set a different value for Fine tuning).</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>* In the performance mode, adjusted fine tune for each part.</TD><TD WIDTH=46% BGCOLOR="#99CCCC">In performance play, each part has its own Fine tuning setting. So although all of the patches you use with that part will be fine tuned by this amount, those same patches used with other parts will not be.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>* In the performance mode, specified control channel, changed the master tune.</TD><TD WIDTH=46% BGCOLOR="#99CCCC">In performance play, if you've got the control channel enabled, and you send RPN and Data Sliders on that channel, THEN it sets the master tune. In other words, all parts will be fine tuned by that amount. Otherwise, you'd have to fine tune each part separately.</TD></TR>
+<TR><TD WIDTH=12%>00<B>H</B> 00<B>H</B></TD><TD WIDTH=12%>mm<B>H</B> --</TD><TD WIDTH=30%>Coarse tuning</TD><TD WIDTH=46% BGCOLOR="#99CCCC">This is the Parameter to set the Master transpose in half steps. I prefer to call this parameter "Transpose Amount".</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>mm : 10<B>H</B> - 40<B>H</B> - 70<B>H</B> (-48 - 0 - +48 semitones)</TD><TD WIDTH=46% BGCOLOR="#99CCCC">You can set its value up or down a maximum of 48 half steps. For -48 steps, you send a coarse value of 10. For centered tuning (ie, 0 transpose), send coarse = 40. For +48 half steps, send coarse = 70.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>ll : Ignored</TD><TD WIDTH=46% BGCOLOR="#99CCCC">The Data Slider fine controller is not used to set Transpose Amount. Only the Data Slider coarse controller (ie, 06) is used to set the Transpose Amount.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>* In the patch mode, this message is not recognized.</TD><TD WIDTH=46% BGCOLOR="#99CCCC">When in patch play mode, this message doesn't change the Transpose Amount. You can't set this parameter over MIDI when in patch play mode.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>* In the performance mode, adjusted coarse tune for each part.</TD><TD WIDTH=46% BGCOLOR="#99CCCC">In performance play, each part has its own Transpose Amount setting. So although all of the patches you use with that part will be transposed by this amount, those same patches used with other parts will not be.</TD></TR>
+<TR><TD WIDTH=12%>7F<B>H</B> 7F<B>H</B></TD><TD WIDTH=12%>-- --</TD><TD WIDTH=30%>RPN reset</TD><TD WIDTH=46% BGCOLOR="#99CCCC">This is sort of a non-existant Parameter. When you select this parameter, all it means is that any subsequent Data Slider controllers will be ignored. That way, you won't accidentally have them change any one of the above 3 Parameters that can be changed via Data Slider controllers.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>mm, ll : Ignored</TD><TD WIDTH=46% BGCOLOR="#99CCCC">Like I said, the whole point of selecting this Parameter is just to force the JV-90 to ignore all subsequent Data Slider messages.</TD></TR>
+<TR><TD WIDTH=12%></TD><TD WIDTH=12%></TD><TD WIDTH=30%>* Return to no specified parameter of RPN. Current setting value is no change.</TD><TD WIDTH=46% BGCOLOR="#99CCCC">This pigeon english is struggling to tell you what I just did above. Honest.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Program Change</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Program Change messages it receives. The JV-90 uses this
+message in conjunction with Bank Select controllers to change patches.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=32%>Second</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Program Change message. It has
+2 bytes. The Status is the first byte. The second is the program number.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=32%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Cn<B>H</B></TD><TD WIDTH=33%>pp</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Program Change message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The pp means that
+the value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Program Change messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>pp = Program number</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (prog.1 - prog.128)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range. The full range of program numbers is supported. Note that program #1 is sent in the Program
+Change message as a 0 value.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Ignored when "Receive Program change" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Program change". If you set this to off, then the
+JV-90 ignores Program Change messages it receives.</TD></TR>
+<TR><TD WIDTH=49%>When the JV-90 receives a program change on a part receive channel while in the performance mode, it changes the patches of that part: the new patch value being the program number plus 1. If the JV-90 receives the program change on the control channel, it changes the performance.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Pretty self-explanatory. In patch mode, Program Change changes to another patch. In performance play mode, each Part has its own patch assignment. So you can use a Program Change message to change the patch for each part individually. If you got the control channel enabled, and you send the Program Change on that channel, then it changes to another Performance instead.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Channel Pressure</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Channel Pressure messages it receives. The JV-90 can use this
+message for a variety of purposes from adjusting the volume of notes while they are being sustained, to adding vibrato, etc.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=32%>Second</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Channel Pressure message. It has
+2 bytes. The Status is the first byte. The second is the pressure amount.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=32%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Dn<B>H</B></TD><TD WIDTH=33%>vv</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Channel Pressure message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The vv means that
+the value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Channel Pressure messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = Pressure value</TD><TD WIDTH=25%>:00<B>H</B>... 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range. The full range of Channel Pressure is supported.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>The effect of Channel pressure depends on the value of "After1 - 4" of the patch tone.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 handles Channel Pressure messages it receives. All this is saying is that the pressure
+amount can be set to affect upto 4 different Tone parameters simultaneously, for example the Tone's tuning in order to achieve
+a vibrato effect, and/or the Tone's filter cutoff to achieve a growl effect, etc.</TD></TR>
+<TR><TD WIDTH=49%>Ignored when "Receive Aftertouch" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Aftertouch". If you set this to off, then the
+JV-90 ignores Channel Pressure messages it receives.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Pitch bend change</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles Pitch Wheel messages it receives.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Pitch Wheel message. It has
+3 bytes. The Status is the first byte. The Second is the coarse pitch change. The third is the fine pitch change.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>En<B>H</B></TD><TD WIDTH=16%>mm<B>H</B></TD><TD WIDTH=17%>ll<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Pitch Wheel message. The n means that the Status byte's channel can be any value within a range of values. The
+allowable range of values will be shown later. The mm means that the coarse value can be any value within a range of
+values. The allowable range of values will be shown later.  The ll means that
+the fine value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Pitch Wheel messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>mm, ll = Pitch bend change</TD><TD WIDTH=25%>:00<B>H</B>, 00<B>H</B> - 7F<B>H</B>, 7F<B>H</B> (-8192 - 0 - +8191)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range. Supports the full range for Pitch Wheel.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Ignored when "Receive Pitch bend" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Pitch bend". If you set this to off, then the
+JV-90 ignores Pitch Wheel messages it receives.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Channel Mode Message</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This indicates that what follows is info about the types of messages that can change the JV-90's MIDI modes. This subsection
+is sort of out of place since these are all controller messages that can be broadcast upon particular MIDI
+channels. They really should have been listed under the Controller messages.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Reset All Controllers</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles a Reset All Controllers message it receives. This message is used
+to reset several other Controllers to their default values.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Reset All Controllers message. It has 3 bytes.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>79<B>H</B></TD><TD WIDTH=17%>00<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's a Reset All Controllers message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 79 and the third
+byte is always 00.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Received this message. The controllers is set the following.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Ouch! More pigeon english! All this is saying is that the following chart shows you which Controllers are reset by a
+Reset All Controllers message, and what their default values are.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=25%>Controller</TD><TD WIDTH=25%>Value</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The chart lists the Controller's name on the right, and its respective default value on the left.</TD></TR>
+</TABLE>
+<HR WIDTH=50% NOSHADE ALIGN="LEFT">
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=25%>Modulation</TD><TD WIDTH=25%>0 (off)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The Mod wheel is reset to its minimum position.</TD></TR>
+<TR><TD WIDTH=25%>Volume</TD><TD WIDTH=25%>127 (maximum)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Volume is reset to maximum.</TD></TR>
+<TR><TD WIDTH=25%>Pan</TD><TD WIDTH=25%>64 (center)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Pan is reset to center.</TD></TR>
+<TR><TD WIDTH=25%>Expression</TD><TD WIDTH=25%>0 (off)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Expression is reset to minimum (ie, no effect applied).</TD></TR>
+<TR><TD WIDTH=25%>Hold1</TD><TD WIDTH=25%>0 (off)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The Hold pedal is released. (ie, Notes stop sustaining).</TD></TR>
+<TR><TD WIDTH=25%>Channel pressure</TD><TD WIDTH=25%>0 (off)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Channel pressure is reset to minimum (ie, no effect applied).</TD></TR>
+<TR><TD WIDTH=25%>Pitch bend change</TD><TD WIDTH=25%>+/- 0 (center)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The Pitch Wheel is reset to center position.</TD></TR>
+<TR><TD WIDTH=25%>RPN</TD><TD WIDTH=25%>No specified parameter</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+None of the Registered Parameter Numbers are reset by a Reset All Controllers message. For example, the Pitch Wheel
+Bend Range isn't reset to its default state (ie, when the unit was turned on).</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Local control</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles a Local control message it receives. This message is used
+to turn the keyboard on or off (ie, have it directly play its internal sound module or not).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Local control message. It has 3 bytes.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>7A<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's a Local control message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 7A. (The JV-90 manual
+has a typo and shows it incorrectly as 7B). The third byte is a 0 for "off" or 127 for "on".</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = value</TD><TD WIDTH=25%>:00<B>H</B>, 7F<B>H</B> (0, 127) 0=OFF 127=ON</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+See above.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>All notes off</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles an All notes off message it receives. This message is used
+to turn off all sustaining notes (although if the Hold1 controller is still on, they won't stop sounding).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for an All notes off message. It has 3 bytes.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>7B<B>H</B></TD><TD WIDTH=17%>00<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's an All notes off message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 7B, and the
+third byte is always 00.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>When this message is recognized, all the notes which have been turned on by MIDI note on message
+are turned off.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">Yeah, I already told you that above.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>OMNI OFF</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles an OMNI OFF message it receives. This message is normally used
+to allow a unit to not respond to all 16 MIDI channels. But, the JV-90 merely uses it as if it were nothing more
+than an All notes off message.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for an OMNI OFF message. It has 3 bytes.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>7C<B>H</B></TD><TD WIDTH=17%>00<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's an OMNI OFF message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 7C, and the
+third byte is always 00.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Recognized as All notes off.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">I already told you that above too.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>OMNI ON</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles an OMNI ON message it receives. This message is normally used
+to allow a unit to respond to all 16 MIDI channels. But, the JV-90 merely uses it as if it were nothing more
+than an All notes off message.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for an OMNI ON message. It has 3 bytes.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>7D<B>H</B></TD><TD WIDTH=17%>00<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's an OMNI ON message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 7D, and the
+third byte is always 00.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Recognized as All notes off.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">Guess what? I already told you that above.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>MONO</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles a MONO Controller message it receives. This message is used
+to set the sound module in monophonic state (ie, plays only 1 note at a time). In the JV-90's case, this is referred to
+as "Solo mode", and each part (of a Performance) can be set to solo mode individually. When in solo mode, a part's
+portamento and legato settings become effective. Otherwise, they are ignored.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a MONO controller message. It has 3 bytes.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>7E<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's a MONO controller message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 7E. The third byte can be
+any value in a range of values. The allowable range is shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = number of mono</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (0 - 16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Normally this value determines how many voices you wish the JV-90 to stack. But only a value of 1 here is honored.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Switched over "Assign mode" of patch common.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that you have a default "Assign mode" setting in the patch common screen. You can set a patch to
+play in Solo mode, or not, but this message overrides that default setting.</TD></TR>
+<TR><TD WIDTH=49%>Recognized as All notes off, and set MODE4 (M = 1) at each part.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Besides changing a part to "Solo mode", it also turns off all notes that the part may have been sustaining up to that point. Also,
+what is being said here is that, no matter how many voices you tell the JV-90 to stack, it always uses only 1 voice
+when it receives a MONO controller message.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>POLY</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles a POLY Controller message it receives. This message is used
+to set the sound module in polyphonic state (ie, plays more than 1 note at a time). In the JV-90's case, this is referred to
+as "Poly mode", and each part (of a Performance) can be set to poly mode individually. When in poly mode, a part's
+portamento and legato settings are ignored.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a POLY controller message. It has 3 bytes.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>7F<B>H</B></TD><TD WIDTH=17%>00<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's a POLY controller message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The second byte is always 7F and the third byte
+is always 00.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can recognize Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Switched over "Assign mode" of patch common.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that you have a default "Assign mode" setting in the patch common screen. You can set a patch to
+play in Poly mode, or not, but this message overrides that default setting.</TD></TR>
+<TR><TD WIDTH=49%>Recognized as All notes off, and set MODE3 at each part.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Besides changing a part to "Poly mode", it also turns off all notes that the part may have been sustaining up to that point.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>System Realtime message</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This indicates that what follows is info about System Realtime types of messages. Such messages include MIDI Clock,
+MIDI Time Code quarter-frame messages, Song Select, etc. The JV-90 ignores all of them except Active Sense.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Active sensing</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 handles an Active Sense message it receives. Read the article
+<A HREF="sense.htm">What's Active Sense?</A> for an indepth explanation of what Active Sense MIDI messages are and
+what they do.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%></TD><TD WIDTH=16%></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for an Active Sense message. It is 1 byte.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%></TD><TD WIDTH=16%></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>FE<B>H</B></TD><TD WIDTH=16%></TD><TD WIDTH=17%></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The byte is always FE.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>When the JV-90 receive "Active sensing"... blah blah blah</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is just an explanation of what Active Sense messages do. Read my above article instead.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>System Exclusive Message</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is the general format for a JV-90 System Exclusive message. There are many permutations of
+it since a variety of System Exclusive messages can be sent to the JV-90 to alter nearly any parameter that you can
+change from the front panel. The details for constructing those messages will be excruciatingly detailed in a later
+section entitled <B>Exclusive communications</B>. Right here, you're shown the general form of all SysEx messages
+that the JV-90 recognizes, but some of the "data" fields will have different values depending upon which parameter
+you're trying to change.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=25%>Status</TD><TD WIDTH=25%>Data</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this chart is showing you is that a System Exclusive message starts with a F0 byte, then has one or more data
+bytes following the F0, and finally ends with an F7. That's the MIDI standard for System Exclusive. Hopefully you
+already know this if you're going to be screwing around with System Exclusive messages.</TD></TR>
+</TABLE>
+<HR WIDTH=50% NOSHADE ALIGN="LEFT">
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=25%>F0<B>H</B></TD><TD WIDTH=25%>ii<B>H</B> dd<B>H</B> ....... ee<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Don't worry about this ii, dd, ee stuff. All it means is that, according to the MIDI standard for System Exclusive, there
+can be any number of data bytes here, each set to any value within an allowable range (ie, 0 to 127).</TD></TR>
+<TR><TD WIDTH=25%>F7<B>H</B></TD><TD WIDTH=25%></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+And then of course, there's a final F7 byte.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=25%>F0<B>H</B></TD><TD WIDTH=25%>: System exclusive</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Whereas the above showed you the MIDI standard for a System Exclusive message, now you're going to see the Roland
+general form. In Roland SysEx, after the opening F0 byte, the first data byte is always a Manufacturer ID of 41.</TD></TR>
+<TR><TD WIDTH=25%>ii = Manufacturer ID</TD><TD WIDTH=25%>: 41<B>H</B> (65)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Roland's Manufacturer ID is always the first data byte after the F0, and is always 41.</TD></TR>
+<TR><TD WIDTH=25%>dd .....ee = Data</TD><TD WIDTH=25%>: 00<B>H</B> - 7F<B>H</B> (0 to 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this means is that there can be any number of data bytes here, each set to any value within the range
+0 to 127.</TD></TR>
+<TR><TD WIDTH=25%>F7<B>H</B></TD><TD WIDTH=25%>: EOX (End of exclusive)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+There's that final F7 byte.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Ignored when "Receive Exclusive" of the system common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that if you go into
+the "System Common" settings of the JV-90, there's a setting called "Receive Exclusivee". If you set this to off, then the
+JV-90 ignores System Exclusive messages it receives.</TD></TR>
+</TABLE>
+
+<BR><BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%><H2><A NAME="tran">2</A>. TRANSMIT DATA</H2></TD><TD WIDTH=50% BGCOLOR="#99CCCC">This indicates the start of the TRANSMIT DATA main section.
+This is divided into subsections exactly like the RECEIVE DATA main section. In other words, it typically begins with a NOTE OFF subsection.
+But here, the info is about how the unit creates Note Off messages. For example, the info here will tell you what range of Note numbers the
+unit's keyboard is capable of generating, as well as what range of velocities, for Note Off messages. Roland units that
+have no built-in controller, such as rackmount modules, may not be able to generate MIDI messages, and therefore the manual
+will omit this section.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Channel Voice Data</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This indicates that what follows is info about the types of messages that the JV-90 can generate upon particular MIDI
+channels. Such types of messages are Note Off and On, Aftertouch, Channel Pressure, all of the Controller messages,
+Program Change, and Pitch Wheel.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Note off</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 keyboard generates Note Off messages.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a MIDI Note Off message. (Note that the JV-90 generates real Note Off messages, rather than using
+Note On with 0 velocity). It has 3 bytes. The
+Status is the first byte. The Second is the note number. The third is the velocity amount for the note.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>8n<B>H</B></TD><TD WIDTH=16%>kk<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's a Note Off message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The kk means that it can be any note number within
+a range of values. The allowable range of values will be shown later. The vv means that it can be any velocity within
+a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 keyboard can generate Note Off messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>kk = Note number</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for note number is 0 to 127. (ie, The JV-90 keyboard can generate the full range of note
+numbers. Even though it only has 76 keys, the keyboard can be "transposed" to generate any range of MIDI note numbers).</TD></TR>
+<TR><TD WIDTH=24%>vv = velocity</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for velocity is 0 to 127. (ie, The JV-90 keyboard can generate the full range for note
+velocity).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>In the Performance mode, not transmit when the MIDI transmit switch is OFF at each Part.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 keyboard generates MIDI Note Off messages. All this is saying is that the keyboard
+generates Note Offs only for those MIDI Parts that have their MIDI transmit switch set to on. For example, assume
+that MIDI Part 1 is assigned to MIDI channel 1 and has its transmit siwtch on. Part 2 is assigned to channel 2 and has its
+transmit switch off. When you play the JV-90 keyboard, it generates Note Off messages only upon channel 1.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Note on</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 keyboard generates Note On messages.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a MIDI Note On message. It has 3 bytes. The
+Status is the first byte. The Second is the note number. The third is the velocity amount for the note.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>9n<B>H</B></TD><TD WIDTH=16%>kk<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The kk means that it can be any note number within
+a range of values. The allowable range of values will be shown later. The vv means that it can be any velocity within
+a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 keyboard can generate Note On messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>kk = Note number</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for note number is 0 to 127. (ie, The JV-90 can recognize the full range of note
+numbers).</TD></TR>
+<TR><TD WIDTH=24%>vv = velocity</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for velocity is 0 to 127. (ie, The JV-90 keyboard can generate the full range for note
+velocity).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>In the Performance mode, not transmit when the MIDI transmit switch is OFF at each Part.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about how the JV-90 keyboard generates MIDI Note On messages. All this is saying is that the keyboard
+generates Note Ons only for those MIDI Parts that have their MIDI transmit switch set to on. For example, assume
+that MIDI Part 1 is assigned to MIDI channel 1 and has its transmit siwtch on. Part 2 is assigned to channel 2 and has its
+transmit switch off. When you play the JV-90 keyboard, it generates Note On messages only upon channel 1.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Control Change</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 generates Controller messages. The JV-90 is capable of generating several
+types of controller messages. What follows is info about each type of controller it generates.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>The function of the Modulation lever is determined by control number 1 (modulation).</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about the JV-90's Modulation lever. All this is saying is that it is hardwired to being controller
+number 1.</TD></TR>
+<TR><TD WIDTH=49%>The function of the Hold1 pedal is determined by control number 64 (hold1).</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about the JV-90's Hold1 pedal (jack). All this is saying is that it is hardwired to being controller
+number 64.</TD></TR>
+<TR><TD WIDTH=49%>Control numbers 0 - 95 can be assigned to Pedal1, Pedal2, and C1.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about the other jacks and levers upon the JV-90. All this is saying is that they aren't hardwired to
+a particular controller number (like the Mod lever and Hold pedal jack are). So, you can change the function that these
+control. For example, you can take the C1 lever and assign it to controller number 07. That's the controller for Volume.
+So when you move the C1 lever, it generates MIDI Volume controller messages (and can therefore change the volume of the
+patch that the keyboard is playing). Or, you can assign the C1 lever to controller number 0A. That's the controller for
+Pan. So when you move the C1 lever, it now generates MIDI Pan controller messages instead (and can therefore change the
+pan position of the patch that the keyboard is playing). You can assign the C1 lever to any controller number in the range
+0 to 95. See the chart <A HREF="ctl.htm">Defined MIDI controllers</A> for a list of all of the defined controller
+numbers, and what they control. (But note that the JV-90's built-in module responds only to a few of the defined
+controllers -- only those that were listed under "Control change" in the RECEIVE DATA section. So too, the Pedal 1 and
+Pedal 2 jacks can be assigned to any of those controller numbers. But note that the Pedal 1 jack can only set a controller
+to either the value 0 (ie, the pedal is released) or 127 (ie, the pedal is pressed down). Unlike the C1 lever or Pedal 2
+jack, the Pedal 1 jack can't generate values inbetween 0 and 127.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Controller message that the JV-90 can generate when the controller number is 0 to 63 or 70 to 95.
+It has 3 bytes. The Status is the first byte. The Second is the controller number. The third is the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>cc<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The n means that the Status byte's channel can be any value within a range of values. The allowable range of values will
+be shown later. The cc means that the controller number can be any number within the range of 0 to 63 or 70 to 90.
+The vv means that the value can be any number within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1  - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can generate Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>cc = Control number</TD><TD WIDTH=25%>: 0<B>H</B> - 3F<B>H</B>, 46<B>H</B> - 5F<B>H</B> (0 - 63, 70 - 95)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range for controller number. The JV-90 can have its lever and/or pedals assigned to any controller
+number in the range of 0 to 63 or 70 - 95.</TD></TR>
+<TR><TD WIDTH=24%>vv = Control value</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range for the controller value. The JV-90 supports full controller range for controller numbers
+0 to 63 or 70 to 95.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Controller message that the JV-90 can generate when the controller number is 64 to 69.
+It has 3 bytes. The Status is the first byte. The Second is the controller number. The third is the value for the controller.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Bn<B>H</B></TD><TD WIDTH=16%>cc<B>H</B></TD><TD WIDTH=17%>vv<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The n means that the Status byte's channel can be any value within a range of values. The allowable range of values will
+be shown later. The cc means that the controller number can be any number within the range 64 to 69. The vv means that
+the value can be any number within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1  - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can generate Controller messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>cc = Control number</TD><TD WIDTH=25%>: 40<B>H</B> - 45<B>H</B> (64 - 69)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range for controller number. The JV-90 can have its lever and/or pedals also assigned to any controller
+number in the range of 64 to 69.</TD></TR>
+<TR><TD WIDTH=24%>vv = Control value</TD><TD WIDTH=25%>:00<B>H</B>, 7F<B>H</B> (0, 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range for the controller value. The JV-90 sends only the value 0 (ie, Off) or 127 (ie, On) for
+controller numbers 64 to 69. It doesn't send any of the inbetween values, even if you're using a lever.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Control change messages will not be transmitted when the following parameter are set:.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about the JV-90's generation of controller messages. If you set some lever or pedal to use one of
+the following control numbers, and yet set that controller number to OFF in the TRANSMIT MIDI screen, then the JV-90
+does not generate MIDI messages (although the levers or pedals may still affect the built-in sound module).</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=25%>Control number</TD><TD WIDTH=25%>TRANSMIT MIDI</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The chart lists the Controller number on the right, and its respective TRANSMIT MIDI screen setting on the left.</TD></TR>
+</TABLE>
+<HR WIDTH=50% NOSHADE ALIGN="LEFT">
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=25%>0, 32 (Bank select)</TD><TD WIDTH=25%>Bnk=OFF</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+If you set a lever/pedal to transmit Bank select coarse or fine, but set TRANSMIT MIDI screen's Bnk setting to OFF, then no such MIDI messages are generated.</TD></TR>
+<TR><TD WIDTH=25%>1, 32 (Modulation)</TD><TD WIDTH=25%>Mod=OFF</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+If you set a lever/pedal to transmit Modulation coarse or fine, but set TRANSMIT MIDI screen's Mod setting to OFF, then no such MIDI messages are generated.</TD></TR>
+<TR><TD WIDTH=25%>7, 39 (Volume)</TD><TD WIDTH=25%>Vol=OFF</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+If you set a lever/pedal to transmit Volume coarse or fine, but set TRANSMIT MIDI screen's Vol setting to OFF, then no such MIDI messages are generated.</TD></TR>
+<TR><TD WIDTH=25%>2 - 6, 8 - 31, 34 - 38, 40 - 95</TD><TD WIDTH=25%>C.C=OFF</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+If you set a lever/pedal to transmit one of these controller numbers, but set TRANSMIT MIDI screen's C.C setting to OFF, then no such MIDI messages are generated.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Program Change</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 generates Program Change messages (as you manually push the Group, Patch, and
+other buttons that change between patches.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=32%>Second</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Program Change message. It has
+2 bytes. The Status is the first byte. The second is the program number.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=32%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Cn<B>H</B></TD><TD WIDTH=33%>pp</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Program Change message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The pp means that
+the value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 can generate Program Change messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>pp = Program number</TD><TD WIDTH=25%>:00<B>H</B> - 7F<B>H</B> (prog.1 - prog.128)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range. The full range of program numbers is supported. Note that program #1 is sent in the Program
+Change message as a 0 value.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Not transmit when "Transmit Program Change" of the System Common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about the JV-90's generation of Program Change messages. In the System Common screen, there is a setting
+called "Transmit Program Change", and if you set this to OFF, then the JV-90 generates no MIDI Program Change messages when
+you manually switch patches.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Channel Pressure</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 keyboard generates Channel Pressure messages.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=32%>Second</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Channel Pressure message. It has
+2 bytes. The Status is the first byte. The second is the pressure amount.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=32%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>Dn<B>H</B></TD><TD WIDTH=33%>vv</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Channel Pressure message. The n means that the Status byte's channel can be any value within
+a range of values. The allowable range of values will be shown later. The vv means that
+the value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 keyboard can generate Channel Pressure messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>vv = Pressure value</TD><TD WIDTH=25%>:00<B>H</B>... 7F<B>H</B> (0 - 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range. The full range of Channel Pressure is supported.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Not transmit when "Transmit Aftertouch" of the System Common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about the JV-90's generation of Channel Pressure messages. In the System Common screen, there is a setting
+called "Transmit Aftertouch", and if you set this to OFF, then the JV-90 generates no MIDI Channel Pressure messages when
+you press harder/softer on the keys.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Pitch bend change</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 Pitch lever generates Pitch Wheel messages.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%>Second</TD><TD WIDTH=16%>Third</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for a Pitch Wheel message. It has
+3 bytes. The Status is the first byte. The Second is the coarse pitch change. The third is the fine pitch change.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>En<B>H</B></TD><TD WIDTH=16%>mm<B>H</B></TD><TD WIDTH=17%>ll<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Here's the Pitch Wheel message. The n means that the Status byte's channel can be any value within a range of values. The
+allowable range of values will be shown later. The mm means that the coarse value can be any value within a range of
+values. The allowable range of values will be shown later.  The ll means that
+the fine value can be any value within a range of values. The allowable range of values will be shown later.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=24%>n = MIDI Channel</TD><TD WIDTH=25%>:0<B>H</B> - F<B>H</B> (ch1 - ch16)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that the allowable range for MIDI channel is 0 to 15. (ie, The JV-90 pitch lever can generate Pitch Wheel messages upon any
+of the 16 MIDI channels).</TD></TR>
+<TR><TD WIDTH=24%>mm, ll = Pitch bend change</TD><TD WIDTH=25%>:00<B>H</B>, 00<B>H</B> - 7F<B>H</B>, 7F<B>H</B> (-8192 - +8191)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates the allowable range. Supports the full range for Pitch Wheel.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Not transmit when "Transmit Pitch bend" of the System Common is OFF.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This is a comment about the JV-90's generation of Pitch Wheel messages. In the System Common screen, there is a setting
+called "Transmit Pitch bend", and if you set this to OFF, then the JV-90 generates no MIDI Pitch Wheel messages when
+you move the pitch lever.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>System Realtime message</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+This indicates that what follows is info about System Realtime types of messages. Such messages include MIDI Clock,
+MIDI Time Code quarter-frame messages, Song Select, etc. The JV-90 does not generate any of those except Active Sense.</TD></TR>
+</TABLE>
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>Active sensing</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is how my JV-90 generates Active Sense messages.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=16%>Status</TD><TD WIDTH=16%></TD><TD WIDTH=16%></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Shows the format for an Active Sense message. It is 1 byte.</TD></TR>
+<TR><TD WIDTH=16%><HR NOSHADE></TD><TD WIDTH=16%></TD><TD WIDTH=16%></TD><TD WIDTH=50% BGCOLOR="#99CCCC"></TD></TR>
+<TR><TD WIDTH=16%>FE<B>H</B></TD><TD WIDTH=16%></TD><TD WIDTH=17%></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+The byte is always FE.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>This message transmit at about 300 milli-second interval.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+If the JV-90 hasn't been generating any other MIDI messages for awhile, it starts sending an Active Sense byte every
+300 milli-seconds.</TD></TR>
+</TABLE>
+
+
+
+
+
+
+
+
+
+
+<BR><TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50%><B>System Exclusive Message</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Indicates that what follows is the general format for a JV-90 System Exclusive message. There are many permutations of
+it since the JV-90 can generate a variety of System Exclusive messages when it dumps various parameter settings over
+MIDI. The details for constructing those messages will be excruciatingly detailed in a later
+section entitled <B>Exclusive communications</B>. Right here, you're shown the general form of all SysEx messages
+that the JV-90 generates, but some of the "data" fields will have different values depending upon which parameter(s)
+is being dumped.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=25%>Status</TD><TD WIDTH=25%>Data</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this chart is showing you is that a System Exclusive message starts with a F0 byte, then has one or more data
+bytes following the F0, and finally ends with an F7. That's the MIDI standard for System Exclusive. Hopefully you
+already know this if you're going to be screwing around with System Exclusive messages.</TD></TR>
+</TABLE>
+<HR WIDTH=50% NOSHADE ALIGN="LEFT">
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=25%>F0<B>H</B></TD><TD WIDTH=25%>ii<B>H</B> dd<B>H</B> ....... ee<B>H</B></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Don't worry about this ii, dd, ee stuff. All it means is that, according to the MIDI standard for System Exclusive, there
+can be any number of data bytes here, each set to any value within an allowable range (ie, 0 to 127).</TD></TR>
+<TR><TD WIDTH=25%>F7<B>H</B></TD><TD WIDTH=25%></TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+And then of course, there's a final F7 byte.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=25%>F0<B>H</B></TD><TD WIDTH=25%>: System exclusive</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Whereas the above showed you the MIDI standard for a System Exclusive message, now you're going to see the Roland
+general form. In Roland SysEx, after the opening F0 byte, the first data byte is always a Manufacturer ID of 41.</TD></TR>
+<TR><TD WIDTH=25%>ii = Manufacturer ID</TD><TD WIDTH=25%>: 41<B>H</B> (65)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+Roland's Manufacturer ID is always the first data byte after the F0, and is always 41.</TD></TR>
+<TR><TD WIDTH=25%>dd .....ee = Data</TD><TD WIDTH=25%>: 00<B>H</B> - 7F<B>H</B> (0 to 127)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this means is that there can be any number of data bytes here, each set to any value within the range
+0 to 127.</TD></TR>
+<TR><TD WIDTH=25%>F7<B>H</B></TD><TD WIDTH=25%>: EOX (End of exclusive)</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+There's that final F7 byte.</TD></TR>
+</TABLE>
+
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=49%>Refer to section 3, 4.</TD><TD WIDTH=50% BGCOLOR="#99CCCC">
+All this is saying is that you should also read the sections entitled "Exclusive communications" and "Parameter Address
+Map". These give the excruciating details of the JV-90's System Exclusive capabilities.</TD></TR>
+</TABLE>
+
+<P><B>What follows here are the "Exclusive communications" and "Parameter address map" sections. These are covered in
+another article entitled <A HREF="rolsysx.htm">Roland System Exclusive Implementation</A>.</B></P>
+
+</BODY></HTML>

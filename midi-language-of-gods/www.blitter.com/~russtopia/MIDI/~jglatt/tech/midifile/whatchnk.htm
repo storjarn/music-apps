@@ -1,0 +1,47 @@
+<HTML><HEAD><TITLE>MIDI File Format: Chunks</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+Data is always saved within a <B>chunk</B>. There can be many chunks inside of a MIDI file.
+
+<P>Each chunk can be a different size (and likely will be). A chunk's size is how many (8-bit)
+bytes are contained in the chunk.
+
+<P>The data bytes in a chunk are typically related in some way. For example, all of the bytes in one chunk
+may be for one particular sequencer track. The bytes for another sequencer track may be put in
+a different chunk. So, a chunk is simply a group of related bytes.
+
+<P>Each chunk must begin with a 4 character (ie, 4 ascii bytes) <B>ID</B> which tells what "type"
+of chunk this is.
+
+<P>The next 4 bytes must form a 32-bit length (ie, size) of the chunk.
+
+<P><U>All chunks must begin with these two fields</U> (ie, 8 bytes), which are referred to as the
+<B>chunk header</B>.
+
+<P>Here's what a chunk's header looks like if you defined it in C:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BLUE>struct</FONT> CHUNK_HEADER
+{
+   <FONT COLOR=BLUE>char</FONT>           ID[4];
+   <FONT COLOR=BLUE>unsigned long</FONT>  Length; 
+};</B></FONT></PRE>
+
+<P><B><FONT COLOR=RED>NOTE:</FONT></B> The <B>Length</B> does not include the 8 byte chunk
+header. It simply tells you how many bytes of data are in the chunk <U>following this header</U>.
+
+<P>And here's an example chunk header (with bytes expressed in hex) if you examined it with a hex editor:
+
+<P>4D 54 68 64 00 00 00 06
+
+<P>Note that the first 4 bytes make up the ascii ID of <B>MThd</B> (ie, the first four
+bytes are the ascii values for 'M', 'T', 'h', and 'd'). The next 4 bytes tell us that there should
+be 6 more data bytes in the chunk (and after that we should find the next chunk header or the end
+of the file).
+
+<P><B><FONT COLOR=RED>NOTE:</FONT></B> The 4 bytes that make up the <B>Length</B> are stored in (Motorola) "Big Endian"
+byte order, not (Intel) "Little Endian" reverse byte order. (ie, The 06 is the fourth byte instead
+of the first of the four).
+
+<P>In fact, all MIDI files begin with the above <B>MThd header</B> (and that's how you know that it's
+a MIDI file).
+
+</FONT></BODY></HTML>

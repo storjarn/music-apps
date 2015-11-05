@@ -1,0 +1,147 @@
+<HTML><HEAD><TITLE>Changing patches over MIDI using Bank Select Controller</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+<P>When the MIDI spec was first developed, it wasn't foreseen that anyone would need more than 128 patches on a given
+module. (Back then, most didn't even have anywhere near that number of patches). So, the MIDI Program Change message was
+hardwired to have a limit of counting only from 1 to 128.</P>
+
+<P>Later, modules with more than 128 patches came on the market. People needed some way of being able to switch to these
+extra patches, but which was still compatible with the old way of switching patches. The manufacturers adopted a scheme of
+arranging patches in "banks" (ie, groups of usually 128 patches). For example, the first 128 patches in a module may be
+"bank 1". The next 128 patches may be "bank 2". Etc. Theoretically, there can be up to 16,384 banks on a module.</P>
+
+<P>The technique that the manufacturers adopted for MIDI control over patch changing is to have the musician first select
+the bank that contains his desired patch, and then select the patch within that bank. For example, assume that a musician
+wants to select the patch "Gungho" which happens to be the third patch in the second bank. First the musician would have
+to send one or two (depending upon how the manufacturer arranged patches into banks) MIDI messages to select the second
+bank (MIDI counts this as bank 1, since MIDI considers bank number 0 to actually be the first bank). Then, the musician
+sends a MIDI message to select the third patch (again, MIDI considers patch number 0 to be the first patch in a bank, so
+the third patch would actually be number 2). So, selecting a patch is a two-step (ie, 2 or 3 message) process. First, you
+send the Bank Select message(s) to switch to the desired bank. Then you send an ordinary Program Change message to select
+which one of the 128 possible patches in that bank you desire.</P>
+
+<P>The Bank Select messages are actually MIDI Controller messages, just like Volume, Pan, Sustain Pedal, Wind, and other
+controllers. Specifically, the controller number for the "Most Significant Byte" (ie, MSB) of Bank Select is controller 0.
+The controller number for "Least Significant Byte" (ie, LSB) of Bank Select is controller 32. The data for these messages
+are the bank number you want to select. (Sometimes the MSB Bank Select is referred to as the coarse adjustment for bank,
+and the LSB Bank Select is referred to as the fine adjustment).</P>
+
+<P><B>NOTE:</B> We need to use 2 messages to contain the bank number because, due to MIDI's design, it's not possible to
+transmit a value greater than 128 in just one controller message. Remember that a bank number can go as high as 16,384,
+and you need 2 MIDI controller messages to send such a large value. But, since most modules do not have more than 128 banks
+anyway, these modules typically only use the MSB message (ie, controller number 0) to select bank, and ignore any LSB
+message (ie, controller number 32). So then, here are the two messages (in hexadecimal, assuming MIDI channel 1, and
+assuming that the module only uses the MSB Bank Select controller) to select that "Gungho" patch:</P>
+
+<TABLE NOBORDER WIDTH=50%>
+<TR><TD WIDTH=15%>B0 00 01</TD><TD WIDTH=85% BGCOLOR="#99CCCC">Switch to bank 2 (NOTE: only the MSB message needed)</TD></TR>
+<TR><TD WIDTH=15%>C0 02</TD><TD WIDTH=85% BGCOLOR="#99CCCC">Switch to the third patch in this bank</TD></TR>
+</TABLE>
+
+<P>The patch doesn't actually change until the module receives the Program Change message. The Bank Select message(s)
+must precede the Program Change message. Otherwise, the module would select the third patch in whatever bank the module was
+currently set to. (In other words, when the module receives Bank Select messages, it doesn't change any patches. Rather, it
+simply notes what the "current bank" is, and any subsequent Program Change messages will switch to patches within that bank.
+What this also means is that you don't necessarily need to send Bank Select before every individual Program Change. If
+you're switching to a patch in the same bank as whatever patch you've currently selected, then you can omit the Bank Select
+messages since the module will then assume the same bank).</P>
+
+<P>The following, real-world example concerns a Roland module. Before proceeding, you should read
+<A HREF="rolarc.htm">The architecture of Roland sound modules</A> if you're unfamiliar with the way that Roland
+arranges Patches into "Banks".</P>
+
+<P>Let's look at the JV-90 as an example. Look under the "MIDI Implementation" chapter of the manual. Follow the
+"Receive Data" section until you get to "Control Change" and "Bank Select". (The article
+<A HREF="rolmidi.htm">Understanding the MIDI Implementation in your Roland manual</A> helps guide you through this
+chapter of the manual). As is so typical of Roland, the company uses the MIDI spec in a
+clever way. Rather than using the data bytes of both the MSB and LSB messages "added" together to make up a single
+bank number, Roland sort of uses the MSB message to select the "component" that you wish to access, and the LSB message to
+select the bank within that component (ie, some components contain several banks, such as the factory patches in ROM).</P>
+
+<P>Look at the following list: (Note that I'm using a fixed pitch font to line up the columns)</P>
+
+<PRE>Bank   Bank    Program     Media
+MSB    LSB     Change
+80      0      1 - 64      Internal (ie, User custom presets in RAM)
+80      0      65 - 128    Data Card
+81      0      1 - 64      JV-90 Preset A (ie, factory patches on Voice Expansion)
+81      0      65 - 128    JV-90 Preset B (ie, factory patches on Voice Expansion)
+81      1      1 - 64      Preset A (ie, factory patches in ROM)
+81      1      65 - 128    Preset B (ie, factory patches in ROM)
+81      2      1 - 64      Preset C (ie, factory patches in ROM)
+81      2      65 - 128    Preset D (ie, factory patches in ROM)
+82      0      1 - 64      Data Card
+83      0      1 - 128     PCM Card
+84      0      1 - 128     Expansion Board (ie, factory patches on Wave Expansion)
+84      1      1 - 128     Expansion Board (129 - 256)</PRE>
+
+<P>Let's say that you want to select the third patch on the factory presets "B" group. Look at "Preset B". In order to
+select from these patches, first you must send an MSB Bank Select with the decimal value 81 (ie, hexadecimal 51). Next, you
+must send an LSB Bank Select with the value 1. Finally, you can send a Program Change. The patches in this bank are numbered
+65 to 128 (ie, the first patch in the "Preset B" is number 65 -- actually it is 64 in our Program Change message since we
+always subtract 1 to account for MIDI assuming 0 as the first patch in a bank). So the third patch in Preset B is #67
+(really 66, or hexadecimal 42). Here are the 3 messages (assuming MIDI channel 1):</P>
+
+<TABLE NOBORDER WIDTH=50%>
+<TR><TD WIDTH=15%>B0 00 51</TD><TD WIDTH=85% BGCOLOR="#99CCCC">MSB (Coarse) Bank select</TD></TR>
+<TR><TD WIDTH=15%>B0 20 01</TD><TD WIDTH=85% BGCOLOR="#99CCCC">LSB (Fine) Bank select</TD></TR>
+<TR><TD WIDTH=15%>C0 42</TD><TD WIDTH=85% BGCOLOR="#99CCCC">Program Change</TD></TR>
+</TABLE>
+
+<P>Let's select the first patch in User RAM (ie, "Internal" as Roland
+calls it in the above chart). We need an MSB Bank Select of 80
+(hexadecimal 50), an LSB Bank Select of 0, and then a Program Change to
+patch 1 (actually 0) since the patches are numbered 1 to 64 here.</P>
+
+<TABLE NOBORDER WIDTH=50%>
+<TR><TD WIDTH=15%>B0 00 50</TD><TD WIDTH=85% BGCOLOR="#99CCCC">MSB (Coarse) Bank select</TD></TR>
+<TR><TD WIDTH=15%>B0 20 00</TD><TD WIDTH=85% BGCOLOR="#99CCCC">LSB (Fine) Bank select</TD></TR>
+<TR><TD WIDTH=15%>C0 00</TD><TD WIDTH=85% BGCOLOR="#99CCCC">Program Change</TD></TR>
+</TABLE>
+
+<P>Of course, if you subsequently want to select another patch in this same bank, then you can skip sending the 2 Bank
+Select messages. After all, "User RAM" is now the current bank.</P>
+
+<P>Although most Roland sound modules use Bank Select controller in ways similiar to the JV-90, your unit may
+have different components and different bank numbers used to select them. You need to look up the appropriate
+chart in your Roland manual. It will be found in the "MIDI Implementation" chapter, under the RECEIVE DATA
+main section, CONTROL CHANGE subsection, and "Bank Select" sub-subsection.</P>
+
+<HR>
+<P>Some sequencer programs allow you to setup an "instrument definition" wherein you simply enter
+the above 3 messages and then specify the name of the patch. For example, maybe this patch is called "Gungho". You can tell
+your sequencer that whenever you select "Gungho" from a list of patch names, the sequencer will then automatically insert
+the above 3 messages into your track at some specified point where you want to switch to the "Gungho" patch. It's a
+lot easier to setup that instrument definition once, detailing the messages to insert for each patch name, and then from
+there, only deal with selecting patch names from some list rather than needing to remember what Bank Select and Program
+Change messages need to be inserted. But of course, in order to create such a definition, you need to understand the above
+(once anyway -- and then you can forget about it all -- after the nightmares subside).<P>
+
+<P>For example, you can go into CakeWalk's Settings->Assign Instruments menu item, and click on "Define Instruments" to
+create a new instrument definition for your MIDI module. Unfortunately, I think that CakeWalk's instrument definition is
+most unintuitive and convoluted because you have to first dig your way down to the "Define names" dialog box, skipping a
+whole dialog of settings, in order to enter all the banks of patch names prior to even defining what sort of bank select
+your module uses and what those banks are. This "bottom up" approach may save some time if you're dealing with a module
+whose banks tend to include a lot of duplicate patches, but it's really a pain for modules whose banks do not contain
+duplicate patches. I'd prefer to first choose the "bank select method", and then have CakeWalk guide me through the
+naming/numbering of a bank, immediately followed by each patch name/number in that bank, and so on for however many more
+banks there are. Worse, it appears that you have to enter the Banks by editing a rather freeform text file. For this
+reason, the creation of CakeWalk instrument definitions is a perilous and difficult undertaking for all but the most
+patient and experienced.</P>
+
+<P>Once you have an instrument definition, you can insert a Bank Select (MSB and LSB) and Program Change in a CakeWalk
+track simply using the Insert menu's "Bank/Patch change".</P>
+
+<P>The very first Bank Select and Program Change events, if they appear before any note events in a track, are automatically
+extracted by CakeWalk and used to set the "Bank" and "Patch" fields in CakeWalk's track display. So, you use these two
+fields to enter your values for any initial Bank and Program Change at playback start. Then, if you want to change the Bank
+and/or Patch somewhere in the middle of the track (ie, after notes have already been played, you'll have use CakeWalk's
+Insert menu to insert "Bank/Patch change". Choose a Bank and a Patch, and enter the desired time where it should be
+inserted, and CakeWalk will insert the Bank Select and Program Change events in the track at that desired
+point. You should see these shown in the Event List. If you don't have a CakeWalk instrument definition file for your MIDI
+module, then you'll need to manually insert the desired Bank controller events yourself using Insert menu's
+"Series of Controllers". Do this once to choose "Bank Select" controller (ie, the coarse, or MSB one) and its desired Value
+and Time. (If your unit also requires the LSB or "fine" value for Bank Select, you'll need to repeat this to choose
+"Bank Select (fine)" controller and set its value/time). Then use the "Bank/Patch change" just to pick out one of the 128
+patches in the bank.</P>
+
+</BODY</HTML>

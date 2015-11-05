@@ -1,0 +1,129 @@
+<HTML><HEAD><TITLE>A beginner's controller keyboard</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+A controller keyboard is simply an electronic piano keyboard with a MIDI OUT jack that can be attached to the MIDI IN
+jack of other musical units. The controller can then be used to "play" the sounds in those other units. Often, controller
+keyboards make no sound by themselves since it's assumed that their MIDI OUT will be attached to the MIDI IN of a device
+that does produce sound. Many computer sound cards have MIDI IN jacks, which when you attach the MIDI OUT of a controller
+keyboard, you can use the keyboard to play the "patches" (ie, sounds) on the card's built-in FM synthesis or wavetable
+module. (But typically, you need computer software to enable the playback of the card's built-in sounds with an external
+keyboard. See <A HREF="connect.htm#q2">"Why won't my MIDI controller play the sounds on my card?"</A>). Furthermore, (MIDI)
+data received by the card (ie, from the controller keyboard) can be recorded and played back by computer software (known as
+a <A HREF="whatsseq.htm">sequencer</A>). Therefore, a keyboard that has a MIDI OUT jack is very useful as a controller for
+working with a computer sound card and computer music software.
+
+<P>If you're a keyboard player, then you probably already know what you want in a controller keyboard. On the other hand,
+if you don't know how to play a keyboard, and just want a very basic (ie, cheap) controller that will give you enough
+features to access your sound card and use a MIDI sequencer, here is some advice.</P>
+
+<P>Some ads describe a keyboard as being "touch sensitive". This could mean 1 of 2 things (or both, which is even better).
+At the very least, a keyboard should generate "MIDI note velocity" messages (to its MIDI OUT jack). This refers to how fast
+(ie, hard) you depress a given key. The faster, or harder, you press down a key, the higher the velocity for that note is.
+Most all sound modules (including the built-in modules of sound cards) nowadays allow velocity to be used to control a
+note's volume and/or brightness (ie, higher velocity makes a note louder and/or brighter). So when you play the keys
+"harder", the notes typically are louder/brighter.</P>
+
+<P>Virtually all keyboards made today support the above feature which officially is referred to as "Note Velocity".</P>
+
+<P>Additionally, some keyboards implement "MIDI Channel Pressure". What this means is that, <B>while</B> holding the key
+down (ie, after you initially press it down), you can vary your finger pressure on the key, and the keyboard will transmit
+additional "MIDI Channel Pressure" messages. Typically, most sound modules use Channel Pressure to vary brightness and/or a
+vibrato or tremulo effect. (ie, As you apply more or less physical pressure to the key, all the while continuously depressing
+it, the sound should change in some way, for example, maybe you'll hear more vibrato applied to the sound whenever you press
+down harder). Modules that support Channel Pressure often allow you to select one of several effects (ie, vibrato, tremulo,
+volume swells, etc) that can be tied to your finger pressure. There's another kind of pressure called "Aftertouch", but
+this is expensive to implement (so you won't find it on cheap keyboards) and most sound modules don't utilize these
+MIDI messages anyway. (I know of no computer sound card which does).</P>
+
+<P>Any keyboard that isn't touch sensitive (ie, uses only 1 preset MIDI velocity) is musically limited as far as I'm
+concerned. Dynamics (ie, varying volume) is an important aspect of music, and without it, you have droning, sterile computer
+music. At the very least, the keyboard should support Note Velocity. Channel Pressure support is also good to have, but if
+the keyboard has a Modulation Wheel, then you can do without Channel Pressure, because typically a Mod Wheel can be set to
+do the same thing as Channel Pressure. The good thing about Channel Pressure is that you can still play notes with both
+hands, and add an effect via applying finger pressure. A Mod Wheel would have to be operated with one hand while you play
+notes with the other hand (unless the keyboard has an input jack that accepts a pedal which can substitute for the Mod
+Wheel). If you're not a keyboard player, Channel Pressure may not be as important to you, since you probably don't have the
+technique to control your finger pressure very well, or may find two-handed parts to be too difficult anyway (so you have a
+free hand to operate the Mod Wheel anyway). If you're a novice keyboardist and are using a sequencer, you'll probably use
+its overdub feature (ie, play back the previously recorded MIDI data while recording more data) to add vibrato, tremulo, or
+other effects to musical parts after recording the part. For overdubbing effects, a Mod Wheel is easier for controlling
+those effects than Channel Pressure.</P>
+
+<P>Some controllers offer a "piano feel". This means that the "action" of the keyboard is physically setup to mimic the way
+that a piano's action really feels. Most electronic keyboards instead have a spring-loaded "organ touch". One action isn't
+necessarily better than the other. It just depends upon your preference. Regardless of which kind of action you prefer, both
+have ways of implementing Note Velocity, Channel Pressure, and Aftertouch, and that is what's really important. Unless price
+is no object, I recommend that novice keyboardists stick with a regular, spring-loaded action (which is cheaper than most
+"real piano action" simulations). It won't make you any less or better a keyboardist.</P>
+
+<P>It's good to have a Pitch Wheel and a Modulation wheel on the unit. Some units have levers instead of wheels, which is
+fine. Some people even prefer gripping levers rather than wheels. Some units have only 1 lever, moveable in 4 directions
+with Pitch controlled by left/right moves and Modulation by up/down. This also is acceptable. Again, some people prefer
+this. (I prefer separate wheels which is an "old school" thing).</P>
+
+<P>It's not important that the unit be able to do "split modes" (ie, different areas of the keyboard broadcast upon
+different MIDI channels) unless your sound card can play more than one Patch simultaneously (ie, is "multi-timbral") and you
+have good enough 2-handed piano technique to play two musical parts simultaneously. A novice keyboardist will probably be
+playing 1 instrument/part (ie, with one hand) at a time, and using the sequencer's overdub feature to build up the musical
+parts of a song. So, the keyboard only needs to broadcast upon one MIDI channel at a time. Virtually every keyboard nowadays
+allows you to set its MIDI channel to one of the possible 16.</P>
+
+<P>Also, you don't need any built-in sounds in the keyboard controller. The cheap stuff doesn't sound that good. (Of course,
+a keyboard that doesn't make any sound by itself doesn't need any MIDI IN jack. But any keyboard that needs to control a
+sound card or record musical parts to a sequencer would, of course, need a MIDI OUT jack. Again, almost all music gear
+nowadays has the appropriate MIDI jacks). If you do choose a controller with built-in sounds, and you're using a
+sequencer to build up several parts, all of which have to ultimately be played back simultaneously, make sure that the
+built-in sound module is <A HREF="http://www.borg.com/~jglatt/tutr/mulit.htm">multi-timbral</A>. For simplicity of working with others' MIDI files, you'll
+also want that built-in module to have some sort of General MIDI (GM) mode of operation.</P>
+
+<P>Furthermore, you should check that the keyboard has at least a 4 octave range (ie, 48 keys). Anything less is too
+confining, even for single-handed parts (and isn't enough to encompass all the drum sounds in a General MIDI Drum Patch). If
+your keyboard chops ever get good enough to do 2-handed parts (ie, a two-handed piano part), I recommend 5 or more octaves.
+I very much recommend full-size keys (ie, not these "mini keys" like on toy Casio and Yamaha keyboards). When you're a
+novice keyboard player, it's hard enough to keep your fingers from accidentally hitting adjacent keys, even when the keys
+are full size. The mini keys are unplayable as far as I'm concerned. On the other hand, I once met a guitarist who actually
+preferred playing those mini keys. He claimed that it was easier for him to "claw" chords being that the keys were closer
+together. I can't see ever developing any kind of accuracy with fast runs on mini keys.</P>
+
+<P>Additionally, the ability to transpose the keyboard's note range would be nice (ie, so that you can play high flute
+notes, and then transpose the note range down for low bass guitar notes -- doing either with a limited range keyboard).
+If you want to do split keyboard modes, then get at <U>least</U> 5 octaves.</P>
+
+<P>If you want to play realistic piano parts, the keyboard should be able to accept (ie, have an input jack for) a sustain
+pedal. (The keyboard should also broadcast a MIDI Controller message for Sustain Pedal. Check that MIDI implementation
+chart). But, you'll have to practice using the pedal while playing, which may not be something that you'll want to bother
+with just for piano parts if you're a novice keyboardist, so it's up to you whether this is important.</P>
+
+<P>Finally, you want the keyboard to be able to run on AC (ie, not just battery powered). If the AC adapter is sold
+separately, buy that too.</P>
+
+<P>In conclusion, here are some pertinent questions (not including any questions about any internal sounds) for a
+controller used by a novice keyboardist:</P>
+
+<OL>
+<LI>Does the unit have a MIDI OUT jack?
+
+<LI>Is the keyboard touch-sensitive (ie, does it generate more than 1, preset MIDI velocity -- ie, does it support
+Note Velocity)?
+
+<LI>Does the keyboard generate MIDI Channel Pressure?
+
+<LI>Does the keyboard have full size keys (ie, not those mini keys like on toy keyboards)?
+
+<LI>How many keys are on the keyboard (ie, what's the note range)?
+
+<LI>Can the keyboard be transposed (ie, can I set the MIDI note range that the keyboard covers)?
+
+<LI>Does the unit have Pitch and Modulation wheels (or levers)?
+
+<LI>Does the unit support a sustain pedal attachment?
+
+<LI>Does the unit run on AC?
+</OL>
+
+<P>There are a number of cheap controllers (with no built-in sound module) on the market. A very popular unit is the Roland
+PC-500. The Roland A-33 is a slightly fancier, but still quite inexpensive controller. I recommend it for the more serious
+keyboardist who doesn't want to get into really expensive, piano actions. The A-90 is Roland's fancy, piano action
+controller. Fatar makes a line of very popular keyboard controllers covering a wide price range. Kurzweil and Peavey make
+some popular and very flexible, but more expensive, controllers that also have some built-in sounds.</P>
+
+</BODY></HTML>

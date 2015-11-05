@@ -1,0 +1,69 @@
+<HTML><HEAD><TITLE>MIDI File Format: Events in an MTrk</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+An MTrk can contain MIDI events and non-MIDI events (ie, events that contain data such as
+tempo settings, track names, etc).
+
+<P>The first (1 to 4) byte(s) in an MTrk will be the first event's delta-time as a variable length
+quantity. The next data byte is actually the first byte of that event itself. I'll refer to this as
+the event's <B>Status</B>. For MIDI events, this will be the actual MIDI Status byte
+(or the first midi data byte if running status). For example, if the byte is hex 90, then this
+event is a <B>Note-On</B> upon midi channel 0. If for example, the byte was hex 23, you'd have to
+recall the previous event's status (ie, midi running status). Obviously, the first MIDI event in
+the MTrk <U>must</U> have a status byte. After a midi status byte comes its 1 or 2 data bytes
+(depending upon the status - some MIDI messages only have 1 subsequent data byte). After that
+you'll find the next event's delta time (as a variable quantity), etc.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>SYSEX events</B></FONT></CENTER>
+
+<P>SYSEX (system exclusive) events (status = F0) are a special case because a SYSEX event can
+be any length. After the F0 status (which is always stored -- no running status here), you'll find
+yet another series of variable length bytes. Combine them with ReadVarLen() and you'll come up
+with a 32-bit value that tells you how many more bytes follow which make up this SYSEX event.
+This length doesn't include the F0 status.
+
+<P>For example, consider the following SYSEX MIDI message:
+
+<P>F0 7F 7F 04 01 7F 7F F7
+
+<P>This would be stored in a MIDI file as the following series of bytes (minus the delta-time
+bytes which would precede it):
+
+<P>F0 07 7F 7F 04 01 7F 7F F7
+
+<P>The 07 above is the variable length quantity (which happens to fit in just one byte for this
+example). It indicates that there are seven, following bytes that comprise this SYSEX message.
+
+<P>Really oddball midi units send a system exclusive message as a series of small "packets" (with
+a time delay inbetween transmission of each packet). The first packet begins with an F0, but it
+doesn't end with an F7. The subsequent packets don't start with an F0 nor end with F7.  The last
+packet doesn't start with an F0, but does end with the F7. So, between the first packet's opening F0 and
+the last packet's closing F7, there's 1 SYSEX message there. (Note: only extremely poor designs,
+such as the crap marketed by Casio exhibit such horrid behavior). Of course, since a delay is
+needed inbetween each packet, you need to store each packet as a separate event with its own
+time in the MTrk. Also, you need some way of knowing which events shouldn't begin with an F0
+(ie, all of them except the first packet). So, the MIDI file redefines a midi status of F7
+(normally used as an end mark for SYSEX packets) as a way to indicate an event that doesn't
+begin with F0. If such an event follows an F0 event, then it's assumed that the F7 event is the
+second "packet" of a series. In this context, it's referred to as a SYSEX CONTINUATION event.
+Just like the F0 type of event, it has a variable length followed by data bytes. On the other
+hand, the F7 event could be used to store MIDI REALTIME or MIDI COMMON messages. In this case,
+after the variable length bytes, you should expect to find a MIDI Status byte of F1, F2, F3, F6,
+F8, FA, FB, FC, or FE. (Note that you wouldn't find any such bytes inside of a SYSEX CONTINUATION
+event). When used in this manner, the F7 event is referred to as an ESCAPED event.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Non-MIDI events</B></FONT></CENTER>
+
+<P>A status of FF is reserved to indicate a special non-MIDI event. (Note that FF is used in MIDI
+to mean "reset", so it wouldn't be all that useful to store in a data file. Therefore, the MIDI
+file arbitrarily redefines the use of this status). After the FF status byte is another byte that
+tells you what <B>Type</B> of non-MIDI event it is. It's sort of like a second status byte. Then
+after this byte is another byte(s -- a variable length quantity again) that tells how many more
+data bytes follow in this event (ie, its Length). This Length doesn't include the FF, Type
+byte, nor the Length byte. These special, non-MIDI events are called <B>Meta-Events</B>, and
+most are optional unless otherwise noted. The section of this online book entitled "Meta-Events"
+lists the currently defined Meta-Events. Note that unless otherwise mentioned, more than one of
+these events can be placed in an MTrk (even the same Meta-Event) at any delta-time. (Just like
+all midi events, Meta-Events have a delta-time from the previous event regardless of what type
+of event that may be. So, you can freely intermix MIDI and Meta events).
+
+</FONT></BODY></HTML>

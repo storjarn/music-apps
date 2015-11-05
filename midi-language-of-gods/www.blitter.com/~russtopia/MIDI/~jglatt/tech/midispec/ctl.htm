@@ -1,0 +1,41 @@
+<HTML><HEAD><TITLE>MIDI Specification: Controller</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Controller</CENTER></FONT></H2>
+
+<P>Category: Voice
+
+<P><FONT COLOR=GREEN>Purpose</FONT>
+
+<P>Sets a particular controller's value. A controller is any switch, slider, knob, etc, that implements some function (usually)
+other than sounding or stopping notes (ie, which are the jobs of the Note On and Note Off messages respectively). There
+are 128 possible controllers on a MIDI device. These are numbered from 0 to 127. Some of these controller numbers are
+assigned to particular hardware controls on a MIDI device. For example, controller 1 is the <B>Modulation
+Wheel</B>. Other controller numbers are free to be arbitrarily interpreted by a MIDI device. For example, a drum box
+may have a slider controlling Tempo which it arbitrarily assigns to one of these free numbers. Then, when the drum box
+receives a Controller message with that controller number, it can adjust its tempo. A MIDI device need not have an actual
+physical control on it in order to respond to a particular controller. For example, even though a rack-mount sound module
+may not have a <B>Mod Wheel</B> on it, the module will likely still respond to and utilize <B>Modulation controller</B>
+messages to modify its sound. If the device is a MultiTimbral unit, then each one of its Parts may respond differently (or not
+at all) to various controller numbers. The Part affected by a particular controller message is the one assigned to the
+message's MIDI channel.
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0xB0 to 0xBF where the low nibble is the MIDI channel.
+
+<P><FONT COLOR=GREEN>Data</FONT>
+<P>Two data bytes follow the Status.
+
+<P>The first data is the controller number (0 to 127). This indicates which controller is affected by the received MIDI
+message.</P>
+
+<P>The second data byte is the value to which the controller should be set, a value from 0 to 127.</P>
+
+<P><FONT COLOR=GREEN>Errata</FONT>
+<P>An <A HREF="ntnoff.htm">All Controllers Off</A> controller message can be used to reset all controllers (that a
+MIDI device implements) to default values. For example, the <B>Mod Wheel</B> is reset to its "off"
+position upon receipt of this message.
+
+<P>See the list of <A HREF="ctllist.htm">Defined Controller Numbers</A> for more information about particular
+controllers.
+
+</FONT></BODY></HTML>

@@ -1,0 +1,64 @@
+<HTML><HEAD><TITLE>MIDI File Format: MThd Chunk</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+The MThd header has an ID of <B>MThd</B>, and a Length of <B>6</B>.
+
+<P>Let's examine the 6 data bytes (which follow the MThd header) in an MThd chunk.
+
+<P>The first two data bytes tell the <B>Format</B> (which I prefer to call "type").
+There are actually 3 different types (ie, formats) of MIDI files. A type of 0 means that the file
+contains one single track containing midi data on possibly all 16 midi channels. If your sequencer
+sorts/stores all of its midi data in one single block of memory with the data in the order that it's
+"played", then it should read/write this type. A type of 1 means that the file contains one or
+more simultaneous (ie, all start from an assumed time of 0) tracks, perhaps each on a single midi
+channel. Together, all of these tracks are considered one sequence or pattern. If your
+sequencer separates its midi data (i.e. tracks) into different blocks of memory but plays them back
+simultaneously (ie, as one "pattern"), it will read/write this type. A type of 2 means that the
+file contains one or more sequentially independant single-track patterns.  If your sequencer
+separates its midi data into different blocks of memory, but plays only one block at a time (ie,
+each block is considered a different "excerpt" or "song"), then it will read/write this type.
+
+<P>The next 2 bytes tell how many tracks are stored in the file, <B>NumTracks</B>. Of course,
+for format type 0, this is always 1. For the other 2 types, there can be numerous tracks.
+
+<A NAME="division"></A>
+<P>The last two bytes indicate how many Pulses (i.e. clocks) Per Quarter Note (abbreviated as PPQN) resolution the
+time-stamps are based upon, <B>Division</B>. For example, if your sequencer has 96 ppqn,
+this field would be (in hex):
+
+<P>00 60
+
+<P><B><FONT COLOR=RED>NOTE:</FONT></B> The 2 bytes that make up the <B>Division</B> are stored in
+(Motorola) "Big Endian" byte order, not (Intel) "Little Endian" reverse byte order. The same is
+true for the <B>NumTracks</B> and <B>Format</B>.
+
+<P>Alternately, if the first byte of Division is negative, then this represents the division
+of a second that the time-stamps are based upon. The first byte will be -24, -25, -29, or -30,
+corresponding to the 4 SMPTE standards representing frames per second. The second byte (a
+positive number) is the resolution within a frame (ie, subframe). Typical values may be 4 (MIDI
+Time Code), 8, 10, 80 (SMPTE bit resolution), or 100.
+
+<P>You can specify millisecond-based timing by the data bytes of -25 and 40 subframes.
+
+<P>Here's what an MThd chunk looks like if you defined it in C:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BLUE>struct</FONT> MTHD_CHUNK
+{
+   <FONT COLOR=BROWN>/* Here's the 8 byte header that all chunks must have */</FONT>
+   <FONT COLOR=BLUE>char</FONT>           ID[4];  <FONT COLOR=BROWN>/* This will be 'M','T','h','d' */</FONT>
+   <FONT COLOR=BLUE>unsigned long</FONT>  Length; <FONT COLOR=BROWN>/* This will be 6 */</FONT>
+
+   <FONT COLOR=BROWN>/* Here are the 6 bytes */</FONT>
+   <FONT COLOR=BLUE>unsigned short</FONT> Format;
+   <FONT COLOR=BLUE>unsigned short</FONT> NumTracks;
+   <FONT COLOR=BLUE>unsigned short</FONT> Division;
+};</B></FONT></PRE>
+
+<P>And here's an example of a complete MThd chunk (with header) if you examined it in a hex editor:
+
+<PRE><B>4D 54 68 64     <FONT COLOR=GREEN>MThd ID</FONT>
+00 00 00 06     <FONT COLOR=GREEN>Length of the MThd chunk is always 6.</FONT>
+00 01           <FONT COLOR=GREEN>The Format type is 1.</FONT>
+00 02           <FONT COLOR=GREEN>There are 2 MTrk chunks in this file.</FONT>
+E7 28           <FONT COLOR=GREEN>Each increment of delta-time represents a millisecond.</FONT></B></PRE>
+
+</FONT></BODY></HTML>

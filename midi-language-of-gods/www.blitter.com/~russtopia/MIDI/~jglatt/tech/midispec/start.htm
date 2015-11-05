@@ -1,0 +1,26 @@
+<HTML><HEAD><TITLE>MIDI Specification: MIDI Start</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>MIDI Start</CENTER></FONT></H2></P>
+
+<P>Category: System Realtime
+
+<P><FONT COLOR=GREEN>Purpose</FONT>
+<P>Some master device that controls sequence playback sends this message to make a slave device start playback of
+some song/sequence from the beginning (ie, MIDI Beat 0).
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0xFA
+
+<P><FONT COLOR=GREEN>Data</FONT>
+<P>None
+
+<P><FONT COLOR=GREEN>Errata</FONT>
+<P>A MIDI Start always begins playback at MIDI Beat 0 (ie, the very beginning of the song).  So, when a slave device
+receives a MIDI Start, it automatically resets its "Song Position" to 0. If the device needs to start playback at some other
+point (either set by a previous Song Position Pointer message, or manually by the musician), then MIDI Continue
+is used instead of MIDI Start.
+
+<P>Often, the slave device has its playback tempo synced to the master via MIDI Clock. See
+<A HREF="seq.htm">Syncing Sequence Playback</A>.
+
+</FONT></BODY></HTML>

@@ -1,0 +1,312 @@
+<HTML><HEAD><TITLE>What is MIDI?</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+<CENTER><FONT COLOR=RED><B>Preface</B></FONT></CENTER>
+
+<P>Before discussing what MIDI is, it is important to understand some basic principles about musical instruments.
+
+<P>There is one thing that all musical instruments do. All musical instruments make a sound under the control of a musician. In other words, at any time, the musician can cause an instrument to start making a sound. For example, a musician can push down a key on a piano to start a sound. Or, he can begin dragging a bow across a violin string to start a sound. Or he can fret and pick a guitar string to start a sound. Let's refer to the action of starting a sound as a "Note On".
+
+<P><TABLE WIDTH=100% BORDER=0 CELLSPACING=20 NOWRAP>
+<TR>
+<TD><IMG SRC="noteon.gif" WIDTH=267 HEIGHT=174 ALT="Pushing down C note" BORDER=0></TD>
+<TD><IMG SRC="speaker.gif" WIDTH=52 HEIGHT=48 BORDER=0></TD>
+<TD VALIGN=CENTER ALIGN=LEFT><FONT COLOR=BROWN>A musician pushes down (and holds down) a key on a keyboard. This sounds
+some musical note (which continues to sound while the musician continues holding down the key). This single gesture of
+the musician is known as a Note-On to MIDI.</FONT></TD>
+</TR>
+</TABLE>
+
+<P>Most instruments also allow the musician to stop the sound at any given time. For example, the musician can release that piano key, thus stopping the sound. Or, he can stop dragging a bow across the violin string. Or he can release his finger from the guitar fret. Let's refer to the action of stopping a sound as a "Note Off".
+
+<P><TABLE WIDTH=100% BORDER=0 CELLSPACING=20 NOWRAP>
+<TR>
+<TD><IMG SRC="noteoff.gif" WIDTH=266 HEIGHT=161 ALT="Releasing C note" BORDER=0></TD>
+<TD><IMG SRC="speaker2.gif" WIDTH=52 HEIGHT=48 BORDER=0></TD>
+<TD VALIGN=CENTER ALIGN=LEFT><FONT COLOR=BROWN>The musician releases the key (that he was holding down) on a keyboard.
+This stops the musical note from sounding. This single gesture of the musician is known as a Note-Off to MIDI.</FONT></TD>
+</TR>
+</TABLE>
+
+<P>Of course, many instruments can play distinct pitches (ie, a musical scale). For example, an acoustic piano has 88 keys, or 88 distinct pitches/notes.
+
+<P>There are other things that many musical instruments may have in common, for example, most instruments can make sounds at various volumes. (ie, They can sound notes at volumes ranging from very soft to very loud). For example, if the pianist pushes down a key with great force, the resulting note will be louder than if he were to gently press down the key.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Introduction</B></FONT></CENTER>
+
+<P>Musicians often want to be able to control electronic instruments remotely or automatically.
+
+<P>Remote control is when a musician plays one musical instrument, and that instrument controls (one or more) other musical instruments.
+
+<P>For example, musicians sometimes find it desirable to combine the sounds of several instruments playing in <U>perfect unison</U> to "thicken" or layer a musical part. The musician wants to blend certain patches upon those instruments. Perhaps he wishes to blend the sax patches upon 5 different instruments to create a more authentic-sounding sax section in a big band. But, since a musician has only two hands and feet, it's not possible to play 5 instruments at once unless he has some method of remote control.
+
+<P>Or, sometimes a musician wants to use only one physical keyboard to control several, separate <A HREF="define.htm#module">sound modules</A>. In the old days, every single musical instrument manufactured had its own built-in method of controlling it. For example, an electronic organ, an electronic piano, a string ensemble, a synthesizer, etc, each had its own built-in keyboard. This got to be rather expensive, as the physical keyboard is one of the more expensive parts of an instrument. Also, all of those keyboards tend to take up a lot of space, which is a problem for a gigging musician. So musicians thought <I>"Wouldn't it be great if I could buy a small box that made
+organ sounds into which I could plug a physical keyboard? And wouldn't it be great if I could buy other boxes that made piano, string, synth, etc, sounds, into which I could plug that same keyboard? And wouldn't it be great if I could attach them all together simultaneously, and switch the keyboard between playing any of them? I could save money and space. All I need is a standard for remotely controlling all of those boxes with that one keyboard."</I>
+
+<P><HR WIDTH=25%>
+
+<P>Automatic control is when the musician uses some other device to play a musical instrument as if another musician were playing it. (Such a device is referred to as a Sequencer).
+
+<P>For example, some musicians want to be able to have "backing tracks" in live performance, but they found it too cumbersome, unreliable, and limiting to use prerecorded tapes. They wanted a method that allowed more flexibility, perhaps to do things such as subtlely alter the arrangement live. To achieve this, rather than playing pre-recorded backing tracks, they wanted a method to automatically control their instruments during the performance using a device that could "intelligently" manipulate the arrangement (such as a computer).
+
+<P><HR WIDTH=25%>
+
+<P>So, musicians had a need to remotely or automatically control their musical instruments, and they wanted a method that wasn't tied to one particular manufacturer's product, nor one particular type of instrument. (ie, They wanted a method that worked as well with an
+electronic piano as it did with a drum box, for example). They wanted a standard that could be useful in controlling <U>any</U> electronic musical device. To satisfy this need, a few music manufacturers got together in mid 1983 and created <B>MIDI</B>, which <B>stands for Musical Instrument Digital Interface</B>. (For more information about the history of MIDI's development, see <A href="history.htm">The beginnings of MIDI</A>).
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Hardware/Connections</B></FONT></CENTER></P>
+
+<P>The visible <B>MIDI connectors</B> on an instrument <B>are female 5-pin DIN jacks</B>. There are separate jacks for incoming MIDI signals (received from another instrument that is sending MIDI signals), and outgoing MIDI signals (ie, MIDI signals that the instrument creates and sends to another device). The jacks look like these:
+
+<CENTER>
+<TABLE BORDER=0 CELLSPACING=0 NOWRAP>
+<TR>
+<TD><IMG SRC="midiplug.gif" WIDTH=56 HEIGHT=57 BORDER=0></TD>
+<TD WIDTH=20></TD>
+<TD><IMG SRC="midiplug.gif" WIDTH=56 HEIGHT=57 BORDER=0></TD>
+</TR>
+<TR>
+<TD ALIGN=CENTER VALIGN=TOP>Midi In</TD>
+<TD WIDTH=20></TD>
+<TD ALIGN=CENTER VALIGN=TOP>Midi Out</TD>
+</TR>
+</TABLE>
+</CENTER>
+
+<P>You use <B>MIDI cables</B> (with male DIN connectors) to <B>connect the MIDI jacks of various instruments together</B>, so that those instruments can pass MIDI signals to each other. You connect the MIDI OUT of one instrument to the MIDI IN of another instrument, and vice versa. For example, the following diagram shows the connection between a computer's MIDI interface and a MIDI keyboard that has built-in sounds.
+
+<CENTER>
+<TABLE BORDER=0 CELLSPACING=0 NOWRAP>
+<TR>
+<TD COLSPAN=3 ALIGN=CENTER VALIGN=BOTTOM><IMG SRC="inout.gif" WIDTH=300 HEIGHT=29 ALT="MIDI cables" BORDER=0></TD>
+</TR>
+<TR>
+<TD VALIGN=TOP><IMG SRC="piano1.gif" WIDTH=199 HEIGHT=51 ALT="Keyboard" BORDER=0></TD>
+<TD WIDTH=20></TD>
+<TD VALIGN=TOP><IMG SRC="computer.gif" WIDTH=128 HEIGHT=120 ALT="Computer's MIDI Interface" BORDER=0></TD>
+</TR>
+</TABLE>
+</CENTER>
+
+<P><B>Some instruments have a third MIDI jack labeled "Thru".</B> This is used as if it were an OUT jack, and therefore you attach a THRU jack only to another instrument's IN jack. In fact, the THRU jack is exactly like the OUT jack with one important difference. Any signals that the instrument itself creates (or modifies) are sent out its MIDI OUT jack but not the MIDI THRU jack. Think of the THRU jack as a stream-lined, unprocessed MIDI OUT jack.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>MIDI messages</B></FONT></CENTER></P>
+
+<P>But MIDI is much more than just some jacks on an electronic instrument. In fact, <B>MIDI is a lot more than just hardware. Mostly, MIDI is an extensive set of "musical commands" which electronic instruments use to control each other</B>. The MIDI instruments pass these commands to each other over the cables connecting their MIDI jacks together. (ie, Those MIDI signals that I referred to above are these commands).
+
+<P>So, what is a MIDI command? <B>A MIDI command consists of a few (usually 2 or 3) "data bytes"</B> (like the data bytes within files that you have on your computer's hard drive). <B>These data bytes are merely a series of numbers. We refer to one of these groups of numbers as a "message"</B> (rather than a command). There are many different MIDI messages, and <B>each one correlates to a specific musical action</B>. For example, there is a certain group of numbers that tells an instrument to make a sound. (This would be that "Note On" message which I mentioned earlier). There is a different group of numbers that tells an instrument to stop making a sound. (This is the "Note Off" message). One of the numbers within that "Note On" or "Note Off" message tells the instrument which one of its "keys" (ie, notes) to start or stop sounding. (Remember that a piano has 88 notes. MIDI instruments can have a maximum of 128 different notes,
+although some instruments respond to only messages limited to a smaller range, say 72 notes).
+
+<P><HR WIDTH=25%>
+
+<P>Many electronic instruments not only respond to MIDI messages that they receive (at their MIDI IN jack), they also automatically generate MIDI messages while the musician plays the instrument (and send those messages out their MIDI OUT jacks).
+
+<CENTER>
+<P><TABLE BORDER=0 CELLSPACING=20 NOWRAP>
+<TR>
+<TD><IMG SRC="noteon.gif" WIDTH=267 HEIGHT=174 ALT="Pushing down C note" BORDER=0></TD>
+<TD>
+<TABLE BORDER=0>
+<TR><TD><IMG SRC="midiplug.gif" WIDTH=56 HEIGHT=57 ALT="Keyboard's MIDI Out" BORDER=0></TD></TR>
+<TR><TD ALIGN=CENTER VALIGN=TOP>Midi Out</TD></TR>
+</TABLE>
+</TD>
+<TD><IMG SRC="arrow2.gif" WIDTH=36 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=64><FONT SIZE=2 COLOR=RED>144 60 64</FONT></TD>
+</TR>
+</TABLE></P>
+</CENTER>
+
+<BLOCKQUOTE><FONT COLOR=BROWN>A musician pushes down (and holds down) the middle C key on a keyboard. Not only does this sound a musical note, it also causes a MIDI Note-On message to be sent out of the keyboard's MIDI OUT jack. That message consists of 3 numeric values as shown above.</FONT></BLOCKQUOTE>
+
+<CENTER>
+<P><TABLE BORDER=0 CELLSPACING=20 NOWRAP>
+<TR>
+<TD><IMG SRC="noteoff.gif" WIDTH=266 HEIGHT=161 ALT="Releasing C note" BORDER=0></TD>
+<TD>
+<TABLE BORDER=0>
+<TR><TD><IMG SRC="midiplug.gif" WIDTH=56 HEIGHT=57 ALT="Keyboard's MIDI Out" BORDER=0></TD></TR>
+<TR><TD ALIGN=CENTER VALIGN=TOP>Midi Out</TD></TR>
+</TABLE>
+</TD>
+<TD><IMG SRC="arrow2.gif" WIDTH=36 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=64><FONT SIZE=2 COLOR=RED>128 60 64</FONT></TD>
+</TR>
+</TABLE></P>
+</CENTER>
+
+<BLOCKQUOTE><FONT COLOR=BROWN>The musician now releases that middle C key. Not only does this stop sounding the musical note, it also
+causes another message -- a MIDI Note-Off message -- to be sent out of the keyboard's MIDI OUT jack. That message consists of 3 numeric values as shown above. Note that one of the values is different than the Note-On message.</FONT></BLOCKQUOTE>
+
+<P>You saw above that when the musician pushed down that middle C note, the instrument sent a MIDI Note On message for middle C out of its MIDI OUT jack. If you were to connect a second instrument's MIDI IN jack to the first instrument's MIDI OUT, then the second instrument would "hear" this MIDI message and sound its middle C too. When the musician released that middle C note, the first instrument would send out a MIDI Note Off message for that middle C to the second instrument. And then the second instrument would stop sounding its middle C note.
+
+<CENTER>
+<P><TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 NOWRAP>
+<TR>
+<TD></TD>
+<TD VALIGN=BOTTOM ALIGN=RIGHT><IMG SRC="arrow2.gif" WIDTH=36 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=64 VALIGN=BOTTOM ALIGN=CENTER><FONT SIZE=2 COLOR=RED>144 60 64</FONT></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD COLSPAN=3 ALIGN=CENTER VALIGN=BOTTOM><IMG SRC="inout2.gif" WIDTH=253 HEIGHT=29 ALT="A MIDI Cable from Instrument 1 to Remote" BORDER=0></TD>
+<TD></TD>
+</TR>
+<TR>
+<TD VALIGN=TOP><IMG SRC="noteon.gif" WIDTH=267 HEIGHT=174 ALT="Pushing down C note" BORDER=0></TD>
+<TD VALIGN=TOP ALIGN=CENTER><IMG SRC="midiplug.gif" WIDTH=56 HEIGHT=57 ALT="Keyboard's MIDI Out" BORDER=0></TD>
+<TD></TD>
+<TD VALIGN=TOP ALIGN=RIGHT><IMG SRC="piano1.gif" WIDTH=199 HEIGHT=51 ALT="Remote keyboard" BORDER=0></TD>
+<TD VALIGN=TOP><IMG SRC="speaker.gif" WIDTH=52 HEIGHT=48 ALT="Sound from the Remote keyboard" BORDER=0></TD>
+</TR>
+</TABLE></P>
+</CENTER>
+
+<BLOCKQUOTE><FONT COLOR=BROWN>A musician pushes down (and holds down) the middle C key on a keyboard. This causes a MIDI
+Note-On message to be sent out of the keyboard's MIDI OUT jack. That message is received by the second instrument which
+sounds its middle C in unison.</FONT></BLOCKQUOTE>
+
+<P><HR WIDTH=25%>
+
+<P>But MIDI is more than just "Note On" and "Note Off" messages. There are <U>lots</U> more messages. There's a message that tells an instrument to move its pitch wheel and by how much. There's a message that tells the instrument to press or release its sustain pedal. There's a message that tells the instrument to change its volume and by how much. There's a message that tells the instrument to change its patch (ie, maybe from an organ sound to a guitar sound). And of course, these are only a few of the many available messages in the MIDI command set.
+
+<P>And just like with Note On and Note Off messages, these other messages are automatically generated when a musician plays the instrument. For example, if the musician moves the pitch wheel, a pitch wheel MIDI message is sent out of the instrument's MIDI OUT jack. (Of course, the pitch wheel message is a different group of numbers than either the Note On or Note Off messages). What with all of the possible MIDI messages, everything that the musician did upon the first instrument would be echoed upon the second instrument. It would be like he had two left and two right hands that worked in perfect sync.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Daisy-chaining/MIDI Channels</B></FONT></CENTER>
+
+<P><B>You can attach a MIDI cable from the second instrument's MIDI THRU to a third instrument's MIDI IN</B>, and the second instrument will pass onto the third instrument those messages that the first instrument sent. Now, all 3 instruments can play in unison. You could add a fourth, fifth, sixth, etc, instrument. <B>We call this "daisy-chaining" instruments</B>.
+
+<CENTER>
+<P><TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 NOWRAP>
+<TR>
+<TD></TD>
+<TD VALIGN=BOTTOM ALIGN=RIGHT><IMG SRC="arrow2.gif" WIDTH=36 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=64 VALIGN=BOTTOM ALIGN=CENTER><FONT SIZE=2 COLOR=RED>144 60 64</FONT></TD>
+<TD></TD>
+<TD VALIGN=BOTTOM ALIGN=RIGHT><IMG SRC="arrow2.gif" WIDTH=36 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=64 VALIGN=BOTTOM ALIGN=CENTER><FONT SIZE=2 COLOR=RED>144 60 64</FONT></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD COLSPAN=3 ALIGN=CENTER VALIGN=BOTTOM><IMG SRC="inout2.gif" WIDTH=253 HEIGHT=29 ALT="A MIDI Cable from Instrument 1 to Remote 1" BORDER=0></TD>
+<TD COLSPAN=3 ALIGN=LEFT VALIGN=BOTTOM><IMG SRC="thru.gif" WIDTH=253 HEIGHT=29 ALT="A MIDI Cable from Remote 1 to Remote 2" BORDER=0></TD>
+<TD></TD>
+</TR>
+<TR>
+<TD VALIGN=TOP><IMG SRC="noteon.gif" WIDTH=267 HEIGHT=174 ALT="Pushing down C note" BORDER=0></TD>
+<TD VALIGN=TOP ALIGN=CENTER><IMG SRC="midiplug.gif" WIDTH=56 HEIGHT=57 ALT="Keyboard's MIDI Out" BORDER=0></TD>
+<TD></TD>
+<TD VALIGN=TOP ALIGN=RIGHT><IMG SRC="piano1.gif" WIDTH=199 HEIGHT=51 ALT="Remote 1" BORDER=0></TD>
+<TD VALIGN=TOP><IMG SRC="speaker.gif" WIDTH=52 HEIGHT=48 ALT="Sound from Remote 1" BORDER=0></TD>
+<TD><IMG SRC="space.gif" WIDTH=52 HEIGHT=1 BORDER=0></TD>
+<TD VALIGN=TOP ALIGN=RIGHT><IMG SRC="piano1.gif" WIDTH=199 HEIGHT=51 ALT="Remote 2" BORDER=0></TD>
+<TD VALIGN=TOP><IMG SRC="speaker.gif" WIDTH=52 HEIGHT=48 ALT="Sound from Remote 2" BORDER=0></TD>
+</TR>
+</TABLE>
+</CENTER>
+
+<BLOCKQUOTE><FONT COLOR=BROWN>A musician pushes down (and holds down) the middle C key on a keyboard. This causes a MIDI Note-On message to be sent out of the keyboard's MIDI OUT jack. That message is received by the second instrument which sounds its middle C in unison. It is also passed from the second instrument to the third instrument which also sounds its middle C note.</FONT></BLOCKQUOTE>
+
+
+<P>But, daisy-chained instruments don't always have to play in unison either. Each can play its own, individual musical part even though all of the MIDI messages controlling those daisy-chained instruments pass through each instrument. How is this possible? <B>There are 16 MIDI "channels". They all exist in that one run of MIDI cables that daisy-chain 2 or more instruments</B> (and perhaps a computer) together. For example, that MIDI message for the middle C note can be sent on channel 1. Or, it can be sent on channel 2. Etc.
+
+<CENTER>
+<P><TABLE BORDER=0 CELLSPACING=20 NOWRAP>
+<TR>
+<TD><IMG SRC="noteon.gif" WIDTH=267 HEIGHT=174 ALT="Pushing down C note" BORDER=0></TD>
+<TD>
+<TABLE BORDER=0>
+<TR><TD><IMG SRC="midiplug.gif" WIDTH=56 HEIGHT=57 ALT="Keyboard's MIDI Out" BORDER=0></TD></TR>
+<TR><TD ALIGN=CENTER VALIGN=TOP>Midi Out</TD></TR>
+</TABLE>
+</TD>
+<TD><IMG SRC="arrow2.gif" WIDTH=36 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=64><FONT SIZE=2 COLOR=RED>144 60 64</FONT></TD>
+</TR>
+</TABLE>
+</CENTER>
+
+<BLOCKQUOTE><FONT COLOR=BROWN>A musician sets his keyboard to send messages upon MIDI channel 1. Then, he pushes down the middle C key. Note the 3 values of the MIDI Note-On message sent out of the keyboard's MIDI OUT jack.</FONT></BLOCKQUOTE>
+
+<CENTER>
+<P><TABLE BORDER=0 CELLSPACING=20 NOWRAP>
+<TR>
+<TD><IMG SRC="noteon.gif" WIDTH=267 HEIGHT=174 ALT="Pushing down C note" BORDER=0></TD>
+<TD>
+<TABLE BORDER=0>
+<TR><TD><IMG SRC="midiplug.gif" WIDTH=56 HEIGHT=57 ALT="Keyboard's MIDI Out" BORDER=0></TD></TR>
+<TR><TD ALIGN=CENTER VALIGN=TOP>Midi Out</TD></TR>
+</TABLE>
+</TD>
+<TD><IMG SRC="arrow2.gif" WIDTH=36 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=64><FONT SIZE=2 COLOR=RED>145 60 64</FONT></TD>
+</TR>
+</TABLE>
+</CENTER>
+
+<BLOCKQUOTE><FONT COLOR=BROWN>The musician changes the keyboard to send messages upon MIDI channel 2 instead. Then, he pushes down the middle C key. Compare the 3 values of this MIDI Note-On message to the preceding example. Note that the first value is different after the MIDI channel has been changed from 1 to 2.</FONT></BLOCKQUOTE>
+
+<P>Most all MIDI instruments allow the musician to select which channel(s) to respond to and which to ignore. For example, if you set an instrument to respond to MIDI messages <U>only</U> on channel 1, and you send a MIDI Note On on channel 2, then the instrument will not play the note. So, if a musician has several instruments daisy-chained, he can set them all to respond to different channels and therefore have independent control over each one.
+
+<CENTER>
+<P><TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 NOWRAP>
+<TR>
+<TD></TD>
+<TD VALIGN=BOTTOM ALIGN=RIGHT><IMG SRC="arrow2.gif" WIDTH=36 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=64 VALIGN=BOTTOM ALIGN=CENTER><FONT SIZE=2 COLOR=RED>145 60 64</FONT></TD>
+<TD></TD>
+<TD VALIGN=BOTTOM ALIGN=RIGHT><IMG SRC="arrow2.gif" WIDTH=36 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=64 VALIGN=BOTTOM ALIGN=CENTER><FONT SIZE=2 COLOR=RED>145 60 64</FONT></TD>
+<TD></TD>
+<TD></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD COLSPAN=3 ALIGN=CENTER VALIGN=BOTTOM><IMG SRC="inout2.gif" WIDTH=253 HEIGHT=29 ALT="A MIDI Cable from Instrument 1 to Remote 1" BORDER=0></TD>
+<TD COLSPAN=3 ALIGN=LEFT VALIGN=BOTTOM><IMG SRC="thru.gif" WIDTH=253 HEIGHT=29 ALT="A MIDI Cable from Remote 1 to Remote 2" BORDER=0></TD>
+<TD></TD>
+</TR>
+<TR>
+<TD VALIGN=TOP><IMG SRC="noteon.gif" WIDTH=267 HEIGHT=174 ALT="Pushing down C note" BORDER=0></TD>
+<TD VALIGN=TOP ALIGN=CENTER><IMG SRC="midiplug.gif" WIDTH=56 HEIGHT=57 ALT="Keyboard's MIDI Out" BORDER=0></TD>
+<TD></TD>
+<TD VALIGN=TOP ALIGN=RIGHT><IMG SRC="piano1.gif" WIDTH=199 HEIGHT=51 ALT="Remote 1" BORDER=0></TD>
+<TD VALIGN=TOP><IMG SRC="speaker2.gif" WIDTH=52 HEIGHT=48 ALT="No sound from Remote 1" BORDER=0></TD>
+<TD><IMG SRC="space.gif" WIDTH=52 HEIGHT=1 BORDER=0></TD>
+<TD VALIGN=TOP ALIGN=RIGHT><IMG SRC="piano1.gif" WIDTH=199 HEIGHT=51 ALT="Remote 2" BORDER=0></TD>
+<TD VALIGN=TOP><IMG SRC="speaker.gif" WIDTH=52 HEIGHT=48 ALT="Sound from Remote 2" BORDER=0></TD>
+</TR>
+</TABLE>
+</CENTER>
+
+<BLOCKQUOTE><FONT COLOR=BROWN>A musician sets his keyboard to send messages upon MIDI channel 2. Then, he pushes down the middle C key. This causes a MIDI Note-On message on MIDI channel 2 to be sent out of the keyboard's MIDI OUT jack. The second instrument is set to MIDI channel 1, so it ignores this MIDI message. (ie, It doesn't play its middle C note). The message is also passed on to the third instrument. This is set to MIDI channel 2, so it does play its middle C note.</FONT></BLOCKQUOTE>
+
+<P>Also, when the musican plays each instrument, it generates MIDI messages only on its one channel. So, it's very easy to keep the MIDI data separate for each instrument even though it all goes over one long run of cables. After all, the MIDI Note On message for middle C on channel 1 will be slightly different than the MIDI Note On message for middle C on channel 2.
+
+<HR SIZE=5 NOSHADE>
+
+<P>In a nutshell, that's what MIDI is -- a set of commands that electronic devices digitally pass between their MIDI jacks to tell each other what to do (ie, what actions to perform).
+
+<P>Suffice it to say that MIDI can do everything musical to an electronic instrument that a human being can physically do, and a few things that humans <U>can't</U> do.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>The advantages of MIDI</B></FONT></CENTER>
+
+<P>There are two main advantages of MIDI -- it's an easily edited/manipulated form of data, and also it's a compact form of data (ie, produces relatively small data files).
+
+<P>Because MIDI is a digital signal, it's very easy to interface electronic instruments to computers, and then do things with that MIDI data on the computer with software. For example, software can store MIDI messages to the computer's disk drive. Also, the software can playback MIDI messages upon all 16 channels with the same rhythms as the human who originally caused the instrument(s) to generate those messages. So, a musician can digitally record his musical performance and store it on the computer (to be played back by the computer). He does this not by digitizing the actual audio coming out of all  of his electronic instruments, but rather by "recording" the MIDI OUT (ie, those MIDI messages) of all of his instruments. Remember that the MIDI messages for all of those instruments go over one run of cables, so if you put the computer at the end, it "hears" the messages from all instruments over just one incoming cable. The great advantage of MIDI
+is that the "notes" and other musical actions, such as moving the pitch wheel, pressing the sustain pedal, etc, are all still separated by messages on different channels. So the musician can store the messages generated by many instruments in one file, and yet the messages can be easily pulled apart on a per instrument basis <U>because each instrument's MIDI messages are on a different MIDI channel</U>. In other words, when using MIDI, a musician never loses control over <U>every single individual action</U> that he made upon each instrument, from playing a particular note at a particular point, to pushing the sustain pedal at a certain time, etc. The data is all there, but it's put together in such a way that every single musical action can be <U>easily</U> examined and edited.
+
+<P>Contrast this with digitizing the audio output of all of those electronic instruments. If you've got a system that has 16 stereo digital audio tracks, then you can keep each instrument's output separate. But, if you have only 2 digital audio tracks (typically), then you've got to mix the audio signals together before you digitize them. Those instruments' audio outputs don't produce digital signals. They're analog. Once you mix the analog signals together, it would take massive amounts of computation to later filter out separate instruments, and the process would undoubtably be far from perfect. So ultimately, you lose control over each instrument's output, and if you want to edit a certain note of one instrument's part, that's even less feasible.
+
+<P><HR WIDTH=25%>
+
+<P>Furthermore, it typically takes <U>much</U> more storage to digitize the audio output of an instrument than it does to record an instrument's MIDI messages. Why? Let's take an example. Say that you want to record a whole note. With MIDI, there are only 2 messages involved. There's a Note On message when you sound the note, and then the next message doesn't happen until you finally release the note (ie, a Note Off message). That's 6 bytes. In fact, you could hold down that note for an hour, and you're still going to have only 6 bytes; a Note On and a Note Off message. By contrast, if you want to digitize that whole note, you have to be recording all of the time that the note is sounding. So, for the entire time that you hold down the note, the computer is storing literally thousands of bytes of "waveform" data representing the sound coming out of the instrument's AUDIO OUT. You see, with MIDI a musician records his actions (ie, movements). He presses the note down. Then, he does nothing until he releases the note. With digital audio, you record the instrument's sound. So while the instrument is making sound, it must be recorded.
+
+<P><HR WIDTH=25%>
+
+<P>So why not <U>always</U> "record" and "play" MIDI data instead of WAVE data if the former offers so many advantages? OK, for electronic instruments that's a great idea. But what if you want to record someone singing? You can strip search the person, but you're not going to find a MIDI OUT jack on his body. (Of course, I anxiously await the day when scientists will be able to offer "human MIDI retrofits". I'd love to have a built-in MIDI OUT jack on my body, interpreting every one of my motions and thoughts into MIDI messages. I'd have it installed at the back of my neck, beneath my hairline. Nobody would ever see it, but when I needed to use it, I'd just push back my hair and plug in the cable). So, to record that singing, you're going to have to record the sound, and digitizing it into a WAVE file is the best digital option right now. That's why sequencer programs exist that record and play both MIDI and WAVE data, in sync.
+
+</BODY></HTML>

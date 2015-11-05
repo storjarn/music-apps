@@ -1,0 +1,1072 @@
+<HTML><HEAD><TITLE>Roland Sound Cards</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+<B>RAP-10</B>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR>
+<TD ALIGN=CENTER WIDTH=10%>Output Channels</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+2 at 44.1, 22.05, or 11.025kHz, 16 or 8 bit. (Any combination of the above, for example play 1
+channel at 22.05kHz 8-bit, and the other at 44.1kHz 16-bit).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Output Rate/Resolution</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+44.1 kHz (max.), 16-bit
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Digital Input</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Stereo jack, 44.1, 22.05, or 11.025kHz, 16 or 8 bit. (Any combination of the above, for
+example, record 1 channel at 22.05kHz 8-bit, and the other at 44.1kHz 16-bit simultaneously).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GM Patches (128) in ROM. 6 Drum kits. 26 voice polyphony. (Digital audio has its own 2 voices).
+16-Part multi-timbral, with the option to set Parts to any channels or disable Parts.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Sound ROM Size</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+No information
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Custom Sample Upload</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Effects</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Digital reverb/delay. Chorus.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Connections</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Joystick (MIDI), stereo line/mic in, stereo aux in, stereo line out, stereo headphone. All jacks are mini plugs. CD audio internal connector.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>System Req.</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+1 port, 1 IRQ, 2 DMA channels.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Driver Support</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows 3.x. (will also work on Win 95/98), Window NT/2000 (without digital audio -- GM Synth and MIDI I/O only, via MPU-401 driver)
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Compatibility</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+MPU-401 (UART). Windows Drivers.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Street Price (U.S.)</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+$249
+</TD></TR>
+</TABLE>
+
+<P>The RAP-10 is essentially the SCC-1's MIDI Synth (first
+128 patches only, like the SCD-10) with 2 tracks of
+CD-quality digital audio added. As such, it sports the
+much-acclaimed Roland Sound Canvas waveform set as found
+in cards like the SCC-1, SCD-10, SCD-15, and SC-7 (but
+not the newer Sound Canvasses such as the SC-88, which
+have newer waveform sets and improved playback
+circuitry). The RAP-10 does not support replacing any of
+its GM waveforms.
+
+<P>The RAP-10 has a digital reverb (with choices of various
+rooms or halls, decay time, and level) which can
+alternately be used as a delay (with repeats and delay
+time adjustable). Furthermore, the RAP-10 has a chorus
+(with feedback, delay, rate and depth). These effects
+can be applied both to the MIDI Synth Parts as well as
+digital audio (with separate reverb/delay and chorus
+levels for each Part and each of the two tracks).</P>
+
+<P>In fact, the RAP-10's digital audio tracks each have a
+number of settings including tuning (in both half steps
+and cents), panning, reverb level, chorus level, volume,
+brightness, and sample rate. For playback, these can be
+adjusted via System Exclusive messages (ie, so any
+software that supports System Exclusive can be used to
+adjust all of these parameters) even during digital audio
+playback. In essense, the RAP-10 allows a lot of the
+realtime control over digital audio tracks that it allows
+for one of its GM MIDI Synth Parts (but by using SysEx
+instead of Controller messages).</P>
+
+<P>The MIDI Synth Parts understand and respond to Channel
+Pressure (which can be used to control Brightness,
+Volume, Vibrato Depth, and/or Vibrato Rate, with each
+Part responding to Pressure in any or no combination of
+the above ways, independently of other Parts), Modulation
+(which can be used to control Vibrato Speed and/or
+Depth), Volume Controller, Effect1 Controller (ie, reverb
+level), Effect3 Controller (ie, chorus level), Hold Pedal
+Controller, Expression Controller, Pan Controller, Pitch
+Bend, Program Change, Reset All Controllers, All Sounds
+Off, and All Notes Off.</P>
+
+<P>Furthermore, using Registered Parameter Number
+Controller, each Part's Pitch Bend Range, as well as
+tuning (in half steps and cents) can be controlled. Using
+Non-registered Parameter Number Controller, you can
+control the pan, volume, tuning, chorus level, and reverb
+level for each drum sound in a kit (in addition to being
+able to control the entire kit's overall volume, pan,
+chorus level, and reverb level).</P>
+
+<P>The RAP-10 has a master Volume and master tuning (ie, for
+all 16 Parts and 2 digital audio tracks) in both half
+steps and cents.</P>
+
+<P>The RAP-10 ships with a Windows MCI driver that will
+work under Win95, and also some software that graphically
+mimics a multi-track mixer for recording/playback. The
+bundled program is more geared for hobbyist and
+multi-media work than pro musician's use. The RAP-10 can
+be used with pro software such as CakeWalk, SAW, Sound
+Forge, or other Windows titles, utilizing both its MIDI
+Synth and digital audio simultaneously. You can also use
+OS/2's RTMIDI MPU-401 driver, but this will not enable
+digital audio tracks (ie, GM sound module control only).
+(You could even use Win95's MPU-401 driver, but this also
+won't enable digital audio tracks).</P>
+
+<P>In order to obtain the actual MIDI In/Out/Thru jacks, you
+need to attach a "breakout box" to the joystick port. The
+joystick port is compatible with the Sound Blaster, so
+any breakout box for the SB will suffice (ie, you don't
+need the overpriced MCB-10).</P>
+
+
+<HR><B>SC-7</B>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR>
+<TD ALIGN=CENTER WIDTH=10%>Output Channels</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+2
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Output Rate/Resolution</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+16-bit @ 44.1KHz
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Digital Input</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GM Patches (128) in ROM. 6 Drum kits. 24 voice polyphony.
+16-Part multi-timbral, with the option to set Parts to any channels or disable Parts.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Sound ROM Size</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+No information
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Custom Sample Upload</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Effects</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Digital reverb/delay. Chorus.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Connections</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+COM port, MIDI In/Out, stereo line outs (RCA jacks), headphone (mini), stereo line inputs (mini), AC power (uses a wall-wart).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Controls</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Volume knob.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>System Req.</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Attaches to computer's serial port.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Driver Support</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows 3.x., Windows 95/98 (if you use the Roland Win95/98 serial driver available on Roland's web site).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Compatibility</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows Drivers.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Street Price (U.S.)</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+$207
+</TD></TR>
+</TABLE>
+
+<P>The SC-7 is essentially the SCC-1's MIDI Synth (first
+128 patches only, like the SCD-10) in an external box
+that attaches to the computer's serial port. (It can
+attach to both the IBM and Mac serial ports, and
+instructions are given on using the SC-7 with either.
+This is a cheap way for Mac owners to get a nice, low
+cost Roland GM sound module). As such, it sports the
+much-acclaimed Roland Sound Canvas waveform set as found
+in cards like the SCC-1, SCD-10, SCD-15, and RAP-10 (but
+not the newer Sound Canvasses such as the SC-88, which
+have newer waveform sets and improved playback
+circuitry). The SC-7 does not support replacing any of
+its GM waveforms, nor does it record/play digital audio.
+
+<P>See the RAP-10 description for remarks about the SC-7's
+MIDI Synth engine. It's the same as the RAP-10's, so all
+RAP-10 remarks (except as concern digital audio tracks)
+are pertinent (ie, its effects and support for MIDI
+messages is the same).</P>
+
+<P>The SC-7 is a complete, standalone unit. It can be used
+without the computer. It has its own power supply and
+case. An external keyboard (or other MIDI controller) can
+be plugged directly into the SC-7 MIDI In to play it as
+a 16-Part multi-timbral module.</P>
+
+<P>The SC-7 ships with a Windows MCI driver, and also some
+software (Ballade, a sequencer, and Band in a Box). It
+can be used with pro sequencers such as CakeWalk.</P>
+
+<P>Furthermore, because the SC-7 offers MIDI In and Out
+jacks to which you can attach even more MIDI gear, it
+becomes a MIDI interface between your computer and all
+other external gear. This makes the SC-7 nice for laptop
+use since it allows connecting external MIDI gear via a
+clone or Mac serial port, is a 16-part multi-timbral unit
+also, and can even be used without the computer. It's
+very small, light, and therefore portable.</P>
+
+
+<HR><B>SCC-1 (SCC-1B)</B>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR>
+<TD ALIGN=CENTER WIDTH=10%>Output Channels</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+2
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Output Rate/Resolution</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+16-bit @ 44.1KHz
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Digital Input</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GS Patches (354) in ROM. 9 Drum kits. 24 voice polphony. 16-Part multi-timbral, with the
+option to set Parts to any channels or disable Parts.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Sound ROM Size</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+4 MEG (compressed) ROM
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Custom Sample Upload</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Effects</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Digital reverb/delay. Chorus.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Connections</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+MIDI In/Out, 2 line outs (RCA), stereo headphone (mini).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>System Req.</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+1 port, 1 IRQ.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Driver Support</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows 3.x., Win 95/98, Window NT/2000, or any operating system that has an MPU-401 driver.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Compatibility</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+MPU-401 (UART and Intelligent). MT-32. Windows Drivers.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Street Price (U.S.)</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+$275
+</TD></TR>
+</TABLE>
+
+<P>The SCC-1 is a MIDI Synth only (ie, no digital audio,
+ie, WAVE recording/playback). It sports the
+much-acclaimed Roland Sound Canvas waveform set as found
+in cards like the RAP-10, SCD-10, SCD-15, and SC-7 (but
+not the newer Sound Canvasses such as the SC-88, which
+have newer waveform sets and improved playback
+circuitry). The SCC-1 does not support replacing any of
+its GS waveforms.
+
+<P>See the RAP-10 description for remarks about the SCC-1's
+MIDI Synth engine. It's the same as the RAP-10's (with
+extra patches and drum kits, plus recognition of Bank
+Select Controller to select such), so all RAP-10 remarks
+(except as concern digital audio tracks) are pertinent
+(ie, its effects and support for MIDI messages is the
+same). The SCC-1's Parts do have a few extra parameters
+that can be adjusted, which the RAP-10 and SC-7 do not
+have, such as Attack Time and Filter Resonance.</P>
+
+<P>Early SCC-1 units had less than 354 patches (ie, didn't have
+the extra MT-32 sounds). The only difference between new
+SCC-1 units and the SCC-1B appears to be that the latter
+includes bundled software, such as a nice patch editor (ie,
+although you can't change the GM waveforms used in a patch,
+you can adjust VCA and VCF envelopes to contour the sound.
+This is different than the RAP-10 or SC-7 more hard-wired GM
+Patch sets). The SCC-1 also offers MT-32 sounds (but not
+without some of the patch customization that the MT-32
+offered). MT-32 sounds are mediocre by today's audio
+standards, but some older games were designed to support
+MT-32 rather than GM.</P>
+
+<P>Furthermore, the SCC-1 has a fully intelligent MPU-401
+compatibility, so it understands all MPU-401 commands.
+(That's not as important today since most software,
+especially Windows stuff, no longer uses MPU-401
+Intelligent Mode).</P>
+
+<P>The SCC-1 ships with a Windows MCI driver, (and the
+SCC-1B with some apps), which will also work under
+Windows 95 (but you're better off using Win95's MPU-401
+driver instead). It can be used with pro sequencers such
+as CakeWalk. You can also use OS/2's RTMIDI MPU-401
+driver.</P>
+
+<P>Roland has replaced the SCC-1 with a package containing
+the MPU-401/AT and SCD-15 daughterboard. It's essentially
+the same thing as an SCC-1B. (I forget what they call this
+combo deal).</P>
+
+
+<HR><B>SC-55</B>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR>
+<TD ALIGN=CENTER WIDTH=10%>Output Channels</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+2
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Output Rate/Resolution</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+16-bit @ 44.1KHz
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Digital Input</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GS Patches (317) in ROM. 9 Drum kits. 24 voice polyphony. 16-Part multi-timbral, with the
+option to set Parts to any channels or disable Parts. 
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Sound ROM Size</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+No information
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Custom Sample Upload</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Effects</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Digital reverb/delay. Chorus.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Connections</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+COM port, MIDI In/Out, stereo line outs (RCA jacks), headphone (mini), stereo line inputs (RCA), AC power (uses a wall-wart).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Controls</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Volume knob, LCD, parameter buttons (ie, Volume, Pan, Reverb, Chorus, Transpose, Instrument, MIDI CH, Part #, Mute Part).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>System Req.</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Attaches to computer's serial port.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Driver Support</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows 3.x., Windows 95/98 (if you use the Roland Win95/98 serial driver available on Roland's web site).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Compatibility</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows Drivers. MT-32.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Street Price (U.S.)</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+???
+</TD></TR>
+</TABLE>
+
+<P>The SC-55 is essentially the SCC-1B (with a few less
+patches) in an external box that attaches to the
+computer's serial port. (It can attach to both the IBM
+and Mac serial ports).
+
+<P>See the RAP-10 description for remarks about the SC-55's
+MIDI Synth engine. It's the same as the SCC-1B's, so all
+SCC-1B remarks are pertinent.</P>
+
+<P>The SC-55 is a complete, standalone unit. See the SC-7
+description for what advantages Roland standalone units
+offer.</P>
+
+
+<HR><B>SC-155</B>
+
+<P>Same as SC-55 except for:</P>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR><TD ALIGN=CENTER WIDTH=10%>Controls</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Volume knob, 8 sliders, LCD, parameter buttons.
+</TD></TR></TABLE>
+
+<P>The SC-155 is the SC-55 in a table top unit (ie, the
+SC-55 is a half-rack unit) with the addition of 8
+sliders to control various parameters of 8 parts (plus
+a button to switch the sliders to control the other
+8 parts). With sliders, the SC-155's parameters can be
+more easily manipulated while playing the unit. Sliders
+also can send MIDI messages to record their movements with
+a sequencer.
+
+<HR><B>CM-300</B>
+
+<P>Same as SC-55 except for:</P>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR><TD ALIGN=CENTER WIDTH=10%>Controls</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Volume knob.
+</TD></TR></TABLE>
+
+<P>The CM-300 is the SC-55 with all controls except the
+Volume knob removed. As such, you need computer software
+to change parameters (via MIDI).
+
+<P>Roland also made the CM-500 which is the CM-300 with
+an MT-32 added inside of it.</P>
+
+<HR><B>SC-35</B>
+
+<P>Same as SC-55 except for:</P>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GS Patches (223) in ROM. 8 Drum kits. 28 voice polyphony. 16-Part multi-timbral, with the
+option to set Parts to any channels or disable Parts.
+</TD></TR>
+<TR><TD ALIGN=CENTER WIDTH=10%>Controls</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Volume and Aux In Vol knobs, 3.5" floppy drive, parameter and sequencer (Play, Stop, Rec, Rew, FF, Pause, Tempo, etc)
+buttons.
+</TD></TR>
+</TABLE>
+
+<P>The SC-35 is essentially the SC-55 plus a Sound Brush
+(ie, a sequencer that records and plays standard MIDI 
+files off of a built-in 3.5 inch floppy drive) in one
+box. As such, the SC-35 is a standalone General MIDI
+file player/recorder. It also has 4 extra voices of
+polyphony, but omits the MT-32 patches.
+
+<P>See the SC-55 description for remarks about the SC-35's
+features.</P>
+
+<HR><B>SC-33</B>
+
+<P>Same as SC-55 except for:</P>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GS Patches (226) in ROM. 8 Drum kits. 28 voice polyphony. 16-Part multi-timbral, with the
+option to set Parts to any channels or disable Parts.
+</TD></TR>
+<TR><TD ALIGN=CENTER WIDTH=10%>Controls</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Volume knob, LCD, editing buttons.
+</TD></TR>
+</TABLE>
+
+<P>The SC-33 is the SC-55 but with editing capabilities
+over the "tones" (ie, waveform parameters such as VCA
+envelopes, VCF envelopes, etc) to design your own 
+patches. It also has 4 extra voices of polyphony, but
+omits the MT-32 patches.
+
+<HR><B>SC-50</B>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR>
+<TD ALIGN=CENTER WIDTH=10%>Output Channels</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+2
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Output Rate/Resolution</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+18-bit @ 44.1KHz
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Digital Input</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GS Patches (226) in ROM. 8 Drum kits. 28 voice polyphony. 16-Part multi-timbral, with the
+option to set Parts to any channels or disable Parts. 
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Sound ROM Size</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+No information
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Custom Sample Upload</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Effects</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Digital reverb/delay. Chorus.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Connections</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+COM port, MIDI In/Out, stereo line outs (RCA jacks), headphone (mini), stereo line inputs (RCA), AC power (uses a wall-wart).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Controls</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Volume knob, LCD, editing buttons.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>System Req.</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Attaches to computer's serial port.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Driver Support</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows 3.x., Windows 95/98 (if you use the Roland Win95/98 serial driver available on Roland's web site).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Compatibility</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows Drivers.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Street Price (U.S.)</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+???
+</TD></TR>
+</TABLE>
+
+<P>The SC-50 is essentially the SC-55 without the MT-32
+sounds, but appears to have improved playback circuitry
+(including 18-bit DACs). The MT-32 sounds are mediocre
+by today's audio standards, so are really only useful
+for older games that support MT-32 but not GM.
+
+<P>Also, the SC-50 has 4 extra voices of polyphony over
+the SC-55.</P>
+
+<P>See the SC-55 description for remarks about the SC-50's
+features.</P>
+
+<P>The SC-50 does have an LCD panel and knobs, so that SC-50
+Patch parameters can be edited from the SC-50 itself (as
+opposed to the SC-7 and SC-55 requiring a software
+"patch editor" to change various parameters).</P>
+
+
+<HR><B>SC-88</B>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR>
+<TD ALIGN=CENTER WIDTH=10%>Output Channels</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+2
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Output Rate/Resolution</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+18-bit @ 44.1KHz
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Digital Input</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GS Patches (654) in ROM. 24 Drum kits. 64 voice polyphony. 32-Part multi-timbral via 2 MIDI inputs.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Sound ROM Size</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+8 MEG compressed. (16 MEG)
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Custom Sample Upload</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Effects</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Digital reverb. Delay. Chorus. EQ.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Connections</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+COM port, 2 MIDI In/Out (THRU), stereo line outs (RCA jacks), headphone (mini), stereo line inputs (RCA), AC power cord.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Controls</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Volume knob, LCD, editing buttons.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>System Req.</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Attaches to computer's serial port.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Driver Support</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows 3.x., Windows 95/98 (if you use the Roland Win95/98 serial driver available on Roland's web site).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Compatibility</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows Drivers. MT-32
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Street Price (U.S.)</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+???
+</TD></TR>
+</TABLE>
+
+<P>The SC-88 is an external box that attaches to the
+computer's serial port. (It can attach to both the IBM
+and Mac serial ports). It contains not only the SCC-1's
+waveform set, but also newer waveforms (over 300 more)
+and improved playback circuitry (including 18-bit DACs).
+It also has many more effects (and reverb and delay are
+separate units now, so Reverb, Delay, Chorus, and EQ are
+simultaneous). The SC-88 therefore offers a
+substantially different and improved MIDI Synth than all
+other Roland Sound Canvas cards (except the SC-55mkII).
+The SC-88 does not support replacing any of its waveforms,
+nor does it record/play digital audio.
+
+<P>The SC-88 is a complete, standalone unit. It can be used
+without the computer. It has its own power supply and
+case. An external keyboard (or other MIDI controller) can
+be plugged directly into the SC-88 MIDI In to play it as
+a 16-Part multi-timbral module. A second controller can be
+plugged into the second MIDI In to play 16 more
+multi-timbral parts. (In order to use all 32 mult-timbral
+parts with the computer, you have to have the latest version
+of Roland's MIDI serial driver, available from Roland's web
+site, under Products/Software updates. This driver turns the serial
+port into 2 separate MIDI Outs, each with 16 MIDI channels).</P>
+
+<P>Furthermore, because the SC-88 offers MIDI In and Out
+jacks to which you can attach even more MIDI gear, it
+becomes a MIDI interface between your computer and all
+other external gear. This makes the SC-88 nice for laptop
+use since it allows connecting external MIDI gear via a
+clone or Mac serial port, is a multi-timbral unit also, and
+can even be used without the computer.</P>
+
+<P>The SC-88 does have an LCD panel and knobs, so that its
+Patch parameters can be edited from the SC-88 itself (as
+opposed to the SC-7 and SC-55 requiring a software
+"patch editor" to change various parameters). The SC-88VL
+is the same as the SC-88 expect that it doesn't have the
+patch editing knobs (ie, like the SC-7 and SC-55, it requires
+computer software to change its patch settings).</P>
+
+<HR><B>SC-55mkII</B>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR>
+<TD ALIGN=CENTER WIDTH=10%>Output Channels</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+2
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Output Rate/Resolution</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+18-bit @ 44.1KHz
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Digital Input</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GS Patches (354) in ROM. 8 Drum kits. 28 voice polyphony. 16-Part multi-timbral, with the
+option to set Parts to any channels or disable Parts.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Sound ROM Size</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+No Information
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Custom Sample Upload</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Effects</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Digital reverb. Delay. Chorus. Flange.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Connections</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+COM port, MIDI In/Out, stereo line outs (RCA jacks), headphone (mini), stereo line inputs (RCA), AC power (uses a wall-wart).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Controls</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Volume knob, LCD, editing buttons.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>System Req.</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Attaches to computer's serial port.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Driver Support</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows 3.x., Windows 95/98 (if you use the Roland Win95/98 serial driver available on Roland's web site).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Compatibility</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows Drivers.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Street Price (U.S.)</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+???
+</TD></TR>
+</TABLE>
+
+<P>The SC-55mkII is sort of like half of an SC-88 (in terms
+polyphony and parts, but also with less waveforms too),
+and has improved waveforms and circuitry over older sound canvasses.
+
+<HR><B>SCD-10</B>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR>
+<TD ALIGN=CENTER WIDTH=10%>Output Channels</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+2
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Output Rate/Resolution</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+16-bit @ 44.1KHz
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Digital Input</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GM Patches (128) in ROM. 6 Drum kits. 28 voice polyphony.
+16-Part multi-timbral, with the option to set Parts to any channels or disable Parts.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Sound ROM Size</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+No information
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Custom Sample Upload</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Effects</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Digital reverb/delay. Chorus.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Connections</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None. (Uses host card's output stage).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>System Req.</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Attaches to host card. (ie, It's a Sound Blaster compatible daughterboard).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Driver Support</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Uses host card's driver.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Compatibility</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Depends upon host card. Designed for an SB or compatible.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Street Price (U.S.)</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+$149
+</TD></TR>
+</TABLE>
+
+<P>The SCD-10 is essentially the SCC-1's MIDI Synth (first
+128 patches only) in the form of a daughterboard that
+attaches to a Sound Blaster's Waveblaster connector. (It
+is not a self-contained card). The SCD-10 does not
+support replacing any of its GM waveforms, nor does it
+record/play digital audio (which is left up to the host card).
+
+<P>See the RAP-10 description for remarks about the SCD-10's
+MIDI Synth engine. It's the same as the RAP-10's, so all
+RAP-10 remarks (except as concern digital audio tracks)
+are pertinent (ie, its effects and support for MIDI
+messages is the same).</P>
+
+<P>Unlike self-contained Roland cards such as the SCC-1,
+RAP-10, or SC-7, the SCD-10 uses its host's output stage,
+which in typical Sound Blaster cards and compatibles, is
+not quite as noise and distortion free as Roland cards.</P>
+
+<P>The SCD-10 ships with some strictly hobbyist software
+(DoReMi and Easy Juke). It can be used with pro
+sequencers such as CakeWalk, provided your host card has
+proper driver support.</P>
+
+<P>One real advantage of the SCD-10 (and SCD-15) over other
+Roland cards is that, since these cards attach to an SB
+compatible host, they offer the best audio solution to a
+game player. The RAP-10's digital audio hardware is not
+SB compatible, and therefore not supported by game
+software (which is typically MS-DOS software that writes
+directly to hardware rather than Windows software that
+uses MCI drivers). The other Roland cards do not offer
+digital audio playback. So they can't be used to play
+voice and sound effects in games (which are usually done
+with WAVE files. On the other hand, since most game
+software can play its background music via an MPU-401
+port, all Roland cards can be used to play background
+music for those games). The SCD-10, in combo with its
+host, offers a complete solution, as the host plays voice
+and sound effects, and the SCD-10 with its renowned
+Roland waveform set plays the background music, without
+requiring two separate sound cards.</P>
+
+<HR><B>SCD-15</B>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR>
+<TD ALIGN=CENTER WIDTH=10%>Output Channels</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+2
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Output Rate/Resolution</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+16-bit @ 44.1KHz
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Digital Input</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GS Patches (354) in ROM. Numerous Drum kits. 28 voice polyphony.
+16-Part multi-timbral, with the option to set Parts to any channels or disable Parts.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Sound ROM Size</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+No information
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Custom Sample Upload</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Effects</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Digital reverb/delay. Chorus.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Connections</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None. (Uses host card's output stage).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>System Req.</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Attaches to host card. (ie, It's a Sound Blaster compatible daughterboard).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Driver Support</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Uses host card's driver.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Compatibility</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Depends upon host card. Designed for an SB or compatible.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Street Price (U.S.)</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+$185
+</TD></TR>
+</TABLE>
+
+<P>The SCD-15 is the same thing as the SCD-10 except that
+it has the full set of GS patches (ie, 354 instead of
+only 128) plus some MT-32 sounds. It has a few extra drum
+kits too. Otherwise, all other remarks concerning the
+SCD-10 apply to the SCD-15.
+
+<P>The extra patches are really not of much use to game
+players since most game software sticks to the smaller
+GM set of patches. A musician seeking a greater variety
+of sounds for MIDI file recording/playback may find the
+extra GS patches more useful, although the extra MT-32
+sounds are mediocre by today's audio standards.</P>
+
+<HR><B>MPU-401/AT</B>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR>
+<TD ALIGN=CENTER WIDTH=10%>Output Channels</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Output Rate/Resolution</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Digital Input</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Sound ROM Size</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Custom Sample Upload</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Effects</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Connections</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+MIDI In and Out. SB compatible WaveBlaster connector. Stereo line outs (RCA).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>System Req.</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+1 Port, 1 IRQ.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Driver Support</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Win 3.x., Windows 95/98, Windows NT/2000, OS/2, or any other OS with an MPU-401 device driver.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Compatibility</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+MPU-401 (UART and Intelligent). Windows drivers.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Street Price (U.S.)</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+$68 (With the SCD-15 daughterboard, $228)
+</TD></TR>
+</TABLE>
+
+<P>The MPU-401/AT is a MIDI interface card without any
+built-in sound module nor digital audio tracks. It is
+meant to control external MIDI units as well as any SB
+compatible daughterboard plugged into the MPU-401/AT's
+internal connector (such as the SCD-10 or SCD-15. In fact,
+putting an SCD-15 into an MPU-401/AT gives you essentially
+an SCC-1B). But, the MPU-401 itself is not SB compatible
+(ie, it accomodates SB daughterboards, but is not an
+SB compatible card itself, and therefore will not work with
+software requiring SB compatibility).
+
+<P>It offers MPU-401 Intelligent and Uart modes. An
+advantage of using this card as the host for an SCD-10 or
+SCD-15 is that this card's audio output circuitry is
+cleaner and quieter than what is normally found in an SB
+type card.</P>
+
+<P>Earlier MPU-401 units did not have the daughterboard
+connector. The very first MPU-401 was actually an external
+box containing all of the Roland circuitry and MIDI jacks.
+This box attached into a secondary card that plugged into
+the ISA bus. Later, Roland reduced its chipset size, and
+was able to fit everything onto one ISA card that fit into
+the computer. This was the MPU-IPC. Recently, Roland added
+the daughterboard connector, for the MPU-401/AT. (I
+recommend the MPU-401/AT, as there were also some improvements
+in MIDI throughput made).</P>
+
+<HR><B>SCP-55B</B>
+
+<TABLE BORDER=3 WIDTH=100% BGCOLOR="#FF9999">
+<TR>
+<TD ALIGN=CENTER WIDTH=10%>Output Channels</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+2 at 44.1, 22.05, or 11.025kHz, 16 or 8 bit. (Any combination of the above, for example play 1
+channel at 22.05kHz 8-bit, and the other at 44.1kHz 16-bit).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Output Rate/Resolution</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+44.1 kHz (max.), 16-bit
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Digital Input</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Stereo jack, 44.1, 22.05, or 11.025kHz, 16 or 8 bit. (Any combination of the above, for
+example, record 1 channel at 22.05kHz 8-bit, and the other at 44.1kHz 16-bit simultaneously).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>MIDI Synth</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+WaveTable synth, GS Patches (354) in ROM. Numerous Drum kits. 28 voice polyphony.
+16-Part multi-timbral, with the option to set Parts to any channels or disable Parts.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Sound ROM Size</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+No information
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Custom Sample Upload</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+None
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Effects</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Digital reverb/delay. Chorus.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Connections</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+With MCB-3 connector, it has MIDI IN and OUT, stereo mic in, stereo line in, and stereo line out (mini jack).
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>System Req.</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+PCMCIA port.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Driver Support</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows 3.x. Windows 95/98.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Compatibility</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+Windows Drivers.
+</TD></TR>
+
+<TR><TD ALIGN=CENTER WIDTH=10%>Street Price (U.S.)</TD><TD WIDTH=90% BGCOLOR="#99CCCC">
+$315
+</TD></TR>
+</TABLE>
+
+<P>The SCP-55B is essentially the SCC-1's MIDI Synth in the
+form of a PCMCIA card that plugs into a PCMCIA slot on
+a computer. The SCP-55B does not support replacing any
+of its GM waveforms. Unlike the SCC-1, the SCP-55B
+incorporates the RAP-10's digital audio capabilities.
+
+<P>See the RAP-10 description for remarks about the SCP-55B's
+MIDI Synth engine. It's the same as the SCC-1B's, so all
+SCC-1B remarks are pertinent. Furthermore, see the RAP-10
+description for remarks about the SCP-55B's digital audio
+tracks.</P>
+
+<P>The SCP-55B is ideal for laptop computers with a PCMCIA
+slot. The SCP-55B can simultaneously play full MIDI scores
+along with 2 tracks of CD-quality audio (recorded/played
+to the Hard Drive). Therefore, multi-media presentations
+can be made with full background music scores and sound
+effects/voice narration happening simultaneously, at very
+good sound quality.</P>
+
+<P>The SCP-55B needs the MCB-3 to provide external MIDI
+jacks and output/input jacks.</P>
+
+<P>The SCP-55B ships with several Windows titles, including
+CakeWalk Express (create/play MIDI files), and Macromedia
+Action (a multi-media authoring tool).</P>
+
+
+<H2>NOTES:</H2>
+
+<P>All cards use Roland's own proprietary chipsets.</P>
+
+<P>One nice thing about the Roland cards which they have over
+cheap cards is a hardware buffered MIDI output. This allows
+the computer's CPU to typically stream MIDI messages to the
+card without requiring the CPU to wait for the card to accept
+MIDI bytes. With the RAP-10, this can even happen at the full
+bus speed of 8MHz, resulting in a more stable timing for
+sequenced playback, especially under CPU-taxing OS's such as
+Windows. Other cards typically make the CPU wait until
+the card has shifted out a MIDI byte at 32KHz before the
+card will accept another byte.</P>
+
+<P>Street prices were obtained from ComputAbility, a typical
+computer mail order firm (800-554-9948) during the time when
+these products were available new.</P>
+
+<P>The sales/distribution for Roland's line of computer cards
+has been taken over by <A HREF="http://www.edirol.com">Editol</A>.
+
+</BODY>
+</HTML>

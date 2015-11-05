@@ -1,0 +1,234 @@
+<HTML><HEAD><TITLE>How to create slurs</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Many instruments, particularly brass and wind instruments, are capable of playing slurs. A slur is a very smooth
+transition from one pitch to another pitch. For example, the way that a brass player may execute a slur is to play the
+first pitch, and then without interrupting his wind pressure, he'll finger the second pitch (without a pronounced
+tonguing either).
+
+<P>To simulate a slur on an electronic module (which uses digital waveforms), what you usually want to do is skip (or
+somehow make less pronounced) the attack portion of the waveform when sounding the slurred note (ie, the second pitch). In
+this way, you move from the sustain (ie, looped) portion of the first pitch (which is already sounding) directly into the
+sustain portion of the second pitch, and the result sounds like a smooth transition. (ie, When you play the second pitch,
+the sound begins within the same area of the waveform as the first pitch is already playing. Contrast this with playing
+those two notes without a slur. The first pitch is playing the looped portion of the waveform. When the second pitch sounds,
+it starts playing from the very beginning of the waveform -- its attack -- and so there is a more pronounced, discontinuous
+transition between the two pitches).</P>
+
+<P>The slurring techniques described here are all concerned with skipping (or smoothing out) the attack portion of the
+second (ie, slurred) pitch.</P>
+
+<P>The easiest (and arguably best) way to play slurs, especially in realtime (ie, when you're manually playing the module
+in a live setting), is to use a module that supports what is commonly referred to as "Legato Mode". When you put the module
+into this mode, the module considers notes that "overlap" to be slurs. In other words, if you play a C note, and then before
+you fully release this note, you play a C# note, the module will assume that you wish a slur between the C and C# notes. The
+module will therefore cause the pitch to smoothly change from C to C#. In other words, even though you may still be holding
+down both the C and C# keys, you'll only hear one pitch; the C#. The first pitch (ie, the C) will no longer be sounding (ie,
+it stops sounding as soon as you play the C# note -- that's when the slur occurs). The implication here is that you can only
+play single pitch melodies. You can't play chords because the module will always slur all simultaneously held notes into the
+last note that was actually triggered. (Some manufacturers refer to this mode as "Solo Mode" consequently). Of course, if you
+do not overlap notes (ie, the C note is fully released before the C# note is played), then no slur occurs, and each note
+sounds with its normal attack. Different modules may use different techniques to perform that slur. For example, one module
+may skip the attack portion of the waveform when it plays the slurred note, starting immediately at the sustain (ie, looped)
+portion. Another module may instead skip the attack phase of the amplifier's Voltage Controlled Generator. The best technique
+is a combination of both methods.</P>
+
+<P>On MIDI samplers that allow you to load your own waveforms in RAM, the module may not allow you to explicitly set where
+(within the waveform) to start playing for a slurred note. Fortunately, some samplers allow you to use a MIDI controller or
+Channel Pressure or even Note Velocity to adjust the playback start point. For example, you can use low Note Velocity values
+to cause the start point to move further ahead. So, when you play soft notes, they are slurred (ie, more of the attack
+portion is skipped), whereas loud notes aren't slurred (ie, the start point is closer to the actual start of the waveform).</P>
+
+<P>If your module doesn't offer a Legato Mode, nor allows you realtime control over the playback start point, then you can
+still execute a slur using the pitch wheel (which all General MIDI modules support. In other words, this technique will work
+with any module). It actually yields as good a result as Legato Mode above. The only caveat is that the technique can't be
+executed in realtime as well as it can be executed by manually inserting Pitch Wheel events into a sequencer track and then
+playing back that track. So, Legato Mode is more useful if you're manually playing the module in a live setting.</P>
+
+<P>When you move the pitch wheel, it slides the sounding note's pitch. The result is that you have a smooth transition
+between various pitches. (The waveform isn't retriggered, nor does the VCA leave its sustain phase). So, you can execute a
+slur between C and C# by playing the C note, holding it down, and moving the pitch wheel upward until the pitch is raised a
+half step. Of course, the pitch wheel slides the pitch in small increments, so this detracts from the slurred effect. You
+don't want to slide the pitch to all of those incremental frequencies between C and C#. You just want the pitch to instantly
+change from the frequency for C to the frequency for C#. Therefore, in order to best simulate the slur, you have to move the
+pitch wheel very, very fast (so that the ear has less time to discern that incremental frequency shift from C to C#).</P>
+
+<P>If you're editing a sequencer track, it's much easier to execute the slur, because all you need to do is manually
+enter a single Pitch Wheel event (after the C note-on event) that causes the pitch to shift up a half step (ie, to the
+frequency for C#). You've eliminated all of those pitch wheel events that would have occurred (as the pitch was being slid
+up a half step) if you had manually moved the pitch wheel. (ie, You've eliminated the incremental frequency shift between
+C and C#).</P>
+
+<P>Personally, I think that the easiest way to create a track with slurs is to simply play all of the notes (ie, not
+worrying about executing slurs at this point), and then <B>subsequently</B> edit the track to replace certain Note-On events
+with a respective Pitch Wheel event in order to create a slur.</P>
+
+<P>Let's take that C to C# slur as an example. If we played the two notes, then we'd have the following MIDI events. (NOTE:
+I'm showing you what you would see in the "event list" of the sequencer track. Some sequencer software doesn't display
+Note-Offs events. Instead, when displaying the respective Note-On event, a "duration" is shown for the note. In my phony
+event list, I'll eliminate the time field since that is irrelevant to this example. The first field will indicate the
+type of event, for example Note or Pitch Wheel. The second field for a Note event will be its note name, for example
+C3 will be our desired C note. The last field will be the velocity).</P>
+
+<P>Note  C5   64
+<BR>Note  C#5  64
+
+<P>In order to create a slur, we need to replace the second event with a pitch wheel event that transposes the C note up to
+a C# (ie, up a half step).</P>
+
+<P>In order to determine what the needed transpose value for the Pitch Wheel must be, we first need to take the pitch wheel's
+range into consideration. On most modules, the pitch wheel range can be set to transpose as much as up and down an octave,
+or as little as up or down a half step. If the pitch wheel is set to cover a smaller range, that means that you'll need
+larger values to reach a certain transpose amount than you would need if the pitch wheel was set to cover a larger range.
+(General MIDI modules power up with the pitch range set to up and down 2 half steps, ie, 4 half steps total range). For our
+example, we'll assume the GM default.</P>
+
+<P><B>NOTE:</B> The following discussion assumes that your sequencer's event list displays the pitch wheel value as one
+number that can range from -8,192 (lowest transposition) to +8,192 (highest transposition), with 0 meaning no transposition
+(ie, the pitch wheel is centered). If your sequencer doesn't display pitch wheel value as so (ie, it instead displays the
+actual 2 values sent over MIDI), then you need software with a more musician-friendly event list.</P>
+
+<P>To determine the transpose amount needed for a half step at a given pitch wheel range, you divide 16,384 by the pitch
+wheel range (in half steps). In our above example, the total pitch range in half steps is 4. So, each half step transpose
+amount is 16,384/4 or 4,096. This means that a transpose amount of 4,096 makes the pitch go up a half step. A transpose
+amount of 4,096 X 2 makes the pitch go up 2 half steps. (You can't go any higher than 8,192 for a pitch wheel value, so
+you're limited to transposing up 2 half steps here -- exactly what our pitch wheel range is set to). A transpose amount of
+-4,096 transposes the pitch down a half step. A transpose amount of -4,096 X 2 transposes the pitch down 2 half steps. (You
+can't go any lower than -8,192 for a pitch wheel value).</P>
+
+<P>So, we replace the C# Note event with a Pitch Wheel event that has a value which tranposes the C note up to the C# (ie,
+a half step).
+
+<P>Note  C5   64
+<BR>Pitch Wheel 4,096
+
+<P>Now let's take that same example, but show it for a pitch wheel range that transposes up and down an octave (ie, 24 half
+steps total). Now, each half step transpose amount is 16,384/24 or 683 (rounded off. The actual value is 682.666...). This
+means that a transpose amount of 683 makes the pitch go up a half step. A transpose amount of 683 X 2 makes the pitch go up
+2 half steps. Etc. (You can't go higher than 12 half steps upward, as that would put you over 8,192, and that's the highest
+value for the pitch wheel). A transpose amount of -683 transposes the pitch down a half step. A transpose amount of -683 X 2
+transposes the pitch down 2 half steps.</P>
+
+<P>So, our event list would look like this instead:</P>
+
+<P>Note  C5   64
+<BR>Pitch Wheel 683
+
+<P>Of course, there are two additional things that we need to do. First, we have to extend the first note event's duration
+to be equal to its original duration plus the duration of the second note (that we replaced) and any time that was inbetween
+the end of the first event and the start of the second event (ie, "dead air" inbetween the two notes sounding). The easiest
+way to do this is if you have an event list that displays the note-off events, rather than simply note-on events with a
+duration. (Unfortunately, many sequencers do not display note-off events, but instead place a duration upon each note-on
+event. This is not good for certain editing, for example, what we want to do here). Before you delete the second note
+(in this case, the C#5), locate its note-off. Jot down the time that the note-off event occurs. Now change the time of the
+first note's note-off (in this case, the note-off for C5) to be the same as that other note-off's time.</P>
+
+<P>If your sequencer doesn't show note-off events, then you've got to do some adding and subtracting of start times and
+durations. Take the first note's start time, and add its duration to that. Now subtract this sum from the second note's start
+time. Jot down this value which we'll refer to as the "delta value". (If the second note's start time is smaller than the
+first sum, then just use a delta value of 0). Now, add together the first note's duration, the delta value, and the second
+note's duration. Set the duration of the first note to this new sum.</P>
+
+<P>We need to later set the pitch wheel back to 0 at the end of the slur. Where is the end of the slur? That
+would be when the second note stops sounding. In other words, where it's respective note-off event occurs. Again, if you've
+got an event list that displays note-off events, simply insert a second Pitch Wheel event at the same start time as the
+second (deleted) note's note-off. Set this pitch wheel's value to 0.</P>
+
+<P>If your sequencer doesn't show note-off events, then you've got to take the first note's start time, and add its
+new duration to that. Now enter a second Pitch Wheel event at this start time, and set the event's value to 0.</P>
+
+<P>Note that many modules support setting the pitch wheel range using the Registered Parameter Number (RPN) Controller with
+a parameter number of 0. See the article <A HREF="rpn.htm">Registered and Non-Registered Parameter Number Controllers</A>
+for an example.</P>
+
+<P>To best hear the effect of the slur, I suggest selecting a patch such as "saxophone" to play the slur.</P>
+
+<HR><P>For the benefit of CakeWalk users who may be asking "How do I enter these events?", the answer is in using CakeWalk's
+"View->New->Event List" menu item to open up a window where you can see the actual MIDI events in a given track. (Make
+sure you select the desired track before opening up an Event List. For example, let's assume that you have the following
+2 note events (on Track 1) in your Event List. (I'm going to show those C5 and C#5 notes I used in my preceding examples).
+Assume a Timebase of 192, ie, 192 clocks in every quarter note. (NOTE: If you use a different Timebase setting, then your
+times will need to be different. CakeWalk's Timebase settings is made in its Settings menu).</P>
+<PRE>
+Trk | Hr:Mn:Sc:Fr |Meas:Beat:Tick|Chan|  Kind  |    Values
+ 1  |  00:00:04:16|       1:3:106|   1|Note    |C3   127   2:030
+ 1  |  00:00:05:27|       2:1:155|   1|Note    |C#3  127   1:000
+</PRE>
+We want to replace the second (C#5 note) event with a Pitch wheel event in order to slur the preceding C5 into a C#5 pitch.
+Unfortunately, CakeWalk doesn't display note-offs, so we've got to do some math. Take the C5 start time of 1:3:106 and add
+its duration of 2:030. (You can simply add each field separately, for example add the 106 and 030 as the Tick field, and
+then add the 3 and 2 as the Beat field. There is no measure field in this note's duration, but if there was, you'd add it to
+the start time's Meas field). The sum is 1:5:136. Now subtract this from the second note's start time. (You can subtract the
+separate fields. But if you need to "borrow" from another field, remember that every 1 in the Beat field equals your Timebase
+in the Tick field. In this case, every Beat is equal to 192 Ticks. Every 1 in the measure field equals 4 Beats (assuming 4/4
+time signature). So, we subtract 155 - 136 for the Tick field. We need to borrow for the second note's Beat field so we
+subtract one measure off and add 4 to its Beat field. That's 5 - 5. And subtracting the Meas fields is now 1 - 1. So, the
+delta time is 0:0:019. So, we're going to extend the first note's duration to 2:030 + 0:0:019 + 1:000. Add these all up to
+3:049. Enter this as the new duration of the first note. Now, our event list looks like:
+<PRE>
+Trk | Hr:Mn:Sc:Fr |Meas:Beat:Tick|Chan|  Kind  |    Values
+ 1  |  00:00:04:16|       1:3:106|   1|Note    |C5   127   3:049
+ 1  |  00:00:05:27|       2:1:155|   1|Note    |C#5  127   1:000
+</PRE>
+Next, insert a Pitch wheel event at the same start time as the second event. (Incidentally, although Pitch Wheel events
+aren't officially considered MIDI controller events, CakeWalk classifies them as such, so to insert a Pitch Wheel event in
+the event list, use the Insert menu's "Series of Controllers", and select "Pitch Wheel" controller). Set it's value to
+transpose the pitch up to C#5. Assuming a pitch wheel range of 4 half steps, we need a value of 4,096 for it.
+<PRE>
+Trk | Hr:Mn:Sc:Fr |Meas:Beat:Tick|Chan|  Kind  |    Values
+ 1  |  00:00:04:16|       1:3:106|   1|Note    |C5   127   3:049
+ 1  |  00:00:05:27|       2:1:155|   1|Note    |C#5  127   1:000
+ 1  |  00:00:05:27|       2:1:155|   1|Wheel   |    4096
+</PRE>
+Now, you can delete the second (C#3) note.
+<PRE>
+Trk | Hr:Mn:Sc:Fr |Meas:Beat:Tick|Chan|  Kind  |    Values
+ 1  |  00:00:04:16|       1:3:106|   1|Note    |C5   127   3:049
+ 1  |  00:00:05:27|       2:1:155|   1|Wheel   |    4096
+</PRE>
+Finally, take the first note's start time and add its new duration. That's 1:3:106 and 3:049, or 1:6:155. Insert another
+pitch wheel event, and set its start time to 1:6:155. (Cakewalk will reformat the time to 2:2:155 after you enter it). Set
+its value to 0.
+<PRE>
+Trk | Hr:Mn:Sc:Fr |Meas:Beat:Tick|Chan|  Kind  |    Values
+ 1  |  00:00:04:16|       1:3:106|   1|Note    |C5   127   3:049
+ 1  |  00:00:05:27|       2:1:155|   1|Wheel   |    4096
+ 1  |  00:00:06:15|       2:2:155|   1|Wheel   |       0
+</PRE>
+You're now done entering your slur. You should hear a smooth bend from C5 to C#5 (as opposed to the original 2 distinct
+notes). If, toward the very end of the slur, you hear the slur revert back to the first pitch (ie, it's the second pitch
+wheel event that restores the pitch wheel to center position, but this shouldn't happen until after the slur has stopped
+sounding -- ie, after the C5 note-off), then there may be problem with your sequencer's event list. What may be happening
+is that, when you enter that second pitch wheel event, CakeWalk is actually placing it before the MIDI note-off for that
+first note. (ie, CakeWalk automatically sorts the events according to their start times after every event you insert in the
+event list). Ideally, this second pitch wheel and the note-off events should both be happening on the exact same clock,
+with the pitch wheel being sent immediately after the note-off. (Unfortunately, since CakeWalk doesn't display note-off
+events, you can't be sure that CakeWalk hasn't sorted the events such that the note-off is placed immediately after the
+pitch wheel event). If you hear what sounds like the pitch being reset before the note stops sounding, then simply add an
+extra clock to the second pitch wheel event's start time. (In this example, you would set its start time as 1:6:156). That
+should force CakeWalk to sort the events such that the note-off is sent before the second pitch wheel event.
+
+<P>I have included a MIDI file <A HREF="../midi/example.mid">example.mid</A>
+that contains 5 tracks. (To save it to disk, right click on the link, and select to save the file).
+Each track represents one of the above 5 steps. For example, the
+first track contains the original 2 note events which we're trying to convert into a slur. The second track contains the
+altered duration for the C5 note. The third track contains the added first pitch wheel event (to cause the slur). The
+fourth track shows how we deleted the second note event. The fifth track contains the final pitch wheel event to reset the
+pitch wheel after the slur is finished. By muting all tracks except the first one, you can hear the original two pitches.
+By muting all tracks except the last one, you can hear the final result of converting to a slur.</P>
+
+<CENTER><P>Here are two short saxophone lines. One is without slurs, and the second uses slurs.</P></CENTER>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (navigator.appName == "Microsoft Internet Explorer")
+{
+	document.write('<CENTER><TABLE><TR><TD><embed src=http://www.borg.com/~jglatt/midi/slur1.mid autostart=false hidden=false volume=100 width=100 height=60></TD><TD><embed src=http://www.borg.com/~jglatt/midi/slur2.mid autostart=false hidden=false volume=100 width=100 height=60></TD></TR><TR><TD ALIGN=CENTER>No Slur</TD><TD ALIGN=CENTER>Slur</TD></TR></TABLE></CENTER>');
+}
+if (navigator.appName == "Netscape")
+{
+	document.write('<CENTER><TABLE><TR><TD><embed src="http://www.borg.com/~jglatt/midi/slur1.mid" width=100 height=60></TD><TD><embed src="http://www.borg.com/~jglatt/midi/slur2.mid" width=100 height=60></TD></TR><TR><TD ALIGN=CENTER>No Slur</TD><TD ALIGN=CENTER>Slur</TD></TR></TABLE></CENTER>');
+}
+ -->
+</SCRIPT>
+
+</BODY></HTML>

@@ -1,0 +1,278 @@
+<HTML><HEAD><TITLE>General MIDI</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+<CENTER><FONT COLOR=RED><B>Preface</B></FONT></CENTER>
+
+After the MIDI 1.0 standard was finalized in the early 1980's, numerous musical instruments with MIDI jacks appeared
+upon the market. Musicians started to attach these instruments via their MIDI ports, and quickly discovered that the
+MIDI 1.0 specification had overlooked some important concerns.
+
+<P>One typical scenario may have been as follows:
+
+<P>A musician attaches his Roland D-10 to his Yamaha DX-7, because he prefers the front panel of the D-10, but prefers the sound of the DX-7, and he wants to use the D-10 to "play" the DX-7. He selects the patch labeled "Piano" on the D-10, and he plays the D-10 keyboard, and on the DX-7 he hears... a trumpet? How did this happen? Well, it happened because MIDI sends a program change message that contains only a patch number -- not the actual name of the patch. So if patch #1 on the DX-7 is a trumpet sound, then that's what he gets on the DX-7, despite the fact that selecting patch #1 on the D-10 yields
+a piano sound on the D-10. The MIDI 1.0 specification did not require that particular sounds be assigned to particular
+patch numbers, so every manufacturer used his own discretion as to "patch mapping".
+
+<P>But the real problem was with MIDI files that the musician made. MIDI files contain only MIDI messages. So, any program change event in a MIDI file refers only to a patch number as well -- not the actual patch name. So, this musician
+creates a MIDI file using his D-10. He has a piano track, so he puts a program change event at the track's beginning to select patch #1, which happens to be a Piano sound on his D-10. He takes that MIDI file to a friend's house. The friend
+has a DX-7. They play the MIDI file on that DX-7, and suddenly, the piano part is playing with a trumpet sound. Well,
+that's because patch #1 on the DX-7 is not a piano -- it's a trumpet sound. To "fix" the MIDI file, now the musician
+with the DX-7 has to edit the MIDI tracks and change every MIDI Program Change event so that it refers to the correct
+patch number on his DX-7. This deviance among MIDI sound modules made it very difficult for musicians to create MIDI
+arrangements that played properly upon various MIDI sound modules.
+
+<P>There were also some other deviances among early MIDI modules that made it more difficult to use them together via
+MIDI. To address these concerns, Roland proposed an addendum to the MIDI 1.0 specification in the late 1980's. This
+new addendum was called "General MIDI" (GM). It added some new requirements to the base MIDI 1.0 specification (but does
+not supplant any parts of the 1.0 specification -- the 1.0 specification is still the base level to which all MIDI
+devices should adhere). GM has now been adopted as part of the MIDI 2.0 specification.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>General MIDI Patches</B></FONT></CENTER>
+
+<P>So to make MIDI Program Change messages of more practical use, Roland found it necessary to adopt a standard "patch
+bank". In other words, what was needed was to assign specific instrument sounds to specific patch numbers. For
+example, it was decided that patch number 1 upon all sound modules should be the sound of an <EM>Acoustic Grand
+Piano</EM>. In this way, no matter what MIDI sound module you use, when you select patch number 1, you always
+hear some sort of Acoustic Grand Piano sound. A standard was set for 128 patches which must appear in a specific
+order, and this standard is called <EM>General MIDI</EM> (GM). For example, patch number 25 upon a GM module must
+be a <EM>Nylon String Guitar</EM>. The chart, <A HREF="gm.htm#Patch">GM Patches</A>, shows you the names of all GM
+Patches, and their respective <EM>Program Change</EM> numbers.
+
+<P>Nowadays, most modules (including the built-in sound modules of computer sound cards) ship with a GM bank (of 128
+patches) so that it is easy to play MIDI files upon any MIDI module, without needing to edit all of the Program Change
+events in the file.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>General MIDI Multi-Timbral requirement</B></FONT></CENTER>
+
+<P>Another burgeoning technology in the late 1980's was the <A HREF="multi.htm">multi-timbral module</A>. Typically,
+there were deviances in the way that various manufacturers implemented this, since the 1.0 specification did not
+specifically address such devices. For example, some early multi-timbral modules supported only a limited set of
+the 16 MIDI channels simultaneously, so if you had a MIDI file with tracks upon unsupported MIDI channels, you
+wouldn't hear those tracks play back. You may not have even realized that those parts weren't being played.
+
+<P>So, one requirement of a GM-compliant module is that it must be fully multi-timbral, meaning that it can
+play MIDI messages upon all 16 channels simultaneously, with a different GM Patch sounding for each channel.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>General MIDI Note Number assignments</B></FONT></CENTER>
+
+<P>There were also deviances in regards to Note Number mapping. For example, some manufacturers mapped middle 'C' to
+MIDI Note Number 60. Others mapped it to Note Numbers 72 or 48. Some modules even had middle C mapped to various
+places in different patches, depending upon the instrument. For example, a bass guitar patch may have middle C
+mapped to the highest C on the keyboard (since the most useful range on a bass guitar is below middle C). A flute
+patch may have middle C mapped to the lowest C on the keyboard.
+
+<P>The result was that, it became confusing to keep track of which key (ie, MIDI Note Number) played middle C for each
+patch. Also, when a MIDI track was played back upon certain modules, the part may play back an octave too high or
+low.
+
+<P>It therefore was decided that all patches must sound an A440 pitch when receiving a MIDI note number of 69. (ie,
+Note Number 69 plays the A above middle C, and therefore Note Number 60 is middle C).
+
+<P>There were deviances in regards to "drum machines" as well. Most drum machines (and drum units built into multi-timbral
+modules) play a different drum sound for each MIDI Note Number. But the 1.0 specification never spelled out which drum
+sounds were assigned to which MIDI note numbers. So, whereas note number 60 may play a snare upon one drum unit, upon
+another drum unit, it may play a crash cymbal. Again, this caused trouble with MIDI files, since sometimes a drum part
+would play back with the wrong drum sounds.
+
+<P>To address this discrepancy, the GM addendum contains a "drum map". This assigns about 48 common drum sounds to 48
+specific MIDI Note Numbers. The assignments of drum sounds to MIDI notes is shown in the chart,
+<A HREF="gm.htm#Keys">GM Drum Sounds</A>. Also, it was decided that a GM drum unit should default to using MIDI
+channel 10 to receive MIDI messages. Therefore, a composer of a GM MIDI file can safely assume that his drum part
+will play correctly if he uses the GM Drum note assignments and records the drum part upon MIDI channel 10.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>General MIDI polyphony</B></FONT></CENTER>
+
+<P>Polyphony is how many notes a module can sound simultaneously. For example, perhaps a module can sound 32 notes
+simultaneously. Early MIDI modules typically had very limited polyphony. For example, the Prophet 5 could sound
+only 5 notes simultaneously.
+
+<P>This discrepancy in polyphony among MIDI modules made it difficult for arrangers to create MIDI files that
+played properly upon various modules. For example, if the arranger created too "busy" an arrangement, it could
+exceed the polyphony of a particular module, and therefore some of the notes may not be heard.
+
+<P>To address this discrepancy, the GM addendum stipulated that a GM module should be capable of sounding at
+least 24 notes simultaneously. (Ie, It must have 24 note polyphony). It could exceed 24 note polyphony, but it
+had to have at least that level of polyphony. In this way, if an arranger ensured that he never had more
+than 24 notes sounding simultaneously in his MIDI file, all notes of his arrangement would be heard upon any
+GM module.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Other General MIDI requirements</B></FONT></CENTER>
+
+<P>Finally, the GM addendum attempted to address some other discrepancies by spelling out a few more requirements.
+
+<P>A GM module should respond to velocity (ie, for note messages). This typically controls the VCA level (ie, volume)
+of each note, but the GM addendum unfortunately did not set a specific function for velocity. Some modules may allow
+velocity to affect other parameters on some patches.
+
+<P>The pitch wheel bend range should default to +/- 2 semitones. This allows an arranger to use pitch bend messages
+in his arrangement without worrying whether a bend that is supposed to be up 2 whole steps will instead jump up 2
+octaves upon a certain sound module.
+
+<P>The module also should respond to Channel Pressure (often used to control VCA level or VCO level for vibrato
+depth). Again, the GM addendum unfortunately did not set a specific function for channel pressure, although
+typically it defaults to controlling the volume of a note while it is being held.
+
+<P>Finally, a GM module should also respond to the following MIDI controller messages: Modulation (1) (usually hard-wired to control LFO amount, ie, vibrato), Channel Volume (7), Pan (10), Expression (11), Sustain (64), Reset All Controllers (121), and All Notes Off (123). Additionally, the module should respond to these <A HREF="../tech/midispec/rpn.htm">Registered Parameter Numbers</A>: Pitch Wheel Bend Range (0), Fine Tuning (1), and Coarse Tuning (2).
+
+<P>There were also some default settings that a GM module should apply upon power up. Channel Volume should default
+to 90, with all other controllers and effects off (including pitch wheel offset of 0). Initial tuning should be
+standard, A440 reference.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>General MIDI messages</B></FONT></CENTER>
+
+<P>The GM addendum did specify a couple System Exclusive messages to alter settings that are common to all GM units, but which were not addressed by the 1.0 specification.
+
+<P>One such message is for <A HREF="../tech/midispec/mastrvol.htm">Master Volume</A> -- not just the volume of a patch upon any one MIDI channel, but the master volume of the module itself.
+
+<P>There is also a System Exclusive message that can be used to <A HREF="../tech/midispec/sysen.htm">turn a module's General MIDI mode on or off</A>. This is useful for modules that also offer more expansive, non-GM playback modes or extra, programmable banks of patches beyond the GM set, but need to allow the musician to switch to GM mode when desired.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Conclusion</B></FONT></CENTER>
+
+<P>GM Standard makes it easy for musicians to put <EM>Program Change</EM> messages in their MIDI (sequencer) song files, confident that those messages will select the correct instruments on all GM sound modules, and the song file would therefore play all of the correct instrumentation automatically. Furthermore, musicians need not worry about parts being played back in the wrong octave. Finally, musicians didn't have to worry that a snare drum part, for example, would be played back on a Cymbal. The GM Standard also spells out other minimum requirements that a GM module should meet, such as being able to respond to Pitch and Modulation Wheels, and also being able to play 24 notes simultaneously (with dynamic voice allocation between the 16 Parts). All of these standards help to ensure that MIDI Files play back properly upon setups of various equipment.
+
+<P>The GM standard is actually not encompassed in the MIDI specification proper (ie, it's an addendum), and there's no reason why someone can't set up the Patches in his sound module to be entirely different sounds than the GM set. After all, most
+MIDI sound modules offer such programmability. But, most have a GM option so that musicians can easily play the many MIDI files that expect a GM module.
+
+<P><B>NOTE:</B> The GM Standard doesn't dictate how a module produces sound. For example, one module could use cheap FM synthesis to simulate the Acoustic Grand Piano patch. Another module could use 24 digital audio waveforms of various notes on a piano, mapped out across the MIDI note range, to create that one Piano patch. Obviously, the 2 patches won't sound exactly alike, but at least they will both be piano patches on the 2 modules. So too, GM doesn't dictate VCA envelopes for the various
+patches, so for example, the Sax patch upon one module may have a longer release time than the same patch upon another module.
+
+<HR>
+<P><H2><A NAME="Patch">GM Patches</A></H2>
+
+<P>This chart shows the names of all 128 GM Instruments, and the MIDI Program Change numbers which select those
+Instruments.
+
+<P>The patches are arranged into 16 "families" of instruments, with each family containing 8 instruments. For example,
+there is a <EM>Reed</EM> family. Among the 8 instruments within the Reed family, you will find Saxophone, Oboe, and Clarinet.
+
+<PRE><FONT COLOR=BLUE>
+<B>Prog#   Instrument            Prog#    Instrument</B></FONT>
+ 
+ <FONT COLOR=GREEN>PIANO</FONT>                           <FONT COLOR=GREEN>CHROMATIC PERCUSSION</FONT>
+<B>1</B>    Acoustic Grand             <B>9</B>   Celesta
+<B>2</B>    Bright Acoustic           <B>10</B>   Glockenspiel
+<B>3</B>    Electric Grand            <B>11</B>   Music Box
+<B>4</B>    Honky-Tonk                <B>12</B>   Vibraphone
+<B>5</B>    Electric Piano 1          <B>13</B>   Marimba
+<B>6</B>    Electric Piano 2          <B>14</B>   Xylophone
+<B>7</B>    Harpsichord               <B>15</B>   Tubular Bells
+<B>8</B>    Clavinet                  <B>16</B>   Dulcimer
+ 
+  <FONT COLOR=GREEN>ORGAN</FONT>                          <FONT COLOR=GREEN>GUITAR</FONT>
+<B>17</B>   Drawbar Organ             <B>25</B>   Nylon String Guitar
+<B>18</B>   Percussive Organ          <B>26</B>   Steel String Guitar
+<B>19</B>   Rock Organ                <B>27</B>   Electric Jazz Guitar
+<B>20</B>   Church Organ              <B>28</B>   Electric Clean Guitar
+<B>21</B>   Reed Organ                <B>29</B>   Electric Muted Guitar
+<B>22</B>   Accoridan                 <B>30</B>   Overdriven Guitar
+<B>23</B>   Harmonica                 <B>31</B>   Distortion Guitar
+<B>24</B>   Tango Accordian           <B>32</B>   Guitar Harmonics
+ 
+  <FONT COLOR=GREEN>BASS</FONT>                           <FONT COLOR=GREEN>SOLO STRINGS</FONT>
+<B>33</B>   Acoustic Bass             <B>41</B>   Violin
+<B>34</B>   Electric Bass(finger)     <B>42</B>   Viola
+<B>35</B>   Electric Bass(pick)       <B>43</B>   Cello
+<B>36</B>   Fretless Bass             <B>44</B>   Contrabass
+<B>37</B>   Slap Bass 1               <B>45</B>   Tremolo Strings
+<B>38</B>   Slap Bass 2               <B>46</B>   Pizzicato Strings
+<B>39</B>   Synth Bass 1              <B>47</B>   Orchestral Strings
+<B>40</B>   Synth Bass 2              <B>48</B>   Timpani
+
+  <FONT COLOR=GREEN>ENSEMBLE</FONT>                       <FONT COLOR=GREEN>BRASS</FONT>
+<B>49</B>   String Ensemble 1         <B>57</B>   Trumpet
+<B>50</B>   String Ensemble 2         <B>58</B>   Trombone
+<B>51</B>   SynthStrings 1            <B>59</B>   Tuba
+<B>52</B>   SynthStrings 2            <B>60</B>   Muted Trumpet
+<B>53</B>   Choir Aahs                <B>61</B>   French Horn
+<B>54</B>   Voice Oohs                <B>62</B>   Brass Section
+<B>55</B>   Synth Voice               <B>63</B>   SynthBrass 1
+<B>56</B>   Orchestra Hit             <B>64</B>   SynthBrass 2
+
+  <FONT COLOR=GREEN>REED</FONT>                           <FONT COLOR=GREEN>PIPE</FONT>
+<B>65</B>   Soprano Sax               <B>73</B>   Piccolo
+<B>66</B>   Alto Sax                  <B>74</B>   Flute
+<B>67</B>   Tenor Sax                 <B>75</B>   Recorder
+<B>68</B>   Baritone Sax              <B>76</B>   Pan Flute
+<B>69</B>   Oboe                      <B>77</B>   Blown Bottle
+<B>70</B>   English Horn              <B>78</B>   Skakuhachi
+<B>71</B>   Bassoon                   <B>79</B>   Whistle
+<B>72</B>   Clarinet                  <B>80</B>   Ocarina
+
+  <FONT COLOR=GREEN>SYNTH LEAD</FONT>                     <FONT COLOR=GREEN>SYNTH PAD</FONT>
+<B>81</B>   Lead 1 (square)           <B>89</B>   Pad 1 (new age)
+<B>82</B>   Lead 2 (sawtooth)         <B>90</B>   Pad 2 (warm)
+<B>83</B>   Lead 3 (calliope)         <B>91</B>   Pad 3 (polysynth)
+<B>84</B>   Lead 4 (chiff)            <B>92</B>   Pad 4 (choir)
+<B>85</B>   Lead 5 (charang)          <B>93</B>   Pad 5 (bowed)
+<B>86</B>   Lead 6 (voice)            <B>94</B>   Pad 6 (metallic)
+<B>87</B>   Lead 7 (fifths)           <B>95</B>   Pad 7 (halo)
+<B>88</B>   Lead 8 (bass+lead)        <B>96</B>   Pad 8 (sweep)
+ 
+   <FONT COLOR=GREEN>SYNTH EFFECTS</FONT>                  <FONT COLOR=GREEN>ETHNIC</FONT>
+ <B>97</B>  FX 1 (rain)               <B>105</B>   Sitar
+ <B>98</B>  FX 2 (soundtrack)         <B>106</B>   Banjo
+ <B>99</B>  FX 3 (crystal)            <B>107</B>   Shamisen
+<B>100</B>  FX 4 (atmosphere)         <B>108</B>   Koto
+<B>101</B>  FX 5 (brightness)         <B>109</B>   Kalimba
+<B>102</B>  FX 6 (goblins)            <B>110</B>   Bagpipe
+<B>103</B>  FX 7 (echoes)             <B>111</B>   Fiddle
+<B>104</B>  FX 8 (sci-fi)             <B>112</B>   Shanai
+
+   <FONT COLOR=GREEN>PERCUSSIVE</FONT>                     <FONT COLOR=GREEN>SOUND EFFECTS</FONT>
+<B>113</B>  Tinkle Bell               <B>121</B>   Guitar Fret Noise
+<B>114</B>  Agogo                     <B>122</B>   Breath Noise
+<B>115</B>  Steel Drums               <B>123</B>   Seashore
+<B>116</B>  Woodblock                 <B>124</B>   Bird Tweet
+<B>117</B>  Taiko Drum                <B>125</B>   Telephone Ring
+<B>118</B>  Melodic Tom               <B>126</B>   Helicopter
+<B>119</B>  Synth Drum                <B>127</B>   Applause
+<B>120</B>  Reverse Cymbal            <B>128</B>   Gunshot
+</PRE>
+
+<P><B><FONT COLOR=BLUE>Prog#</FONT></B> refers to the MIDI Program Change number that causes this <EM>Patch</EM> to be selected. These decimal numbers are what the user normally sees on his module's display (or in a sequencer's "Event List"), but note that MIDI modules count the first Patch as 0, not 1. So, the value that is sent in the Program Change message would actually be one
+less. For example, the Patch number for Reverse Cymbal is actually sent as 119 rather than 120. But, when entering that Patch number using sequencer software or your module's control panel, the software or module understands that humans normally start counting from 1, and so would expect that you'd count the Reverse Cymbal as Patch 120. Therefore, the software or module
+automatically does this subtraction when it generates the MIDI Program Change message.
+
+<P>So, sending a MIDI Program Change with a value of 120 (ie, actually 119) to a Part causes the Reverse Cymbal Patch to be selected for playing that Part's MIDI data.
+
+<HR>
+<P><H2><A NAME="Keys">GM Drum Sounds</A></H2></P>
+<P>This chart shows what drum sounds are assigned to each MIDI note for a GM module (ie, that has a drum part).
+
+<PRE><FONT COLOR=BLUE> 
+<B>MIDI    Drum Sound          MIDI    Drum Sound
+Note #                      Note #</FONT>
+ 35</B>   Acoustic Bass Drum     <B>59</B>   Ride Cymbal 2
+ <B>36</B>   Bass Drum 1            <B>60</B>   Hi Bongo
+ <B>37</B>   Side Stick             <B>61</B>   Low Bongo
+ <B>38</B>   Acoustic Snare         <B>62</B>   Mute Hi Conga
+ <B>39</B>   Hand Clap              <B>63</B>   Open Hi Conga
+ <B>40</B>   Electric Snare         <B>64</B>   Low Conga
+ <B>41</B>   Low Floor Tom          <B>65</B>   High Timbale
+ <B>42</B>   Closed Hi-Hat          <B>66</B>   Low Timbale
+ <B>43</B>   High Floor Tom         <B>67</B>   High Agogo
+ <B>44</B>   Pedal Hi-Hat           <B>68</B>   Low Agogo
+ <B>45</B>   Low Tom                <B>69</B>   Cabasa
+ <B>46</B>   Open Hi-Hat            <B>70</B>   Maracas
+ <B>47</B>   Low-Mid Tom            <B>71</B>   Short Whistle
+ <B>48</B>   Hi-Mid Tom             <B>72</B>   Long Whistle
+ <B>49</B>   Crash Cymbal 1         <B>73</B>   Short Guiro
+ <B>50</B>   High Tom               <B>74</B>   Long Guiro
+ <B>51</B>   Ride Cymbal 1          <B>75</B>   Claves
+ <B>52</B>   Chinese Cymbal         <B>76</B>   Hi Wood Block
+ <B>53</B>   Ride Bell              <B>77</B>   Low Wood Block
+ <B>54</B>   Tambourine             <B>78</B>   Mute Cuica
+ <B>55</B>   Splash Cymbal          <B>79</B>   Open Cuica
+ <B>56</B>   Cowbell                <B>80</B>   Mute Triangle
+ <B>57</B>   Crash Cymbal 2         <B>81</B>   Open Triangle
+ <B>58</B>   Vibraslap
+</PRE>
+
+A note-on with note number 42 will trigger a Closed Hi-Hat. This should cut off any Open Hi-Hat or Pedal Hi-Hat sound that may be sustaining. So too, a Pedal Hi-Hat should cut off a sustaining Open Hi-Hat or Closed Hi-Hat. In other words, only one of these three drum sounds can be sounding at any given time.
+
+<P>Similiarly, a Short Whistle should cut off a Long Whistle. A Short Guiro should cut off a Long Guiro. An Mute Triangle should cut off an Open Triangle. A Mute Cuica should cut off an Open Cuica.
+
+<P>Normally, all the above drum sounds have a fixed duration. Regardless of the time between when a Note-On is received and when a matching Note-Off is received, the drum sound always plays for a given duration. For example, assume that a device has a "Crash Cymbal 1" sound that plays for 4 seconds. If a Note-On for note number 49 is received, that cymbal sound starts playing. If a Note-Off for note number 49 is received only 1 second later, that should not cut off the remaining 3 seconds of the sound. The exceptions may be Long Whistle and Long Guiro, which may use the duration between the Note-On and Note-off to determine how "long" the sound plays.
+
+<P>If a drum is still sounding when another one of its Note-Ons is received, typically, another voice "stacks" another instance of that sound playing.
+
+</BODY></HTML>

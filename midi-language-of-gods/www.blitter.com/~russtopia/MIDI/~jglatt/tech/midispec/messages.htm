@@ -1,0 +1,68 @@
+<HTML><HEAD><TITLE>MIDI Specification: Messages</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+The MIDI protocol is made up of <B>messages</B>. A message consists of a string (ie, series) of 8-bit bytes.
+MIDI has many such defined messages. Some messages consist of only 1 byte. Other messages have 2 bytes. Still
+others have 3 bytes. One type of MIDI message can even have an unlimited number of bytes. The one thing that
+all messages have in common is that the first byte of the message is the <B>Status</B> byte. This is a special
+byte because it's the only byte that has bit #7 set. Any other following bytes in that message will not have
+bit #7 set. So, you can always detect the start a MIDI message because that's when you receive a byte with bit
+#7 set. This will be a Status byte in the range 0x80 to 0xFF. The remaining bytes of the message (ie, the data
+bytes, if any) will be in the range 0x00 to 0x7F. (Note that I'm using the C programming language convention
+of prefacing a value with 0x to indicate hexadecimal).
+
+<P>The Status bytes of 0x80 to 0xEF are for messages that can be broadcast on any one of the 16 MIDI channels.
+Because of this, these are called <B>Voice</B> messages. (My own preference is to say that these messages
+belong in the <B>Voice Category</B>). For these Status bytes, you break up the 8-bit byte into 2 4-bit nibbles.
+For example, a Status byte of 0x92 can be broken up into 2 nibbles with values of 9 (high nibble) and 2 (low
+nibble). The high nibble tells you what <I>type</I> of MIDI message this is. Here are the possible values for
+the high nibble, and what type of Voice Category message each represents:
+
+<PRE><B>
+8 = <A HREF="noteoff.htm">Note Off</A>
+9 = <A HREF="noteon.htm">Note On</A>
+A = <A HREF="aftert.htm">AfterTouch</A> (ie, key pressure)
+B = <A HREF="ctl.htm">Control Change</A>
+C = <A HREF="pgm.htm">Program (patch) change</A>
+D = <A HREF="pressure.htm">Channel Pressure</A>
+E = <A HREF="wheel.htm">Pitch Wheel</A>
+</B></PRE>
+
+So, for our example status of 0x92, we see that its message type is <B>Note On</B> (ie, the high nibble is 9).
+What's the low nibble of 2 mean? This means that the message is on MIDI channel 2. There are 16 possible
+(logical) MIDI channels, with 0 being the first. So, this message is a Note On on channel 2. What status
+byte would specify a <B>Program Change</B> on channel 0? The high nibble would need to be C for a Program
+Change type of message, and the low nibble would need to be 0 for channel 0. Thus, the status byte would
+be 0xC0. How about a Program Change on channel 15 (ie, the last MIDI channel). Again, the high nibble would
+be C, but the low nibble would be F (ie, the hexademical digit for 15).Thus, the status would be 0xCF.
+
+<P><B><FONT COLOR=RED>NOTE:</FONT></B>
+Although the MIDI Status byte counts the 16 MIDI channels as numbers 0 to F (ie, 15), all MIDI gear (including
+computer software) displays a channel number to the musician as 1 to 16. So, a Status byte sent on MIDI channel
+0 is considered to be on "channel 1" as far as the musician is concerned. This discrepancy between the status
+byte's channel number, and what channel the musician "believes" that a MIDI message is on, is accepted because
+most humans start counting things from 1, rather than 0.
+
+<P>The Status bytes of 0xF0 to 0xFF are for messages that aren't on any particular channel (and therefore all
+daisy-chained MIDI devices always can "hear" and choose to act upon these messages. Contrast this with the
+Voice Category messages, where a MIDI device can be set to respond to those MIDI messages only on a specified
+channel). These status bytes are used for messages that carry information of interest to all MIDI devices,
+such as syncronizing all playback devices to a particular time. (By contrast, Voice Category messages deal
+with the individual musical parts that each instrument might play, so the channel nibble scheme allows a
+device to respond to its own MIDI channel while ignoring the Voice Category messages intended for another
+device on another channel).
+
+<P>These status bytes are further divided into two categories. Status bytes of 0xF0 to 0xF7 are called
+<B>System Common</B> messages. Status bytes of 0xF8 to 0xFF are called
+<B>System Realtime</B> messages. The implications of such will be discussed later.
+
+<P>Actually, certain Status bytes within this range are not defined by the MIDI spec to date, and are reserved
+for future use. For example, Status bytes of 0xF4, 0xF5, 0xF9, and 0xFD are not used.  If a MIDI device ever
+receives such a Status, it should ignore that message. See <A HREF="ignore.htm">Ignoring MIDI Messages</A>.
+
+<P>What follows is a description of each message type. The description tells what the message does, what its
+status byte is, and whether it has any subsequent data bytes and what information those carry. Generally,
+these descriptions take the view of a device receiving such messages (ie, what the device would typically be
+expected to do when receiving particular messages). When applicable, remarks about a device that transmits
+such messages may be made.
+
+</FONT></BODY></HTML>

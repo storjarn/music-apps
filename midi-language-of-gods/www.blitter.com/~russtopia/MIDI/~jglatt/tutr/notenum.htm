@@ -1,0 +1,211 @@
+<HTML><HEAD><TITLE>MIDI Note Numbers and Names</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+<CENTER><FONT COLOR=RED><B>Note Names</B></FONT></CENTER>
+
+<P>Before discussing MIDI note numbers, it is important to understand some basic principles about how musicians name musical notes.</P>
+
+<P>Many instruments can play distinct pitches (ie, a musical scale). For example, an acoustic piano has 88 keys,
+or 88 distinct pitches/notes.</P>
+
+<P>Instruments with keyboards (such as the pipe organ and harpsichord) were among the earliest,
+most versatile musical instruments at around the time when musicians were devising a way to notate music. So, it's
+traditional to name musical pitches based upon the piano keyboard. A piano has white and black keys. They are
+visually grouped into octaves where one octave contains 12 keys. (ie, One octave contains 7 white keys which are
+interspersed by 2 groups of black keys). Below is a picture of one octave of keys upon a piano.</P>
+
+<P><CENTER><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 NOWRAP>
+<TR>
+<TD><IMG SRC="piano2.gif" BORDER=0></TD>
+<TD><IMG SRC="piano3.gif" BORDER=0></TD>
+</TR>
+</TABLE></CENTER></P>
+
+<P>Musicians name
+the musical pitches played upon the white keys by using the alphabetical names A to G. For example, "middle C"
+is the white key closest to the center of the keyboard. Musicians append sharps or flats to the alphabetical names
+to identify the black keys. For example, the black key above middle C is a C#. Also, musicians use the octave number
+to further identify a particular key. For example, "middle C" is specifically the C in the fourth octave upon a piano
+(so it would be notated as C4. I refer to that as its <B>note name</B>).</P>
+
+<P>Below is a portion of a piano with the keys labeled as a musician would refer to them. (ie, Here are the note names
+for 3 octaves of keys, starting at octave 1).</P>
+
+<P><CENTER><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 NOWRAP>
+<TR>
+<TD WIDTH=10></TD>
+<TD WIDTH=30><CENTER>C#1</CENTER></TD>
+<TD WIDTH=30><FONT COLOR=RED>D#1</FONT></TD>
+<TD WIDTH=8></TD>
+<TD WIDTH=27>F#1</TD>
+<TD WIDTH=28><FONT COLOR=RED>G#1</FONT></TD>
+<TD WIDTH=27>A#1</TD>
+<TD WIDTH=8></TD>
+<TD WIDTH=30><FONT COLOR=RED>C#2</FONT></TD>
+<TD WIDTH=30>D#2</TD>
+<TD WIDTH=8></TD>
+<TD WIDTH=27><FONT COLOR=RED>F#2</FONT></TD>
+<TD WIDTH=29>G#2</TD>
+<TD WIDTH=28><FONT COLOR=RED>A#2</TD>
+<TD WIDTH=8></TD>
+<TD WIDTH=30>C#3</TD>
+<TD WIDTH=30><FONT COLOR=RED>D#3</FONT></TD>
+<TD WIDTH=10></TD>
+<TD WIDTH=27>F#3</TD>
+<TD WIDTH=27><FONT COLOR=RED>G#3</FONT></TD>
+<TD WIDTH=30>A#3</TD>
+</TR>
+</TABLE></CENTER>
+
+<CENTER><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 NOWRAP>
+<TR>
+<TD><IMG SRC="piano2.gif" BORDER=0></TD>
+<TD><IMG SRC="piano2.gif" BORDER=0></TD>
+<TD><IMG SRC="piano2.gif" BORDER=0></TD>
+<TD><IMG SRC="piano3.gif" BORDER=0></TD>
+</TR>
+</TABLE></CENTER>
+
+<CENTER><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=2 NOWRAP>
+<TR>
+<TD>C1</TD>
+<TD><FONT COLOR=RED>D1</FONT></TD>
+<TD>E1</TD>
+<TD><FONT COLOR=RED>F1</FONT></TD>
+<TD>G1</TD>
+<TD><FONT COLOR=RED>A1</FONT></TD>
+<TD WIDTH=22>B1</TD>
+<TD><FONT COLOR=RED>C2</FONT></TD>
+<TD>D2</TD>
+<TD><FONT COLOR=RED>E2</FONT></TD>
+<TD>F2</TD>
+<TD><FONT COLOR=RED>G2</TD>
+<TD>A2</TD>
+<TD WIDTH=22><FONT COLOR=RED>B2</FONT></TD>
+<TD>C3</TD>
+<TD><FONT COLOR=RED>D3</FONT></TD>
+<TD>E3</TD>
+<TD><FONT COLOR=RED>F3</FONT></TD>
+<TD>G3</TD>
+<TD><FONT COLOR=RED>A3</FONT></TD>
+<TD>B3</TD>
+</TR>
+</TABLE></CENTER>
+</P>
+
+<P><HR SIZE=5 NOSHADE></P><P><CENTER><FONT COLOR=RED><B>MIDI Note Numbers</B></FONT></CENTER></P>
+
+<P><B>A MIDI controller</B> (be it a piano-like keyboard, a MIDI guitar, a MIDI drum kit, etc) <B>can
+have upto 128 distinct pitches/notes.</B> (Consequently, A MIDI controller has a wider range of notes -- ie, more octaves
+of notes -- than even an acoustic piano). The lowest note is a C upon a MIDI controller (as opposed to an A upon an
+acoustic piano).
+
+<P>But whereas musicians name the keys using the alphabetical names, with sharps and flats, and also
+octave numbers (as shown in the diagram above), this is more difficult for MIDI devices to process, so they
+instead assign a unique number to each key. The numbers used are 0 to 127. As mentioned, the lowest note
+upon a MIDI controller is a C and this is assigned note number 0. The C# above it would have a note number of 1. The
+D note above that would have a note number of 2. Etc. "Middle C" is note number 60. (ie, There are 59 other keys below
+middle C upon a MIDI controller). So, <B>a MIDI note number of 69 is used for A440 tuning.</B> (ie, That is the A note above
+middle C).
+
+<P>Below is a portion of a piano with the keys labeled as a MIDI Device would refer to them. (ie, Here are the note numbers
+for 3 octaves of keys, starting at the lowest octave).</P>
+
+<P><CENTER><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 NOWRAP>
+<TR>
+<TD WIDTH=9></TD>
+<TD WIDTH=38><CENTER>1</CENTER></TD>
+<TD WIDTH=30><FONT COLOR=RED>3</FONT></TD>
+<TD WIDTH=13></TD>
+<TD WIDTH=27>6</TD>
+<TD WIDTH=22><FONT COLOR=RED>8</FONT></TD>
+<TD WIDTH=26>10</TD>
+<TD WIDTH=14></TD>
+<TD WIDTH=30><FONT COLOR=RED>13</FONT></TD>
+<TD WIDTH=30>15</TD>
+<TD WIDTH=8></TD>
+<TD WIDTH=27><FONT COLOR=RED>18</FONT></TD>
+<TD WIDTH=27>20</TD>
+<TD WIDTH=28><FONT COLOR=RED>22</TD>
+<TD WIDTH=10></TD>
+<TD WIDTH=30>25</TD>
+<TD WIDTH=30><FONT COLOR=RED>27</FONT></TD>
+<TD WIDTH=10></TD>
+<TD WIDTH=27>30</TD>
+<TD WIDTH=25><FONT COLOR=RED>32</FONT></TD>
+<TD WIDTH=32>34</TD>
+</TR>
+</TABLE></CENTER>
+
+<CENTER><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 NOWRAP>
+<TR>
+<TD><IMG SRC="piano2.gif" BORDER=0></TD>
+<TD><IMG SRC="piano2.gif" BORDER=0></TD>
+<TD><IMG SRC="piano2.gif" BORDER=0></TD>
+<TD><IMG SRC="piano3.gif" BORDER=0></TD>
+</TR>
+</TABLE></CENTER>
+
+<CENTER><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=3 NOWRAP>
+<TR>
+<TD WIDTH=16>0</TD>
+<TD WIDTH=16><FONT COLOR=RED>2</FONT></TD>
+<TD WIDTH=17>4</TD>
+<TD WIDTH=17><FONT COLOR=RED>5</FONT></TD>
+<TD WIDTH=17>7</TD>
+<TD WIDTH=15><FONT COLOR=RED>9</FONT></TD>
+<TD WIDTH=17>11</TD>
+<TD WIDTH=17><FONT COLOR=RED>12</FONT></TD>
+<TD WIDTH=16>14</TD>
+<TD WIDTH=17><FONT COLOR=RED>16</FONT></TD>
+<TD WIDTH=17>17</TD>
+<TD WIDTH=17><FONT COLOR=RED>19</TD>
+<TD WIDTH=17>21</TD>
+<TD WIDTH=17><FONT COLOR=RED>23</FONT></TD>
+<TD WIDTH=17>24</TD>
+<TD WIDTH=17><FONT COLOR=RED>26</FONT></TD>
+<TD WIDTH=17>28</TD>
+<TD WIDTH=17><FONT COLOR=RED>29</FONT></TD>
+<TD WIDTH=15>31</TD>
+<TD WIDTH=14><FONT COLOR=RED>33</FONT></TD>
+<TD WIDTH=14>35</TD>
+</TR>
+</TABLE></CENTER>
+</P>
+
+<P>For a more indepth discussion of why machines use MIDI note numbers, see <A HREF="http://www.borg.com/~jglatt/tutr/notenum2.htm">Why humans and
+machines refer to musical pitches in different ways</A>.</P>
+
+<P>As mentioned, a MIDI controller can <U>theoretically</U> have 128 keys (or frets, or drum pads, etc).
+Of course, in practice, it's too expensive to manufacture a MIDI controller with 128 keys on it. Besides, most musicians
+aren't accustomed to playing a keyboard with more than 88 keys (or a drum kit with 128 pads, etc). It would seem very
+odd to the musician -- perhaps even too unwieldly an instrument to play. So typically, most controllers have less than
+128 keys upon them. For example, a "full-size"
+keyboard controller will usually have only the 88 keys that a piano has; the lowest key being the low A like upon a
+piano. (ie, Its lowest key is actually MIDI Note Number 21). Nevermind that a true "full-size" keyboard controller would
+have 128 keys and its lowest key would go down to a C two octaves below the piano's A key. Of course, most keyboard
+controllers have a "MIDI transpose" function so that, even if you don't have the full 128 keys, you can alter the note
+range that your (more limited) keyboard covers. For example, instead of that lowest A key being assigned to note number
+21, you could transpose it down an octave so that it is assigned a note number of 9.</P>
+
+<P><HR SIZE=5 NOSHADE></P><P><CENTER><FONT COLOR=RED><B>Errata</B></FONT></CENTER></P>
+
+<P>Some MIDI software or devices don't use MIDI note numbers to identify notes to a musician (even though that's what the
+MIDI devices themselves expect, and what they pass to each other in MIDI messages). MIDI note numbers don't mean that much
+to a musician. Instead, the software/device may display note names, such as F#3 (ie, the F# in the third octave
+of a piano keyboard).</P>
+
+<P>There is one, nagging discrepancy that has crept up between various models of MIDI devices and software programs,
+and that concerns the octave numbers for note names. If your MIDI software/device considers octave 0 as being the
+lowest octave of the MIDI note range (which it ideally should), then middle C's note name is C5. The lowest note name is
+then C0 (note number 0), and the highest possible note name is G10 (note number 127).</P>
+
+<P>Some software/devices instead
+consider the third octave of the MIDI note range (ie, 2 octaves below middle C) as octave 0. (They do this because they
+may be designed to better conform to a keyboard controller that has a more limited range; one which perhaps doesn't have
+the two lowest octaves of keys which a 128 key controller would theoretically have. So they pretend that the third octave
+is octave 0, because the first two octaves are physically "missing" on the keyboard). In that case, the first 2 octaves
+(that are physically missing) are referred to as -2 and -1. So,
+middle C's note name is C3, the lowest note name is C-2, and the highest note name is G8. This discrepancy is purely
+in the way that the software/device displays the note name to you.</P>
+
+</BODY></HTML>

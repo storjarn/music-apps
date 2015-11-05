@@ -1,0 +1,784 @@
+<HTML><HEAD><TITLE>The architecture of Roland Sound Modules</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Roland JV series sound modules (such as the JV-90, JV-1080, etc, or
+series based upon it such as the XP series) often seem confusing to many
+people. Although Roland's user manuals are serviceable in their content
+(ie, they do contain most of the information that you need to know),
+some folks seem to find the language and presentation a bit too
+jargon-ish and terse. This article attempts to give you a broader
+understanding of the design of a typical Roland sound module, so that
+when you dig into the user manual for specific details, the manual will
+make more sense to you.
+
+<H3>Banks/Patches</H3>
+
+<P>A typical Roland multitimbral module such as the JV-90 has numerous
+banks of patches. According to the MIDI specification, a MIDI bank can
+have, at most, 128 patches in it. But Roland often arranges patches into
+smaller "groups" so that they better map out to buttons upon the front
+panel. For example, Roland often puts 16 buttons on the front panel
+(dedicated to the selection of patches), in 2 rows of 8. The top row
+selects among 8 "subgroups" of patches. In each subgroup, there are 8
+patches, and you select among those 8 using the bottom row. In this way,
+you always have access to 8 patches via one button per patch (ie, each
+bottom row button selects a different patch). You don't need to press 2
+buttons in order to switch between patches, as long as you stick with
+those 8 patches. Of course, if you want to switch to a different
+subgroup of 8 patches, then you have to use the top row of buttons as
+well. Now, there are a total of 8 times 8 (ie, 8 subgroups of 8 patches
+each), or 64 patches that you can switch to at any given moment using
+Roland's grouping of 16 buttons on the front panel. So that's why Roland
+tends to arrange patches into groups of 64. Roland typically refers to
+such a "partial MIDI bank" (ie, half of a full, 128 patch MIDI bank) as
+a "Patch Group".</P>
+
+<P>To switch the buttons to select between 64 other patches (ie, a
+different Patch Group), then you usually need to press one of the "Patch
+Group" buttons on the Roland. Roland gives various "labels" to these
+Patch Groups. Groups which are stored in a ROM chip are typically
+labeled with letters following the word "Preset", for example, the first
+4 groups in ROM may be labeled as "Preset A", "Preset B", "Preset C",
+and "Preset D". Since these patches are in ROM (ie, READ-ONLY MEMORY),
+you can't store any edits you make to them (unless you store the newly
+edited patch into some patch location in a RAM-located "User" group,
+thus overwriting that user patch). Hence the designation "Preset".
+Typically, Roland also provides some battery-backed RAM where you can
+store your own, customized patches. There may be one or more Patch
+Groups in this RAM, and they are typically labeled with letters
+following the word "User" or "Internal", for example the first 4 groups
+in RAM may be labeled as "User A", User B", "User C", and "User D". You
+can edit these patches and store your changes back to those patch
+locations in RAM.</P>
+
+<P>Also, Roland tends to arrange the various additional "components" of
+a module into their own patch groups. For example, Roland modules
+sometimes have patches on "data cards" that are inserted into a slot
+(sort of looks like PCMCIA) in the back of the unit. The module may also
+have a connector whereby a "voice expansion" board (to allow more
+polyphony) can be internally plugged into the module, and this card
+contains further patches. Many modules can also use a "wave expansion" board
+(to allow new waveforms to be used in patches) which contains yet more
+patches. Roland typically puts the patches upon each of these components
+into its own Patch Group which you select by pressing some Patch Group
+button on the front panel (appropriately labeled, such as W-EXP for the
+patches upon the wave expansion board). Although the data cards often
+contain battery backed memory so that you can edit and store customized
+patches upon them, the wave expansion board typically has only 1 group
+of ROM patches. As far as the VE-JV1 voice expansion board is concerned
+(and all subsequent comments about voice expansion concern this board),
+it has RAM patches (and just 1 very small group containing only 8
+patches), so that you can edit those patches' settings. But it isn't
+battery-backed, so every time that you turn on the unit, you have to
+reload the desired 8 patches into the voice expansion's RAM by sending
+System Exclusive MIDI messages to its MIDI input. (Roland offers an
+easier alternative by allowing you to internally transfer 1 Performance,
+and its 8 patches and drum kit, from the module's main RAM or ROM to the
+voice expansion's RAM. It still takes a few seconds just like a SysEx
+dump over MIDI, but there's no external cable connections to be made).</P>
+
+<P>In conclusion, Roland typically arranges its patches into groups of 64 (or less), called
+"Patch Groups". There are usually 16 buttons upon the front panel which allow easily
+switching among 1 Patch Group's 64 patches. In order to setup the buttons to switch
+among a different Patch Group's 64 patches, you need to press one of the Patch
+Group buttons.</P>
+
+<H3>Rhythm Sets</H3>
+
+A Roland "Rhythm Set" is simply a "drum kit" (ie, one mapping of various
+drum sounds across the entire note range of the keyboard, where each key
+plays a different drum sound. Henceforth, I'll simply use "drum kit" in
+lieu of Roland's "Rhythm Set" designation). Roland typically offers
+several drum kits to choose from (but sometimes you can only use 1 at a
+time). For example, there may be an "808 Rhythm Set" which features
+electronic drum sounds mapped across the keyboard. There may also be an
+"Orchestral Rhythm Set" which features orchestral percussion such as
+various timpani pitches and concert cymbals mapped across the keyboard.
+
+<P>Just like with patches, sometimes Roland has a few "preset" drum kits in ROM. You
+can't edit the settings of these kits. They may be labeled "Preset A", "Preset B", etc,
+just like the ROM patches. There may be one or two kits in RAM, whose settings you can
+edit. These are typically labeled "User (or Internal) A", "User B", etc.</P>
+
+<P>The voice expansion board typically is limited to playing 1 drum kit
+stored in its own RAM. As with the board's RAM patches, you can edit this
+kit's settings (but those settings need to be saved to external media in
+order to be permanently saved), or load another kit into the board, thus
+overwriting that kit's settings.</P>
+
+<P>I'll discuss the editing and creation of drum kits later.</P>
+
+<H3>Performances</H3>
+
+Roland often has groups of things referred to as "Performances". For
+example, there may be a group of Performances labeled "Preset A" in ROM.
+There may be another group of Performances labeled "User A" in RAM. A
+Performance is mostly just a "setup" of various parameters, often
+having to do with multi-timbral operation, such as MIDI channel
+assignments, but also other settings such as settings for built-in
+hardware effects, what MIDI messages the keyboard generates when you
+play it, how the Roland Patches respond to incoming MIDI messages such
+as Volume, Pan, etc, controllers, etc. I'll get into more details about
+Performances later.
+
+<P>The voice expansion board typically has only 1 Performance in its own
+RAM, and it is limited to playing only this Performance. You can load
+another Performance into the board, thus overwriting that 1 Performance
+with new settings, but that involves sending system exclusive messages
+to the board's MIDI input. In fact, the voice expansion's Performance is
+limited to playing only those 8 Patches also loaded into its RAM, as
+well as the 1 drum kit loaded into its RAM. The voice expansion is
+essentially a "mini JV-880" in of itself, rather than an actual
+augmentation of the main module.</P>
+
+<H3>Performance Play and Patch Play modes</H3>
+
+"Performance Play mode" is essentially the module's multi-timbral mode,
+whereas "Patch Play mode" is more suitable to playing only 1 patch at a
+time from the local keyboard, or quickly auditioning patches in a Patch
+Group when you're deciding which ones to select while creating a given
+Performance. Some Roland modules disable multi-timbral operation when in
+Patch Play mode, and/or automatically set the local keyboard to play the
+currently selected Patch regardless of whether the keyboard is set to
+broadcast upon the same MIDI channel as the Patch is set to receive.
+This can be a boon when you're auditioning Patches to be used in a
+Performance, as it's often a lot more hassle (especially upon older
+modules) to audition Patches in "Performance Play mode" than it is to
+merely drop back into Patch Play mode.
+
+<H3>Waveforms/Tones/Patches/Performances</H3>
+
+Typically, Roland modules contain numerous digital waveforms in ROM. These
+are the raw "sounds" that you use when creating Tones, and ultimately
+Patches and Performances. Some Roland modules offer a special "waveform
+play" mode where you can hear the raw waveforms without any kind of
+processing such as effects or filtering applied. (The non-percussion
+waveforms are typically looped automatically so that you can use them in
+patches that "sustain", but other than looping, no other settings are
+applied to the raw waveform itself). But upon other modules, you may have
+to create a Tone using that waveform in order to hear it. Usually,
+Roland lists the names of all raw waveforms in the user manual under
+"Waveform List". (Adding a wave expansion board will give you even more
+waveforms with which to create Tones, and that board will usually come
+with a list of its raw waveforms).
+
+<HR><P>A Roland Tone is merely <B>one</B> of the raw waveforms with
+various settings, such as volume, tone, and pitch shaping applied to it.
+The Tone has settings for a Voltage-controlled Amplifier (ie, VCA),
+Voltage-controlled Filter (ie, VCF), Voltage-controlled low frequency
+oscillator (ie, VCO), and other settings that can be applied to the raw
+waveform to change its tone, pitch, volume, etc.</P>
+
+<P>For example, a particular Tone may be using a raw waveform named
+"Jazz Organ" (ie, a waveform of a typical Hammond B-3 sound). You could
+use that Tone's VCA to cause the waveform's initial attack (ie, volume)
+to slowly fade in. You can then create another Tone that uses the exact
+same waveform, but alter the Tone's VCA settings so that the waveform
+has a fast attack, and perhaps use that Tone's VCO to add some constant
+vibrato.</P>
+
+<P>In conclusion, Tones are used to create a variety of sounds based
+upon the raw waveforms, using VCA, VCF, VCO and other Tone settings
+applied to some raw waveform. (Note: Lately, the Roland manuals have
+begun referring to Tones as "Waves". And the description for the Tone
+settings is within the chapter that describes editing a Patch since
+nowadays each Patch in Roland modules has its own individual 4 Tones.
+Contrast this with older designs where Patches had to pick 4 Tones from
+among a more limited number of shared Tones. In other words, nowadays a
+Patch contains 4 unique Tones, and their settings, embedded inside of
+it. For example, in the JV-90 manual, the Tone settings are described in
+the "Patch Edit mode" chapter, starting with the heading of "Parameters
+accessed by pressing [WAVE/LFO]).</P>
+
+<HR><P>A Roland Patch typically consists of upto 4 Tones set to play across
+the keyboard range. (A Patch isn't required to use all 4 Tones. It can
+use only 1, 2, or 3, if desired. If you don't want to use one of the
+Tones of a Patch, then switch that Tone to "Off").</P>
+
+<P>Of course, the Patch has various settings that can be applied <B>individually</B> to these Tones.</P>
+
+<P>For example, the Patch has a volume setting for each Tone. So, if one
+Tone happens to be inherently louder than another Tone, but you want
+them to sound equally loud within the patch, you can balance their
+respective volumes. (Note: In newer Roland modules where each Patch has
+its own unique 4 Tones, the individual Tone volumes are actually among
+the Tone settings). Or, if you deliberately want some Tone to be very
+soft (ie, maybe to "flavor" the sound without being a prominent
+component of the sound), you can turn down its overall volume.</P>
+
+<P>So too, the Patch has a pan setting for each Tone. For example, you
+can have one Tone panned to the right (ie, set to sound out of only the
+right "Audio Out" jack) and another Tone panned to the left to create a
+stereo effect between the Tones. (This is particularly useful for
+creating spacious "stereo patches" of a single instrument. Typically what
+you do is create 2 Tones that use the same waveform, but apply slightly
+different Tone settings to them, for example, making one slightly sharp
+and the other slightly flat, or use the VCF cutoff to make one brighter
+than the other. Then you pan those 2 Tones in stereo within a given
+patch. See my article <A HREF="arrange.htm">Arranging for MIDI sound modules</A>
+for ideas on creating stereo patches. Just substitute the word "Tone" for
+the word "Part" when reading the various, suggested techniques).</P>
+
+<P>Also, the Patch has separate settings for the note range over
+which each Tone plays. So, rather than stacking the Tones so that they
+play over the same note range (and thus building up a thicker, perhaps
+stereo sound), you can limit the Tones to playing in only specific note
+ranges. For example, you can limit one Tone to playing over only the top
+3 octaves of the keyboard, and limit another Tone to playing over only
+the bottom 3 octaves. (ie, You can set up "split keyboard" patches,
+where one Tone using a given waveform plays over a certain note range,
+and another Tone using an entirely different waveform plays over a
+different note range).</P>
+
+<P>You may also be able to set the velocity range over which each Tone
+plays, so that, for example, playing loudly sounds only 1 Tone whereas
+playing softly sounds a different Tone only (ie, velocity switching or
+cross-fading). For example, you can setup a patch to switch between
+playing a picked or slapped bass note depending upon how hard you press
+the key.</P>
+
+<P>There may be other Patch settings that determine how received MIDI
+controllers such as Volume, Expression, Hold Pedal, etc, or MIDI
+messages such as Pressure (ie, aftertouch), Mod or Pitch Wheel affect
+the Tones. For example, you may be able to set increasing MIDI Pressure
+to increase the depth of the LFO applied to a Tone (ie, increase a
+vibrato effect).</P>
+
+<P>Upon newer modules, there may also be settings for effects such as
+Reverb and Chorus (although, except for the Patch's level settings for
+Reverb and Chorus, these are typically overridden by Performance
+settings when in "Performance Play mode").</P>
+
+<HR><P>A Roland Performance typically consists of several Patches set to
+play simultaneously (ie, in multi-timbral mode), with the keyboard (or
+some external controller) perhaps playing one (or maybe even more) of
+those patches. Actually, a Performance consists of several "Internal
+Parts" in Roland terminology, but since you assign 1 Patch to every
+"Part", you can think of a Performance as consisting of several,
+simultaneously playing patches. For modules that have a built-in
+keyboard such as the XP-50, a Performance also has settings for how the
+keyboard generates MIDI messages (ie, how the keyboard functions as a
+controller).</P>
+
+<P>Older Roland modules have Performances that are limited to playing
+only 8 (or fewer) patches simultaneously (ie, the Performance is limited
+to 8 "Internal Parts"), and ultimately limited to playing patches upon
+only 8 of the 16 available MIDI channels simultaneously. With the
+addition of a Voice Expansion board, that board gives 8 more Parts, and
+can therefore be set to handle the remaining MIDI channels for full
+multi-timbral support. (But be aware of the limited patch storage
+capabilities of some Roland voice expansion boards, mentioned earlier. I
+really wish Roland had designed the voice expansion board to access the
+main RAM and ROM patches/performances in the module, instead of being
+limited to accessing patches and the performance only within its own
+limited RAM. On the other hand, one really nice thing is that, because
+the board can be treated as its own module, with its own MIDI input
+disconnected from the main MIDI input, if you have a multi-bus MIDI
+interface, you can greatly reduce MIDI data clogging by running separate
+MIDI Outs to the <B>disconnected</B> MIDI inputs of the voice expansion
+board and main module).
+
+<P>Each Performance "Internal Part" can be assigned to a MIDI channel.
+Normally, you'd set each Part to a unique MIDI channel (so you have
+independent MIDI control of each Part).</P>
+
+<P>Then you assign one Patch (from among all of the various groups of
+Patches) to each Part. Of course, you can always change a Part's Patch
+<B>at any given moment</B> by sending the module a MIDI Program Change
+message upon that Part's MIDI channel. So, think of this assignment as
+merely a "default", temporary setup which is automatically initiated
+whenever you select this particular Performance, but which can be
+dynamically changed over MIDI very quickly and easily. Further note that
+the various Parts of a Performance can choose their Patches from among
+any group. For example, one Part can be using a Patch in "Preset A"
+Patch Group and another Part can be using a Patch on a group in the
+wave expansion board. (One exception is with the voice expansion board.
+As mentioned, the board can access only the 1 Performance, and its 8 Patches
+and drum kit, currently loaded into its RAM. And the Performances in the
+main module can't access the voice expansion's Patches).</P>
+
+<P>Each Part has its own individual volume so that you can balance the
+volume of its Patch against the other Parts' Patches. It typically also
+has individual pan and tuning settings. (Think of these as master
+settings which affect any respective settings you made when editing the
+Patch). Note that a Part's volume and pan are dynamically changeable via
+MIDI controller messages on that Part's MIDI channel, just like the
+Patch assignment can be changed over MIDI. Again, think of these as
+merely "default" settings.</P>
+
+<P>There may be other Part settings such as whether it responds to various
+MIDI messages such as Hold pedal or Volume controller. (For example,
+maybe you don't want external gear to be able to change that "default"
+volume you set for the Part. In that case, disable receipt of Volume
+MIDI messages).</P>
+
+<P>The Performance also has reverb and chorus settings that are
+applicable to all Patches. (On older modules, the individual Reverb and
+Chorus levels for each Part are set in that Patch's settings. On newer
+modules, the Performance itself may have individual effects levels for
+each Part which override the Reverb/Chorus levels in the Patch
+settings). These settings are active only in Performance Play mode
+(except if you're using an older module whose Patch settings don't
+include settings for the effects, in which case the Performance settings
+are active in Patch Play mode too).</P>
+
+<P>There are also settings for how the module responds to some keyboard
+controller (or in the case of modules with a built-in keyboard, how the
+internal sounds respond to that keyboard). Note that the JV modules that
+have built-in keyboards were also designed to function as MIDI
+controllers of other MIDI modules (ie, besides the internal sound
+module). For this reason, you have separate settings for what MIDI
+messages the keyboard generates, versus how the internal sound module
+responds to the keyboard. The Performance settings that apply to how the
+module's internal sounds (ie, its "Internal Parts") respond to the
+keyboard are typically referred to under the heading "INT ZONE". The
+Performance settings that apply to how the keyboard generates MIDI
+messages are typically referred to under the heading "TX ZONE".
+(Obviously, rackmount modules have no keyboard, and therefore would have
+no "TX ZONE" settings). These are entirely independent settings. In
+other words, you can setup the keyboard not only to control the internal
+sounds while also generating MIDI messages to control other modules, but
+also have entirely different ways of controlling both. For example, you
+can set the module's Pitch Wheel to affect the internal sounds, but not
+actually transmit Pitch Wheel messages to the MIDI Out. You can set the
+keyboard to play Internal Parts that are assigned to MIDI channels 1 and
+2, but have the keyboard simultaneously generating MIDI messages upon
+channels 4, 5, and 6 instead, for example. So, you need to think of the
+keyboard's internal sound routing, and the MIDI output setup as two
+entirely different setups. (This can sometimes be confusing to folks who
+are accustomed to modules whose keyboards are more closely tethered to
+the internal sound module. While Roland's approach can be very flexible,
+it can also confuse a guy when he's got a situation such as the
+preceding MIDI channel setup. Let's say that he records a part into his
+sequencer. During recording, there's no problem because he's got the
+local keyboard playing his two Internal Parts assigned to channels 1 and
+2. But the module is actually outputting messages upon channels 4, 5,
+and 6. Now when he plays back that sequencer track, it's going to play
+whatever Internal Parts are assigned to channels 4, 5, and 6, rather
+than the Parts assigned to than channels 1 and 2).</P>
+
+<P>Here I want to delve into a further discussion of Parts. As
+mentioned, a Performance has "Internal Parts". An Internal Part is
+simply a Part that plays some internal Patch in the sound module. An
+Internal Part can be played by the keyboard, or some external controller
+(including a sequencer). The INT ZONE settings determine how the
+keyboard/sequencer plays these Internal Parts (ie, the INT ZONE settings
+are for the 8 Internal Parts).</P>
+
+<P>A Performance (upon a module with a built-in keyboard) also has "MIDI
+Parts". A MIDI Part does absolutely nothing except broadcast MIDI
+messages to MIDI Out when you play the keyboard. Typically, there are as
+many MIDI Parts as there are Internal Parts. For example, a JV-90 has 8
+MIDI Parts. The TX ZONE settings determine how the keyboard generates
+MIDI messages when you play it (ie, the TX ZONE settings are for the 8
+MIDI Parts). Like with Internal Parts, each MIDI Part can be assigned a
+MIDI channel, and then assigned to "play" over a certain note range of
+the keyboard. What do I mean by "play"? I mean that when you press down
+a key within that note range, the MIDI Part sends a Note-On message to
+MIDI Out upon that Part's MIDI channel. The MIDI Part itself makes no
+sound because it is not attached to anything inside of the module. It
+connects only to MIDI Out. When you move the Pitch Wheel, the MIDI Part
+sends Pitch Wheel messages to MIDI Out upon that Part's MIDI channel.
+Since the JV-90 has 8 MIDI Parts, its keyboard can simultaneously
+broadcast upon upto 8 different MIDI channels. (And just like with
+Internal Parts, if you don't want to use all 8 MIDI Parts, you turn off
+the unneeded ones). So, you can setup "MIDI splits", for example,
+setting two MIDI Parts to broadcast upon different channels and limiting
+one MIDI Part to "playing" over only the bottom half of the keyboard,
+and the other MIDI Part playing over only the top half of the keyboard.
+(Incidentally, most JV modules have buttons pertaining to the Parts. For
+example, the JV-90 has 8 buttons that are used to turn on/off Parts when
+in "edit mode". If you're editing INT ZONE settings, then these buttons
+select the 8 Internal Parts. As soon as you switch to editing TX ZONE
+settings, these same 8 buttons now turn on/off the 8 MIDI Parts).</P>
+
+<P>Let's take another example that shows the difference between MIDI
+Parts and Internal Parts (ie, the difference between TX ZONE and INT
+ZONE settings). Let's say that you want to transpose all of the Parts of
+only 1 Performance to play a half step higher. Rather than using the
+master transpose (which would affect all Performances you select), you
+want to transpose only this 1 Performance. (Maybe you want to set up 12
+Performances, each transposed a different amount, so that you can easily
+change the key of any song just by selecting the Performance with the
+appropriate transpose amount. This is just an idea of some things you
+can do with Roland's approach). OK, you go into your Performance's INT
+ZONE settings. For each of the 8 Parts, you set its TRANSPOSE setting up
+a half step. Now, you play the keyboard and you do indeed hear any
+Patches being played a half step up. Next, you record a sequencer track,
+and play it back. The patches are no longer playing a half step up, but
+rather, have reverted back to normal tuning. What went wrong? Well, you
+forgot to go into the TX ZONE settings, and set all of your MIDI Parts
+to transpose up a half step. (ie, The MIDI Parts have their own
+TRANSPOSE setting under TX ZONE). The net result is that, while the
+keyboard did indeed transpose its notes when playing the Internal Parts,
+it simultaneously generated MIDI note numbers that weren't transposed --
+and your sequencer recorded the latter. When you played the track back,
+those non-transposed MIDI notes were sent to the Internal Parts.</P>
+
+<P>In conclusion, you <B>must</B> understand the differences between the
+INT ZONE and TX ZONE settings in order to setup a Roland Performance
+properly. (I can't stress this enough as an understanding unlocks the
+potential of having a very versatile controller, as well as eliminating
+a lot of the problems you may be having with getting the sequencer
+playback to sound the same as what you heard when you recorded the
+track). Usually, you'll want to have them correspond to each other, for
+example, in that sequencer scenario, you'd want the TX ZONE settings to
+be broadcasting MIDI messages upon channels 1 and 2, to coincide with
+having set the INT ZONE settings such that the keyboard played the Parts
+which were assigned to channels 1 and 2. But sometimes, you may want the
+TX ZONE different than the INT ZONE. For example, I have a separate MIDI
+module which I use to play my left hand bass parts. I wanted it so that
+my JV-90 Performances played internal sounds only upon the upper half of
+the keyboard, and the bottom half of the keyboard played only that
+external module. Here's what I did:</P>
+
+<OL><LI>In all of my Performances, I limited the Internal Parts (that the
+keyboard was set to play) to only the upper range of the keyboard. I
+did this using the KEY RANGE UPPER and LOWER settings of INT ZONE.
+
+<P><LI>I made sure that no Internal Part was assigned to MIDI channel 2, as
+that channel was being reserved for my external module.</P>
+
+<P><LI>I set one MIDI Part to "play" over only the lower half of the
+keyboard (using the KEY RANGE UPPER and LOWER settings of TX ZONE), and
+assigned it to channel 2 (using TRANSMIT CHANNEL of TX ZONE). I likewise
+set other MIDI Parts (ie, as many MIDI Parts as I had Internal Parts
+being played by the keyboard) to play over only the upper half of the
+keyboard, and assigned them to the same MIDI channels as those Internal Parts
+which the keyboard was playing.</P></OL>
+
+<P>The net result is that, no matter what Performance I select, I always
+have a MIDI split happening, and the JV-90's internal sounds are limited to
+playing over only the top half of the keyboard. If I record the JV's MIDI Out
+into a sequencer, and play that track back into the JV-90 and my bass module,
+then it will properly playback with that same MIDI split.</P>
+
+<P>There may be other settings in the TX ZONE and INT ZONE. For example,
+there is a velocity curve. Maybe you have some external module that has a
+vastly different response to note velocity than the Roland's internal sounds.
+(ie, Perhaps when you use the Roland keyboard to control the external module, the
+module plays too softly upon soft notes and/or too loudly upon loud notes).
+So, you can set the VELOCITY CURVE under TX ZONE for the MIDI Part which is
+controlling that external module. And yet, for the Internal Parts, and the
+other MIDI Parts which you've setup to correspond to those Internal Parts,
+you have separate VELOCITY CURVE settings.</P>
+
+<P>There's a lot of flexibility in using a Roland keyboard as a controller.
+Explore it. Use it where it helps you.</P>
+
+<P>Finally, we come to the issue of the "Rhythm Part". Every Performance
+has at least one Rhythm Part. Sometimes, the last Internal Part is
+hard-wired to being the Rhythm Part (ie, the "patch" that you select for
+it must be one of the drum kits, or Rhythm Set as Roland calls them). On
+newer modules, one or more of the Internal Parts may be set to play a
+drum kit. Although the Rhythm Part's settings globally affect whichever
+drum kit is selected (much like any other Part's settings globally affect a
+Patch), the individual settings of a given Drum Kit are edited in
+"Rhythm Edit mode". (And just like with other Parts, the drum kit that the
+Rhythm Part uses can be changed on-the-fly with a MIDI Program Change
+message on the Rhythm Part's channel. So too, can the "default" volume and
+pan settings be altered with respective MIDI controller messages).</P>
+
+<H3>Creating/Editing a Drum Kit</H3>
+
+When creating a drum kit, you need to visualize the entire keyboard
+range. To each key, you assign any one of the various raw waveforms.
+(The raw waveforms include a selection of drum sounds. It's true that
+you could select a pitched waveform instead, maybe a Trumpet waveform,
+and assign it to that one key in the drum kit. You could even assign
+that same waveform to several adjacent keys, and set each key to
+transpose the pitch a different amount in order to create a musical
+scale mapped over an area of the drum kit. But that's sort of an odd
+approach, unless maybe you want to try some microtonal setup since each
+individual key has its own fine tuning in most Roland modules' drum
+kits).
+
+<P>Each key has its own settings. For example, each key has its own
+volume so that you can balance the various drum sounds.</P>
+
+<P>So too, each key has its own pan setting. For example, you
+can have one drum panned to the right (ie, set to sound out of the
+right "Audio Out" jack) and another drum panned to the left to create a
+stereo drum kit.</P>
+
+<P>Each key typically has its own VCA, VCF, and VCO so that you can shape the
+drum's pitch, timbre, and volume (ie, decay).</P>
+
+<P>There may be other individual (per key) settings such as setting how
+the drum responds to velocity, and choosing to have one key cut off the
+sound of another key (ie, to have a closed hi-hat cut off an open hi-hat
+sound).</P>
+
+<P>There is usually also some global settings, such as for effects like
+Reverb and Chorus (although, except for the Rhythm Set's level settings for
+Reverb and Chorus, these are typically overridden by Performance
+settings when in "Performance Play mode").</P>
+
+<HR><H2>Further reading</H2>
+
+The article <A HREF="rolmidi.htm">Understanding the MIDI Implementation of your Roland manual</A> guides you through
+your manual's MIDI Implementation chapter. The RECEIVE DATA section contains useful information in helping you to
+understand what MIDI messages your sequencer (or other device) can send to your Roland Sound module to control its
+Parts. In other words, this may help you understand what sorts of things you're likely to be able to setup in INT
+ZONE. The TRANSMIT DATA section helps you to deduce what kinds of MIDI messages your Roland can send to other
+devices (ie, when it is used as a MIDI controller). In other words, this may help you understand what sorts of things
+you're likely to be able to setup in TX ZONE.</P>
+
+<P>Also, the article <A HREF="bank.htm">Changing patches over MIDI using Bank Select Controller</A> has an example
+for a Roland JV-90. It's use of Bank Select controller is similiar to other Roland Sound Modules, and may help you
+in understanding how to utilize your manual's listing under the "Bank Select" sub-subsection of the
+RECEIVE DATA / CONTROL CHANGE section.</P>
+
+<P>The <A HREF="rap10use.htm">Roland Audio Card FAQ</A> has information specific to Sound Canvas and RAP-10 units.
+The more basic Sound Canvas models often have hardwared Tones that you can't edit, limited Patch editing, and also only one
+multitimbral setup with limited editing (ie, 1 Performance which likely isn't even identified as such), for example, the
+SC-7. So, a lot of the programmability described in this article is not applicable to those units.</P>
+
+<HR><H2>Questions about Roland architecture</H2>
+
+<P>Questions in this FAQ are:</P>
+<P><A HREF="rolarc.htm#rol1">"How do I pick out a Performance that uses the Patches I want?"</A>
+<BR><A HREF="rolarc.htm#rol2">"What's this 'control channel' nonsense?"</A>
+<BR><A HREF="rolarc.htm#rol3">"Why is my sound module playing only some of the MIDI channels?"</A>
+<BR><A HREF="rolarc.htm#rol4">"How do I check what Patches a given Performance has assigned to it by default?"</A>
+<BR><A HREF="rolarc.htm#rol5">"How do I edit (and save those edits of) a Preset Patch/Performance in ROM?"</A>
+<BR><A HREF="rolarc.htm#rol6">"What do you recommend doing after one first gets a Roland module?"</A>
+</P>
+
+<P><H2><A NAME="rol1">I</A> want to use my module in Multi-timbral mode.
+Does that mean that I have to be in "Performance Play mode" and must find a
+Performance that happens to have the particular Patches that I want to
+use?</H2></P>
+
+<P>Yes, you should be in Performance Play mode, but I'm not sure if you
+necessarily need to be searching for a Performance that is already setup
+with the desired selection of Patches. Rather, it seems to me that your
+only concern is switching around the Patches assigned to the Internal
+Parts of <B>any</B> given Performance. You can do that by simply sending
+the Bank Select and Program Change messages to change a Part's Patch
+assignment. For example, assume that, for the currently selected
+Performance, you've got 16 Internal Parts, and you've set them to the 16
+MIDI channels (ie, Part 1 is set to channel 1, Part 2 is set to channel
+2, etc, Part 16 is set to channel 16). Now, at the start of the song,
+you maybe set Part 1 to play the "Trumpet" Patch. You do this by sending
+a Bank Select and Program Change messages on MIDI channel 1 to select
+the Trumpet Patch. In the middle of the song, you wish to switch this to
+the Oboe Patch. You simply send the Bank Select and Program Change
+messages on channel 1 to select the Oboe Patch, and then Part 1 starts
+playing the Oboe Patch -- all without changing to another Performance.</P>
+
+<P>Remember that all a Performance is, is the 16 (or however many)
+Internal Parts and their settings (ie, which MIDI channel each Part
+uses, each Part's volume, each Part's Patch assignment, each Part's MIDI
+response such as whether the Part responds to various controllers, what
+key range over which the Part plays, whether the Part is layered with
+other Parts or perhaps split, etc). But remember that many of these Part
+settings can be quickly altered on-the-fly during playback via MIDI
+messages. (ie, Volume controller changes the Part's volume, Pan
+controller changes the Part's pan position, Bank Select and Program
+Change alter the Patch used by the Part, etc). So for merely switching
+the instrumentation of the 16 Internal Parts, and altering Part settings
+such as volume, pan, etc, you only need send appropriate MIDI messages
+to the Performance's Parts (ie, on their respective MIDI channels). It
+may be easier to use your computer sequencer software to pick out the
+desired Patches (from a nicely displayed graphical listing of all of the
+names), and let it send the Roland module the appropriate Bank Select
+and Program Change messages. This is really easy if your sequencer is
+setup with a "Definition File" for your Roland module. Simply manually
+switch to a Performance that, while it may not have the 16 Patches that
+you want assigned by default, is otherwise setup as desired (ie, all 16
+Parts are enabled, and they are set to different MIDI channels. You may
+even want to create such a "template Performance" for use with your
+sequencer).</P>
+
+<P>Of course, there are times when you want to change Performances.
+Remember that the effects and other global settings are also settings of
+a Performance (ie, whatever reverb to use such as Hall or Plate or
+whatever, etc). Furthermore, the keyboard settings are made in the
+Performance (ie, which Parts the keyboard is set to play, what kind of
+scale tuning is employed across the keyboard, choosing which velocity
+curve you desire for note velocity, etc). So, you need to change
+the Performance when you need to change these particular settings,
+for example, switching from one Performance that has the effects set to
+use a Hall reverb, to another Performance that has the effects set to a
+slap echo.</P>
+
+<P>Otherwise, you won't need to search for a Performance that has the
+desired Patch assignments, nor even create such a Performance yourself
+(although I think that you should create a few Performances as
+"templates" which you frequently use. It makes things easy if you got a
+Performance already setup with 16 desired patches, and their respective
+volumes, and with the effects setup as desired, routed to the desired
+outputs, etc, etc, etc. After all, there is some Performance setup that
+you can't do over MIDI, for example, set the MOD wheel to control filter
+cutoff for a particular Part. You have to edit the Performance anyway to
+set that up).</P>
+
+<P>For the purposes of sequencing, I suggest that you setup the first 16
+Performances as templates. Turn off the Control Channel (described
+later). In all 16 Performances, turn on all of the Internal Parts, and
+set each to a different MIDI channel (ie, set Part 1 to MIDI channel 1,
+Part 2 to MIDI channel 2, etc... and Part 16 to MIDI channel 16). In
+each Performance, set the keyboard to play only 1 Internal Part, but
+assign a different Part than the other Performances. In other words, for
+Performance 1, set the keyboard to play only Internal Part 1. For
+Performance 2, set the keyboard to play only Part 2. Etc. In each
+Performance, turn on only 1 MIDI part, but assign it to a different
+channel than the other Performances. In other words, for Performance 1,
+set that MIDI Part to channel 1. For Performance 2, set that MIDI Part
+to channel 2. Etc. In this way, you can pick out the respective
+Performance based upon the MIDI channel you wish to use. For example, if
+you want to record a sequencer track where the MIDI data is on channel
+3, then manually select Performance 3. If you subsequently want to
+record another sequencer track upon channel 16, then manually select
+Performance 16. (Of course, you'll need to put Bank Select and Program
+Change events, as well as Volume and Pan controllers, at the beginning
+of your sequencer track to make sure that each Performance you select
+gets automatically setup with the proper selection of Patches and mix).
+The net result is that you'll be able to quickly and easily reassign
+the MIDI channel that the keyboard generates messages upon, and still keep
+it playing the desired Internal Part, simply by manually selecting from
+among these 16 Performances.</P>
+
+<P><H2><A NAME="rol2">What's</A> this 'control channel' nonsense?</H2></P>
+
+<P>Normally, MIDI Bank Select and Program Change messages change the Patch
+assigned to a given Part (ie, the Part that is assigned to the same MIDI
+channel as the message is broadcast upon).</P>
+
+<P>But what if you want to change from one Performance to another
+Performance using MIDI messages? Well, that's where the control channel
+comes in. When the control channel is not off (ie, it's set to one of
+the 16 MIDI channels), that's the channel which is used to control the
+Performance settings themselves (rather than an individual Part within
+the current Performance). For example, sending a Bank Select controller,
+followed by a Program Change, both on the control channel, causes the
+module to change to another Performance (perhaps one within another group of
+Performances).</P>
+
+<P>There's one caveat to this scheme. The control channel eats up
+certain messages on its channel before any Part sees them. For example,
+assume that you assigned Part 1 in the Performance to channel 16. You
+have also set the control channel to 16. The net result is that you'll
+never be able to change that Part's Patch assignment (from its default).
+Why? Because the control channel grabs those Bank Select and Program
+Change messages on channel 16, using them to switch Performances, before
+the Performance's Part ever sees those messages. (Indeed, the Part never
+does see them). Hence, the Part never can have its Patch assignment changed
+over MIDI.</P>
+
+<P>In other words, you can't have the same MIDI channel used to control
+both a Part's settings as well as control the Performance. So, if you
+have 16 Parts, but want to use the control channel, then 1 Part (that is
+set to that same MIDI channel) will always lose some MIDI control. I
+prefer to turn off Control Channel, and manually change
+Performances when needed (which isn't often since I tend to use external
+MIDI control to alter any given Performance's Parts as desired, rather
+than switching among various Performances).</P>
+
+<P>By default, the control channel is often turned on, and set to the last
+(ie, Rhythm) Part's MIDI channel.</P>
+
+<P><H2><A NAME="rol3">Why</A> is my MIDI sound module playing only some
+of the MIDI channels? I played a MIDI file that has tracks on MIDI
+channels 1 to 16, but I heard only some of the tracks.</H2></P>
+
+<P>First, make sure that you're in "Performance Play mode". Some modules disable multi-timbral operation in other modes.</P>
+
+<P>Secondly, does your sound module support all 16 MIDI channels simultaneously in
+its multi-timbral mode? Some older models do not. For example, a JV-90
+has only 8 "Internal Parts", which means that it can play a maximum of only 8 MIDI
+channels simultaneously. You get to pick out which 8 channels to play
+(ie, by setting the MIDI channel for each Part), but you're still
+limited to 8 MIDI channels at any given moment (unless you get a voice
+expansion board).</P>
+
+<P>Third, did you check that the Performance you selected has all of its Internal Parts turned on, and assigned to
+different MIDI channels? It does no good to select a Performance that has all but 1 Part turned off, or has all of the
+enabled Parts set to the same MIDI channel, if you want to play a MIDI file with multiple tracks upon multiple channels.</P>
+
+<P>Furthermore, if you've got a voice expansion board, make sure that the 8 Parts of its Performance are set to
+different MIDI channels than the 8 Parts in the Performance currently selected for the "main module". Remember that
+the voice expansion has its own 1 Performance that it always uses, and is totally separate from the main module's
+Performances. You don't want the voice expansion's Performance to be duplicating the same MIDI channel assignments. You
+want it covering the remaining MIDI channels. Also, make sure that your sequencer is actually getting data to the voice
+expansion. If you don't have a direct connection to the expansion's MIDI IN jack, then flip the switch to connect it to the
+main MIDI input.</P>
+
+<P><H2><A NAME="rol4">How</A> do I check what patches a given Performance has assigned to it by default? I could guess
+that a Performance with a name of "Vibes" may have a vibraphone Patch assigned to a Part that the keyboard is playing,
+but what about the Patch assignments for the other Parts? How am I to know what Patch assignments the other Parts have?</H2></P>
+
+<P>Well, you <B>don't</B> really know what Patch each of the 16 Parts is assigned
+in any given Performance offhand. But, you can press a button and get a
+listing of the Patch number for each Part, and then use the list in your
+manual to look up the corresponding name. Let me explain how I do it on
+my JV-90.</P>
+
+<P>Say that I call up the first Performance in the User Group. It's name
+is "Plucky". What Patches are the JV-90's 8 Internal Parts using? Well,
+there are a group of buttons on the left which Roland calls the "Edit
+Palette" buttons. Each of these buttons has a different function
+depending upon whether you're in Patch or Performance mode (or you can
+even get into modes whereby Roland cuts off all the effects and filters
+and plays the raw waveforms. There are other modes you enter where
+you're selecting the Patches and/or Performances on Wave Expansion cards
+or Data cards or whatever, and these buttons may take on different
+functions in those modes too). So, there's a button that, when I'm in
+Performance Mode, displays the Patch numbers for the 8 Parts. It says
+"Patch" over the button (ie, in the row that is labeled "Perform". In
+the row that is labeled "Patch", that same button has the label "Wave"
+over it, to allow me to find out what 4 Tones are being used by a Patch
+when I'm in Patch mode). Suddenly, my display changes and it shows me
+which Patch number is used by each Part. For example, maybe its says
+that Part 1 is using patch A71 (ie 71 in Preset A patches). I look up
+A71 in my Patch list in the manual, and it says "Nylon Gtr 1". So,
+that's what Part 1 is using for this Performance. Of course, if you
+alter the Patches from the factory defaults, then the manual's listing
+is no longer applicable. You should keep a list of what customizations you make.</P>
+
+<P><H2><A NAME="rol5">There's</A> a nice Preset Patch/Performance I like which, with minor edits, would be great. The
+problem is that it's a Preset in ROM, and I can't save the edits to that same Group. What do I do?</H2></P>
+
+<P>Call up the Patch/Performance you like. Get into Patch/Performance
+Edit mode. Make all of the changes that you want. But, before you exit
+from edit mode, first choose to WRITE the Patch/Performance (ie, perform
+a Write command) to some location within a RAM (ie, User or Internal)
+Patch/Performance group. Sure, you'll have to overwrite whatever
+Patch/Performance was previously stored in the user location you finally
+choose, but if it's a Patch/Performance you'll never use, you don't
+care.</P>
+
+<P><H2><A NAME="rol6">What</A> do you recommend doing after one first gets a Roland module?</H2></P>
+
+<OL><LI>Read this FAQ.
+
+<P><LI>Read it again. Some people have poor reading skills, and they miss
+or deliberately skip over important points the first time. Worse, they
+tend to "fall asleep at the wheel" unless they're kept awake with
+periodic excursions into crass, obnoxiously provocative humor -- much of
+which is readily available at this web site. Indeed, I blame all of my
+many lapses into bad taste upon people with poor reading skills. If it
+wasn't for having to keep them awake, I could instead concentrate upon
+delivering an unwavering, myopic, textbook (ie, of no practical use) drone like the typical college
+instructor does.</P>
+
+<P><LI>Read the manual. (Notice a trend here? And yes, I'm actually one
+of those guys who, when he gets a new piece of gear, excitedly unpacks
+the manual first and reads it cover to cover, quite willingly, before
+even plugging in the gear. That's why I <B>can't</B> buy Casio gear. By the time I'm halfway through the
+pigeon-english in the manual, I'm already tying the noose to the rafter).</P>
+
+<P><LI>Dump the factory Patches/Performances. These things are just designed to hook impressionable listeners in 
+music showrooms. They're designed to be played, and hopefully sound decent, upon crummy, mono PA systems. They're typically
+gawdy effects with dreadfully slow attacks and fade-outs for the sake of the nouveau keyboardist who is buying his first
+keyboard and doesn't know how to play beyond a snail's pace nor use the sustain pedal. I've discovered that many of the raw
+waveforms aren't ever
+even used in the factory Patches (so you won't hear them unless you make your own Patches), and they're some nice raw
+material. Furthermore, there typically aren't any Patches with nice stereo imaging. That makes a world of difference in
+the "thickness" and "complexity" of a Patch. I seldom ever use any Roland factory Patches, and of the few I've liked, they
+all needed a bit of tweaking to get them sounding better.</P>
+
+<P><LI>Get your divorce papers ready for filing. Your wife will have left you by the time you get around to experimenting
+with Performance Edit mode... if she knows what's good for her.</P></OL>
+
+</BODY></HTML>

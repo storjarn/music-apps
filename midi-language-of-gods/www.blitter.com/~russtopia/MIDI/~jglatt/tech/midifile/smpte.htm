@@ -1,0 +1,14 @@
+<HTML><HEAD><TITLE>MIDI File Format: SMPTE Offset</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<FONT COLOR=BLUE><H3><CENTER>SMPTE Offset</CENTER></H3></FONT></P>
+
+<P>FF 54 05 <I><FONT COLOR=RED><B>hr mn se fr ff</B></FONT></I>
+
+<P>Designates the SMPTE start time (hours, minutes, seconds, frames, subframes) of the MTrk. It should
+be at the start of the MTrk. The hour should not be encoded with the SMPTE format as it is in
+<B>MIDI Time Code</B>. In a format 1 file, the SMPTE OFFSET must be stored with the tempo
+map (ie, the first MTrk), and has no meaning in any other MTrk. The <I><FONT COLOR=RED><B>ff</B></I></FONT>
+field contains fractional frames in 100ths of a frame, even in SMPTE based MTrks which specify a different
+frame subdivision for delta-times (ie, different from the subframe setting in the MThd).
+
+</FONT></BODY></HTML>

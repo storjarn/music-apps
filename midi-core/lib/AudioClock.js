@@ -43,7 +43,7 @@
             // clockTrim.start(0);
 
             if (me.Output) {
-                me.Output.send( [MIDI.Constants.Start, 0, 0] );
+                me.Output.send( [MIDI.Messages.Start, 0, 0] );
             }
 
             var isUp = false;

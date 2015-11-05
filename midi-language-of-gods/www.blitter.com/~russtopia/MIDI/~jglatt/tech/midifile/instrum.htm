@@ -1,0 +1,21 @@
+<HTML><HEAD><TITLE>MIDI File Format: Instrument</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<FONT COLOR=BLUE><H3><CENTER>Instrument</CENTER></H3></FONT></P>
+
+<P>FF 04 <I><FONT COLOR=GREEN><B>len</B></FONT></I> <I><FONT COLOR=RED><B>text</B></FONT></I>
+
+<P>The name of the instrument (ie, MIDI module) being used to play the track. This may be
+different than the Sequence/Track Name. For example, maybe the name of your sequence (ie, Mtrk)
+is "Butterfly", but since the track is played upon a Roland S-770, you may also include an
+Instrument Name of "Roland S-770".
+
+<P>It's best to put one (or more) of this event at the beginning of an MTrk to provide the user
+with identification of what instrument(s) is playing the track. Usually, the instruments (ie,
+patches, tones, banks, etc) are setup on the audio devices via <B>MIDI Program Change</B>
+and <B>MIDI Bank Select Controller</B> events within the MTrk. So, this event exists merely to
+provide the user with visual feedback of what instruments are used for a track.
+
+<P>Note that <I><FONT COLOR=GREEN><B>len</B></FONT></I> could be a series of bytes since it
+is expressed as a variable length quantity.
+
+</FONT></BODY></HTML>

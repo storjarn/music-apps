@@ -118,32 +118,32 @@
             this.State.tickCount = tickVal;
         },
         sendClock: function() {
-            this.emit('clock', MIDI.Constants.TimingClock, this);
+            this.emit('clock', MIDI.Messages.TimingClock, this);
             if (this.State.tickCount % this.State.ppq === 0){
                 this.emit('beat', this);
             }
             if (this.Output) {
-                this.Output.send( [MIDI.Constants.TimingClock, 0, 0] );
+                this.Output.send( [MIDI.Messages.TimingClock] );
             }
         },
         startClock: function() {
-            this.emit('play', MIDI.Constants.Start, this);
-            this.emit('start', MIDI.Constants.Start, this);
+            this.emit('play', MIDI.Messages.Start, this);
+            this.emit('start', MIDI.Messages.Start, this);
             if (this.Output) {
-                this.Output.send( [MIDI.Constants.Start, 0, 0] );
+                this.Output.send( [MIDI.Messages.Start] );
             }
         },
         continueClock: function() {
-            this.emit('play', MIDI.Constants.Continue, this);
-            this.emit('continue', MIDI.Constants.Continue, this);
+            this.emit('play', MIDI.Messages.Continue, this);
+            this.emit('continue', MIDI.Messages.Continue, this);
             if (this.Output) {
-                this.Output.send( [MIDI.Constants.Continue, 0, 0] );
+                this.Output.send( [MIDI.Messages.Continue] );
             }
         },
         stopClock: function() {
-            this.emit('stop', MIDI.Constants.Stop, this);
+            this.emit('stop', MIDI.Messages.Stop, this);
             if (this.Output) {
-                this.Output.send( [MIDI.Constants.Stop, 0, 0] );
+                this.Output.send( [MIDI.Messages.Stop] );
             }
         },
         linkInput: function(inputPort) {
@@ -151,16 +151,16 @@
             var oldHandler = inputPort.onmidimessage;
             function MIDIMessageEventHandler(event) {
                 switch (event.data[0]) {
-                    case MIDI.Constants.TimingClock:
+                    case MIDI.Messages.TimingClock:
                         clock.sendClock();
                         break;
-                    case MIDI.Constants.Start :
+                    case MIDI.Messages.Start :
                         clock.startClock();
                         break;
-                    case MIDI.Constants.Continue:
+                    case MIDI.Messages.Continue:
                         clock.continueClock();
                         break;
-                    case MIDI.Constants.Stop:
+                    case MIDI.Messages.Stop:
                         clock.stopClock();
                         break;
                 }

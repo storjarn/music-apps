@@ -1,0 +1,18 @@
+<HTML><HEAD><TITLE>MIDI Specification: RealTime Category Messages</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>RealTime Category Messages</CENTER></FONT></H2>
+
+<P>Each RealTime Category message (ie, Status of 0xF8 to 0xFF) consists of only 1 byte, the Status. These messages are
+primarily concerned with timing/syncing functions which means that they must be sent and received at specific times
+without any delays. Because of this, MIDI allows a RealTime message to be sent <U>at any time</U>, even interspersed
+within some other MIDI message. For example, a RealTime message could be sent inbetween the two data bytes of a
+Note On message. A device should always be prepared to handle such a situation; processing the 1 byte RealTime
+message, and then subsequently resume processing the previously interrupted message as if the RealTime message had
+never occurred.
+
+<P>For more information about RealTime, read the sections
+<A HREF="run.htm">Running Status</A>,
+<A HREF="ignore.htm">Ignoring MIDI Messages</A>,
+and <A HREF="seq.htm">Syncing Sequence Playback</A>.
+
+</FONT></BODY></HTML>

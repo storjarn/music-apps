@@ -1,0 +1,96 @@
+<HTML><HEAD><TITLE>MIDI Specification</TITLE></HEAD>
+<BODY BGCOLOR=WHITE TEXT=BLACK LINK=BLUE VLINK=BLUE ALINK=RED><FONT SIZE=3>
+
+<PRE><B><A HREF="intro.htm" TARGET=Frame2>Intro</A>
+
+<A HREF="hardware.htm" TARGET=Frame2>Hardware</A>
+
+<A HREF="messages.htm" TARGET=Frame2>Messages</A>
+&nbsp;&nbsp;<A HREF="noteoff.htm" TARGET=Frame2>Note-Off</A>
+&nbsp;&nbsp;<A HREF="noteon.htm" TARGET=Frame2>Note-On</A>
+&nbsp;&nbsp;<A HREF="aftert.htm" TARGET=Frame2>Aftertouch</A>
+&nbsp;&nbsp;<A HREF="ctl.htm" TARGET=Frame2>Controller</A>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="ctllist.htm" TARGET=Frame2>Defined Controllers</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="bank.htm" TARGET=Frame2>Bank Select</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="mod.htm" TARGET=Frame2>Modulation Wheel</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="wind.htm" TARGET=Frame2>Breath controller</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="foot.htm" TARGET=Frame2>Foot Pedal</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="ptime.htm" TARGET=Frame2>Portamento Time</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="dslider.htm" TARGET=Frame2>Data Entry</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="vol.htm" TARGET=Frame2>Volume</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="balance.htm" TARGET=Frame2>Balance</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="pan.htm" TARGET=Frame2>Pan position</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="exp.htm" TARGET=Frame2>Expression</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="eff1.htm" TARGET=Frame2>Effect Control 1</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="eff2.htm" TARGET=Frame2>Effect Control 2</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="gens.htm" TARGET=Frame2>General Purpose Slider 1</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="gens.htm" TARGET=Frame2>General Purpose Slider 2</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="gens.htm" TARGET=Frame2>General Purpose Slider 3</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="gens.htm" TARGET=Frame2>General Purpose Slider 4</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="hold.htm" TARGET=Frame2>Hold Pedal</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="port.htm" TARGET=Frame2>Portamento (on/off)</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sus.htm" TARGET=Frame2>Sustenuto Pedal</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="soft.htm" TARGET=Frame2>Soft Pedal</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="leg.htm" TARGET=Frame2>Legato Pedal</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="hold2.htm" TARGET=Frame2>Hold 2 Pedal</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sndvar.htm" TARGET=Frame2>Sound Variation</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sndtim.htm" TARGET=Frame2>Sound Timbre</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sndrel.htm" TARGET=Frame2>Sound Release Time</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sndatt.htm" TARGET=Frame2>Sound Attack Time</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sndbri.htm" TARGET=Frame2>Sound Brightness</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sndctl.htm" TARGET=Frame2>Sound Control 6</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sndctl.htm" TARGET=Frame2>Sound Control 7</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sndctl.htm" TARGET=Frame2>Sound Control 8</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sndctl.htm" TARGET=Frame2>Sound Control 9</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sndctl.htm" TARGET=Frame2>Sound Control 10</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="genb.htm" TARGET=Frame2>General Purpose Button 1</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="genb.htm" TARGET=Frame2>General Purpose Button 2</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="genb.htm" TARGET=Frame2>General Purpose Button 3</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="genb.htm" TARGET=Frame2>General Purpose Button 4</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="eff.htm" TARGET=Frame2>Effects Level</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="trem.htm" TARGET=Frame2>Tremulo Level</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="cho.htm" TARGET=Frame2>Chorus Level</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="cel.htm" TARGET=Frame2>Celeste Level</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="pha.htm" TARGET=Frame2>Phaser Level</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="dinc.htm" TARGET=Frame2>Data Button increment</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="ddec.htm" TARGET=Frame2>Data Button decrement</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="nrpn.htm" TARGET=Frame2>Non-registered Parameter</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="rpn.htm" TARGET=Frame2>Registered Parameter</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sndoff.htm" TARGET=Frame2>All Sound Off</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="ctloff.htm" TARGET=Frame2>All Controllers Off</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="local.htm" TARGET=Frame2>Local Keyboard (on/off)</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="ntnoff.htm" TARGET=Frame2>All Notes Off</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="omoff.htm" TARGET=Frame2>Omni Mode Off</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="omon.htm" TARGET=Frame2>Omni Mode On</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="mono.htm" TARGET=Frame2>Mono Operation</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="poly.htm" TARGET=Frame2>Poly Operation</A>
+&nbsp;&nbsp;<A HREF="pgm.htm" TARGET=Frame2>Program Change</A>
+&nbsp;&nbsp;<A HREF="pressure.htm" TARGET=Frame2>Channel Pressure</A>
+&nbsp;&nbsp;<A HREF="wheel.htm" TARGET=Frame2>Pitch Wheel</A>
+&nbsp;&nbsp;<A HREF="sysex.htm" TARGET=Frame2>System Exclusive</A>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="id.htm" TARGET=Frame2>Manufacturer IDs</A>
+&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="uni.htm" TARGET=Frame2>Universal SysEx</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sysen.htm" TARGET=Frame2>GM Enable</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="mastrvol.htm" TARGET=Frame2>Master Volume</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="identity.htm" TARGET=Frame2>Identity Request</A>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A HREF="sample.htm" TARGET=Frame2>Sample Dump Standard</A>
+&nbsp;&nbsp;<A HREF="frame.htm" TARGET=Frame2>MTC Quarter Frame</A>
+&nbsp;&nbsp;<A HREF="ssp.htm" TARGET=Frame2>Song Position Pointer</A>
+&nbsp;&nbsp;<A HREF="songsel.htm" TARGET=Frame2>Song Select</A>
+&nbsp;&nbsp;<A HREF="tune.htm" TARGET=Frame2>Tune Request</A>
+&nbsp;&nbsp;<A HREF="clock.htm" TARGET=Frame2>MIDI Clock</A>
+&nbsp;&nbsp;<A HREF="tick.htm" TARGET=Frame2>MIDI Tick</A>
+&nbsp;&nbsp;<A HREF="start.htm" TARGET=Frame2>MIDI Start</A>
+&nbsp;&nbsp;<A HREF="stop.htm" TARGET=Frame2>MIDI Stop</A>
+&nbsp;&nbsp;<A HREF="continue.htm" TARGET=Frame2>MIDI Continue</A>
+&nbsp;&nbsp;<A HREF="sense.htm" TARGET=Frame2>Active Sense</A>
+&nbsp;&nbsp;<A HREF="reset.htm" TARGET=Frame2>Reset</A>
+
+<A HREF="modes.htm" TARGET=Frame2>MIDI Modes</A>
+<A HREF="real.htm" TARGET=Frame2>Realtime Message</A>
+<A HREF="run.htm" TARGET=Frame2>Running Status</A>
+<A HREF="seq.htm" TARGET=Frame2>Syncing Sequence Playback</A>
+<A HREF="ignore.htm" TARGET=Frame2>Ignoring MIDI Messages</A>
+</PRE>
+
+</FONT></BODY></HTML>

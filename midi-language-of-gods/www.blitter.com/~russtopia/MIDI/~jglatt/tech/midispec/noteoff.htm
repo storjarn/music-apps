@@ -1,0 +1,35 @@
+<HTML><HEAD><TITLE>MIDI Specification: Note-Off</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Note Off</CENTER></FONT></H3>
+
+<P>Category: Voice
+
+<P><FONT COLOR=GREEN>Purpose</FONT>
+
+<P>Indicates that a particular note should be released.  Essentially, this means that the note stops sounding, but some
+patches might have a long VCA release time that needs to slowly fade the sound out.  Additionally, the device's Hold Pedal
+controller may be on, in which case the note's release is postponed until the Hold Pedal is released.  In any event, this
+message either causes the VCA to move into the release stage, or if the Hold Pedal is on, indicates that the note should
+be released (by the device automatically) when the Hold Pedal is turned off.  If the device is a MultiTimbral unit, then each
+one of its Parts may respond to Note Offs on its own channel.  The Part that responds to a particular Note Off message is
+the one assigned to the message's MIDI channel.
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0x80 to 0x8F where the low nibble is the MIDI channel.
+
+<P><FONT COLOR=GREEN>Data</FONT>
+<P>Two data bytes follow the Status.
+
+<P>The first data is the note number. There are 128 possible notes on a MIDI device, numbered 0 to 127 (where Middle C is
+note number 60). This indicates which note should be released.
+
+<P>The second data byte is the velocity, a value from 0 to 127. This indicates how quickly the note should be released
+(where 127 is the fastest). It's up to a MIDI device how it uses velocity information.  Often velocity will be used to tailor the
+VCA release time. MIDI devices that can generate Note Off messages, but don't implement velocity features, will transmit
+Note Off messages with a preset velocity of 64.
+
+<P><FONT COLOR=GREEN>Errata</FONT>
+<P>An <A HREF="ntnoff.htm">All Notes Off controller</A> message can be used to turn off all notes for which a device
+received <B>Note On</B> messages (without having received respective Note Off messages).
+
+</FONT></BODY></HTML>

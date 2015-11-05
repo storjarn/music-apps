@@ -1,0 +1,182 @@
+<HTML><HEAD><TITLE>MIDI File Format: Meta-Event Guidelines</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+To illustrate how best to use various Meta-Events when you save a MIDI file, let's consider
+an example sequencer track.
+
+<P>Assume that the user has created a sequencer track that he named "My track". He is
+using a Roland JV-1080 to play this track. His JV-1080 is connected to the third MIDI Out port on
+his computer's MIDI interface (which supports multiple MIDI Outs -- for more than 16 MIDI
+channels). The operating system lists this port with a name of "MIDI Out 3". He
+has picked out a patch on his JV-1080 called "Gonzo Harp". This is not a General MIDI patch. It happens
+to be in the third bank of patches, and is patch number 0. This track will play on the JV-1080's
+MIDI channel 1.
+
+<P>How would you write out an MTrk for this sequencer track?
+
+<P>First, you would start off with a <A HREF="trkname.htm" TARGET=Frame2>Sequence/Track Name</A>
+Meta-Event. The text for this event would be "My track". (Note that you do not need to nul-terminate
+text in a Meta-Event. The Meta-Event's variable quantity length tells how many characters are in
+the name). You would put this at a delta-time of zero. So let's examine our MTrk chunk so far,
+as if we were using a hex editor:
+
+<PRE><B>4D 54 72 6B     <FONT COLOR=GREEN>MTrk ID</FONT>
+00 00 00 0C     <FONT COLOR=GREEN>Length of the MTrk chunk so far.</FONT>
+
+                <FONT COLOR=BLUE>Our Track Name Meta-Event</FONT>
+00              <FONT COLOR=GREEN>Delta-time is 0.</FONT>
+FF              <FONT COLOR=GREEN>A Meta-Event.</FONT>
+03              <FONT COLOR=GREEN>Track Name type.</FONT>
+08              <FONT COLOR=GREEN>Length of "My track"</FONT>
+4D              <FONT COLOR=GREEN>ASCII 'M'</FONT>
+79              <FONT COLOR=GREEN>ASCII 'y'</FONT>
+20              <FONT COLOR=GREEN>ASCII ' '</FONT>
+74              <FONT COLOR=GREEN>ASCII 't'</FONT>
+72              <FONT COLOR=GREEN>ASCII 'r'</FONT>
+61              <FONT COLOR=GREEN>ASCII 'a'</FONT>
+63              <FONT COLOR=GREEN>ASCII 'c'</FONT>
+6B              <FONT COLOR=GREEN>ASCII 'k'</FONT>
+</B></PRE>
+
+Next, you may choose to put an <A HREF="instrum.htm" TARGET=Frame2>Instrument Name</A>
+Meta-Event (although this isn't as important as other events, and you may skip it if your
+software neither knows, nor cares, what specific MIDI module is playing the track). The text for
+this event would be "Roland JV-1080".
+
+<PRE><B>                <FONT COLOR=BLUE>Our Instrument Name Meta-Event</FONT>
+00              <FONT COLOR=GREEN>Delta-time is 0.</FONT>
+FF              <FONT COLOR=GREEN>A Meta-Event.</FONT>
+04              <FONT COLOR=GREEN>Instrument Name type.</FONT>
+0E              <FONT COLOR=GREEN>Length of "Roland JV-1080"</FONT>
+52              <FONT COLOR=GREEN>ASCII 'R'</FONT>
+6F              <FONT COLOR=GREEN>ASCII 'o'</FONT>
+6C              <FONT COLOR=GREEN>ASCII 'l'</FONT>
+61              <FONT COLOR=GREEN>ASCII 'a'</FONT>
+6E              <FONT COLOR=GREEN>ASCII 'n'</FONT>
+64              <FONT COLOR=GREEN>ASCII 'd'</FONT>
+20              <FONT COLOR=GREEN>ASCII ' '</FONT>
+4A              <FONT COLOR=GREEN>ASCII 'J'</FONT>
+56              <FONT COLOR=GREEN>ASCII 'V'</FONT>
+2D              <FONT COLOR=GREEN>ASCII '-'</FONT>
+31              <FONT COLOR=GREEN>ASCII '1'</FONT>
+30              <FONT COLOR=GREEN>ASCII '0'</FONT>
+38              <FONT COLOR=GREEN>ASCII '8'</FONT>
+30              <FONT COLOR=GREEN>ASCII '0'</FONT>
+</B></PRE>
+
+Next, you would put a <A HREF="port.htm" TARGET=Frame2>Device (Port) Name</A>
+Meta-Event. The text for this event would be "MIDI Out 3".
+
+<PRE><B>                <FONT COLOR=BLUE>Our Device (Port) Name Meta-Event</FONT>
+00              <FONT COLOR=GREEN>Delta-time is 0.</FONT>
+FF              <FONT COLOR=GREEN>A Meta-Event.</FONT>
+09              <FONT COLOR=GREEN>Device (Port) Name type.</FONT>
+0A              <FONT COLOR=GREEN>Length of "MIDI Out 3"</FONT>
+4D              <FONT COLOR=GREEN>ASCII 'M'</FONT>
+49              <FONT COLOR=GREEN>ASCII 'I'</FONT>
+44              <FONT COLOR=GREEN>ASCII 'D'</FONT>
+49              <FONT COLOR=GREEN>ASCII 'I'</FONT>
+20              <FONT COLOR=GREEN>ASCII ' '</FONT>
+4F              <FONT COLOR=GREEN>ASCII 'O'</FONT>
+75              <FONT COLOR=GREEN>ASCII 'u'</FONT>
+74              <FONT COLOR=GREEN>ASCII 't'</FONT>
+20              <FONT COLOR=GREEN>ASCII ' '</FONT>
+33              <FONT COLOR=GREEN>ASCII '3'</FONT>
+</B></PRE>
+
+Next, you would put an <A HREF="patch.htm" TARGET=Frame2>Program (Patch) Name</A>
+Meta-Event to indicate the name of the patch being used. The text for this event would
+be "Gonzo Harp".
+
+<PRE><B>                <FONT COLOR=BLUE>Our Program (Patch) Name Meta-Event</FONT>
+00              <FONT COLOR=GREEN>Delta-time is 0.</FONT>
+FF              <FONT COLOR=GREEN>A Meta-Event.</FONT>
+08              <FONT COLOR=GREEN>Program (Patch) Name type.</FONT>
+0A              <FONT COLOR=GREEN>Length of "Gonzo Harp"</FONT>
+47              <FONT COLOR=GREEN>ASCII 'G'</FONT>
+6F              <FONT COLOR=GREEN>ASCII 'o'</FONT>
+6E              <FONT COLOR=GREEN>ASCII 'n'</FONT>
+7A              <FONT COLOR=GREEN>ASCII 'z'</FONT>
+6F              <FONT COLOR=GREEN>ASCII 'o'</FONT>
+20              <FONT COLOR=GREEN>ASCII ' '</FONT>
+48              <FONT COLOR=GREEN>ASCII 'H'</FONT>
+61              <FONT COLOR=GREEN>ASCII 'a'</FONT>
+72              <FONT COLOR=GREEN>ASCII 'r'</FONT>
+70              <FONT COLOR=GREEN>ASCII 'p'</FONT>
+</B></PRE>
+
+Next, you need to put the MIDI Bank Select Controller events and the MIDI Program Change
+event that select the desired patch ("Gonzo Harp") on the JV-1080. Let's assume that the Bank
+Select values will be 0 for MSB controller and 3 for LSB. We already said that the patch
+number is 0.
+
+<PRE><B>                <FONT COLOR=BLUE>Bank Select MSB</FONT>
+00              <FONT COLOR=GREEN>Delta-time is 0.</FONT>
+B0              <FONT COLOR=GREEN>Controller on channel 1.</FONT>
+00              <FONT COLOR=GREEN>Bank Select MSB.</FONT>
+00              <FONT COLOR=GREEN>MSB = 0</FONT>
+                <FONT COLOR=BLUE>Bank Select LSB</FONT>
+00              <FONT COLOR=GREEN>Delta-time is 0.</FONT>
+B0              <FONT COLOR=GREEN>Controller on channel 1.</FONT>
+20              <FONT COLOR=GREEN>Bank Select LSB.</FONT>
+03              <FONT COLOR=GREEN>LSB = 3</FONT>
+                <FONT COLOR=BLUE>Program Change</FONT>
+00              <FONT COLOR=GREEN>Delta-time is 0.</FONT>
+C0              <FONT COLOR=GREEN>Program Change on channel 1.</FONT>
+00              <FONT COLOR=GREEN>Patch = 0</FONT>
+</B></PRE>
+
+<P>After this, you would put other data for the track, such as MIDI Note-on, Note-off, etc, and
+other Meta-Events.
+
+<HR>
+
+<P>Now let's examine loading that same file created above.
+
+<P>First, you'll encounter the Track Name event. Use this to set the name for the sequencer
+track which will store this MTrk's data.
+
+<P>Next, you'll encounter the Instrument Name. If your program keeps a database of instruments
+that are "installed" on the computer, this could come in useful for several reasons. First,
+if your database lists which instruments are attached to which MIDI ports on the system, then
+you could ignore any Device (Port) Name event (just in case it happens to refer to someone else's
+MIDI port that isn't applicable on your system). You'll know which MIDI port to use for
+this MTrk based solely upon the Instrument Name and your own database. Secondly, if you have
+that instrument listed in your database, then you choose to forego any patch remapping. (ie,
+You may choose not to check that the values in any Bank Select and Program Change messages
+are correct, under the assumption that the desired patch is already located where it should be).
+At least, it may make any patch remapping easier.
+
+<P>Next, you'll encounter the Device (Port) Name event. If you weren't able to use the
+Instrument Name to deduce which MIDI port to use on your system, then you should check this
+port name. If it exists on your system, use that port. If not, use a default port.
+
+<P>Next, you'll encounter the Program Name event. You can use this to implement patch remapping.
+If your instrument database also lists what patches are available upon each
+instrument, then you can check for the existence of this patch in your database. (If you were able
+to use the Instrument Name, then you already know upon what instrument that patch should be
+found). Once you find that patch in your database, hopefully your database will contain the
+correct Bank Select and Program Change values needed to select that patch. In that case, you
+could ignore the next Bank Select and Program Change events you encounter in the MTrk. What you've
+effectively done is remap a patch change. So for example, if the MTrk was created upon an
+instrument with a unique arrangement of patches (and therefore its Bank Select and Program Change
+events have the wrong values when played upon a different instrument), you've remapped it to play
+the correct patch on another instrument.
+
+<P>Finally, you'll encounter the Bank Select and Program Change events. If you weren't able to
+use the Instrument and Program Name Meta-Events to deduce the correct Bank Select and Program
+Change values, then you may use these events verbatim.
+
+<HR>
+
+A free Dynamic Link Library called "GenMidi" is available to programmers writing MIDI software.
+This DLL can be used to maintain a database of Instrument names, and the names of all patches on
+those instruments (including which Bank Select and Program Change values select each patch). Included
+with the DLL is a tool that allows a user to create a database of such.
+
+<P>By using this DLL in your program, you can more easily implement patch remapping, and better
+coordinate with other programs that also use this DLL. Plus, you don't have to develop your own
+tools to allow users to create such databases.
+
+<P>The DLL is downloadable from the <A HREF="../../progs/software.htm">Software Programs</A> page.
+
+</FONT></BODY></HTML>

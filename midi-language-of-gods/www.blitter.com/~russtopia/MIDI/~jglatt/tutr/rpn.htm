@@ -1,0 +1,208 @@
+<HTML><HEAD><TITLE>Registered and Non-registered Parameter Number controllers</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+<H1>Registered and Non-registered Parameter Number controllers</H1>
+
+<P>The MIDI Non-registered Parameter Number (abbreviated to NRPN) and
+Registered Parameter Number (abbreviated to RPN) controllers can be used to
+adjust and control a wide range of functions upon a MIDI device. These
+controllers are used in conjunction with the Data Button Decrement
+(#96), Data Button Increment (#97), and Data Entry Slider (#6 for coarse
+adjust, and #38 for fine adjust) controllers.</P>
+
+<HR>
+<H2>Non-registered Parameter Number</H2>
+
+<P>The Non-registered Parameter Number controllers are controller #98 for the
+"low bits", and controller #99 for the "high bits" of the parameter number.
+Here's how a manufacturer may use NRPN.</P>
+
+<P>Assume that a manufacturer decides to allow a musician to adjust the
+<B>Filter Resonance</B> of a Voltage Controlled Filter using some MIDI
+controller messages. There is no standard MIDI controller defined for this
+purpose. One option that a manufacturer has is to use some Non-registered
+Parameter Number to control Filter Resonance. The available NRPN's are
+numbers 0 to 16,383. Just for the sake of illustration, let's say that the
+manufacturer chooses 14,000 as the parameter number for Filter Resonance
+(ie, the NRPN is 14,000). Note that a manufacturer is free to use parameter
+numbers for any desired purpose.</P>
+
+<P>A Data Button Increment, Data
+Button Decrement, and/or Data Entry Slider controller will be used to actually change the
+Filter Resonance value. Each Data Button Increment message sent to the device will increase
+the Filter Resonance by 1. Each Data Button Decrement sent to the device will decrease
+the Filter Resonance by 1. Each Data Entry Slider will set the
+Filter Resonance to whatever value is specified in the Data Entry Slider
+MIDI message. But before these 3 controllers can adjust Resonance, first you
+must send the pair of NRPN controller messages which tell the device that it
+should regard those 3 controllers as affecting Filter Resonance. The
+parameter number in the NRPN messages will be 14,000 because that's what this
+manufacturer chose as the parameter number for Filter Resonance.</P>
+
+<P>To create
+the NRPN message, you need to convert the 14,000 (decimal) to a binary
+representation. The reason is because MIDI can't transmit numbers larger
+than 127 within a message unless you "break up" the number into several
+"pieces of data", where each piece is less than 127, and the receiving
+device puts those pieces back together to recreate the original, large
+number. So, we need to convert the 14,000 to binary in order to figure out
+how to break it up into 2 pieces. 14,000 works out to be the following
+(16 digit) binary stream:</P>
+
+<P><B>0011 0110 1011 0000</B></P>
+
+<P><B>NOTE:</B> The Windows 95 calculator, when in scientific mode, can be
+used to convert values between decimal, hexadecimal, and binary notation.
+But note that the calculator trims off leading zeros (ie, It will display only
+14 or less of the 16 digits) of binary values. Make sure that you remember to
+prepend leading zeros so that you always have 16 binary digits.</P>
+
+<P>In order to break this up into 2 pieces, we discard the first two zeros.
+(Due to the parameter number range being 0 to 16,383, the first two of the
+16 binary digits will always be zero). We then take the next 7 digits,
+put a 0 in front of them, and recreate a decimal value from them:</P>
+
+<P><B>0 11 0110 1</B></P>
+
+<P>The above binary stream converts to 109 (6D in hexadecimal). These are
+the "high bits" of the parameter number.</P>
+
+<P>We then take the remaining 7 digits, put a 0 in front of them, and
+recreate a second decimal value from them:</P>
+
+<P><B>0 011 0000</B></P>
+
+<P>The above binary stream converts to 48 (30 in hexadecimal). These are the
+"low bits" of the parameter number.</P>
+
+<P>So, when we transmit the parameter number of 14,000 over MIDI, we break
+it up into 2 pieces; the decimal values 109 and 48 (where 109 is the "high
+bits" and 48 is the "low bits").</P>
+
+<P>Now we need to send the pair of NRPN controller messages to the device.
+We send NRPN controller #99 (ie, the "coarse" controller) with our high bits
+of the parameter number:</P>
+
+<P><B>176 99 109</B></P>
+
+<P><B>NOTE:</B> I'm expressing all values in decimal instead of hexadecimal.
+Also, I'm assuming a MIDI channel of 1 (ie, actually 0), so that's why I
+show a 176 above for the MIDI Controller Status. Of course, MIDI channel 2
+would be a MIDI Status of 177. MIDI Channel 3 would be 178. Etc.
+If you're using a sequencer program to enter these messages, the program
+will probably figure out the status for you -- you only need to tell the
+sequencer that you want to enter a MIDI controller event, with a controller
+number of 99, and for the data value, enter the low bits of your desired
+parameter number (above, that's 109).</P>
+
+<P>We then send the NRPN controller #98 (ie, the "fine" controller) with our
+low bits of the parameter number:</P>
+
+<P><B>176 98 48</B></P>
+
+<P>Incidentally, here are the above 2 messages shown as hexadecimal
+(which is the way that they're listed in Roland literature):</P>
+
+<P><B>B0 63 6D
+<BR>B0 62 30</B></P>
+
+<P>After sending these 2 messages, any subsequent Data Button Decrement,
+Data Button Increment, or Data Entry Slider message (on the same
+MIDI channel) will adjust the Filter Resonance. For example, let's use
+the Data Entry Slider controller to set Filter Resonance to the value 100:</P>
+
+<P><B>176 6 100</B></P>
+
+<P>Note that the manufacturer can define other NRPN numbers. For
+example, let's say that parameter number 14,001 is used to adjust
+the <B>Filter Envelope Release Time</B>. Now, if you want to use the Data
+Button Increment, Data Button Decrement, and Data Entry Slider
+messages to adjust Filter Envelope Release Time, you first have to send the
+pair of NRPN controller messages with a parameter number of 14,001.
+(And you have to break up the 14,001 into two pieces; the "high bits"
+and the "low bits", as we did above with the parameter number of
+14,000). Of course, after you send the pair of NRPN controllers with
+this new parameter number, the Data Button Increment, Data Button
+Decrement, and Data Entry Slider will no longer adjust Filter Resonance,
+but instead, will adjust Filter Envelope Release Time. In other words,
+the Data Button Increment, Data Button Decrement, and Data Button
+Slider adjust whatever "setting" is associated (by the manufacturer)
+with the last received pair of NRPN controllers (and the parameter
+number specified by that pair). That's how these MIDI controllers
+are related.</P>
+
+
+<HR>
+<H2>CakeWalk Example</H2>
+
+<P>Here's the procedure for entering the above example of setting Filter Resonance to the value 100 using CakeWalk.</P>
+
+<OL>
+<LI>Select the desired track where you wish to insert the NRPN controller.
+
+<LI>Go to the <B>Insert</B> menu and select <B>Series of Controllers</B>.
+<P><IMG SRC="nrpn1.jpg"></P>
+
+<LI>In the dialog that opens, select <B>NRPN (coarse)</B> controller.
+<P><IMG SRC="nrpn2.jpg"></P>
+
+<LI>For the <B>Value Range End</B>, type in the "high bits" of the parameter number. For this example, that would be 109.
+<P><IMG SRC="nrpn3.jpg"></P>
+
+<LI>Set both the <B>From</B> and <B>Thru</B> times to the Measure, Beat, and Clock when you want the NRPN to be sent.
+
+<LI>Click on the OK button.
+
+<LI>Go to the <B>Insert</B> menu and select <B>Series of Controllers</B>.
+
+<LI>In the dialog that opens, select <B>NRPN (fine)</B> controller.
+
+<LI>For the <B>Value Range End</B>, type in the "low bits" of the parameter number. For this example, that would be 48.
+
+<LI>Set both the <B>From</B> and <B>Thru</B> times to the Measure, Beat, and Clock when you want the NRPN to be sent.
+
+<LI>Click on the OK button.
+
+<LI>Go to the <B>Insert</B> menu and select <B>Series of Controllers</B>.
+
+<LI>In the dialog that opens, select <B>Data Entry (coarse)</B> controller.
+
+<LI>For the <B>Value Range End</B>, type in the value you wish. For this example, that would be 100. (Note that some MIDI
+devices may want to use both the coarse and fine Data Slider controllers if a parameter can be set to greater than the
+value 127. In that case, you break up the value into "high" and "low" parts just like with the NRPN coarse and fine
+controllers).
+
+<LI>Set both the <B>From</B> and <B>Thru</B> times to the Measure, Beat, and Clock when you want the Data Slider to be sent. (Note
+that this must be later than the 2 preceding NRPN controller messages. If you enter this controller after the preceding 2,
+CakeWalk should send it after those other 2, even if you specify the same times for all 2 events. But, if you wish to be
+sure, you can choose a time that is at least one clock later than the preceding 2 events).
+
+<LI>Click on the OK button.
+
+</OL>
+
+
+<HR>
+<H2>Registered Parameter Numbers</H2>
+
+<P>Of course, there were some "settings" that nearly all manufacturers
+found themselves defining, such as Pitch Wheel Bend Range. For this
+reason, we also have a pair of controllers for these <B>defined</B> parameter
+numbers. We use the Registered Parameter Number (RPN) controller messages
+for these defined parameter numbers. The RPN controller #101 specifies the
+"high bits" of the parameter number, and RPN controller #100 specifies the
+"low bits". There are (as far as I know) only a couple defined RPN's.
+Parameter # 0 adjusts Pitch Wheel Bend Range. Parameter # 1 adjusts Master
+Tuning. Of course, you break up these parameter numbers in the same manner
+as you did NRPN's, but you use RPN controllers 100 and 101 to transmit the
+parameter number (instead of the NRPN controllers 98 and 99). For example,
+here I tell the device that I want to adjust Pitch Wheel Bend Range, and
+then I use the Data Entry Slider to set it to 12 steps (ie, an octave
+up and down). This requires 3 events (ie, the two RPN controllers to tell
+the device to adjust parameter number 0 for Pitch Wheel Range, and the
+Data Entry Slider to set the value for Pitch Wheel Range).</P>
+
+<P><B>176 101 0
+<BR>176 100 0
+<BR>176 6 12</P>
+
+</BODY></HTML>

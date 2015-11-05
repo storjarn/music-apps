@@ -1,0 +1,422 @@
+<HTML><HEAD><TITLE>MIDI/Audio under Windows 95/98/2000</TITLE></HEAD><BODY BGCOLOR=WHITE TEXT=BLACK ALINK=PURPLE VLINK=PURPLE LINK=BLUE>
+
+This article answers questions about MIDI and audio setup under Windows 95/98/ME/2000/XP. For more general questions/answers about MIDI/audio/computer setups, and trouble-shooting, read the FAQ <A HREF="connect.htm">"MIDI connections and computer
+setup"</A>.
+
+<P>If you're having a problem with an internal IBM PC card not working, then you should first check for any hardware
+conflicts in your system. Read the article <A HREF="conflict.htm">"Resolving hardware conflicts"</A> for more information.
+
+<P>Questions in this FAQ are:
+
+<P><A HREF="win95.htm#w1">"How do I install/setup an audio/MIDI driver?"</A>
+<BR><A HREF="win95.htm#w2">"How do I remove an audio/MIDI driver?"</A>
+<BR><A HREF="win95.htm#w3">"Where is Win95's MIDI Mapper?"</A>
+<BR><A HREF="win95.htm#w4">"Why didn't Windows autodetect my second sound card?"</A>
+<BR><A HREF="win95.htm#w7">"How do I get my 16-bit sequencer program to have more stable digital audio under Win95?"</A>
+<BR><A HREF="win95.htm#w5">"Why can't I get sound from my MS-DOS game programs run under Win95?"</A>
+<BR><A HREF="win95.htm#w6">"What is that yellow exclamation mark in Device Manager?"</A>
+<BR><A HREF="win95.htm#w8">"Why won't my Windows 3.1 or Windows 95/98/ME driver work under Windows NT/2000/XP?"</A>
+
+<P><HR SIZE=5 NOSHADE>
+<P><H2><FONT COLOR=RED><A NAME="w1">How</A> do I install/setup an audio/MIDI driver?</FONT></H2>
+
+<P>Nowadays, most driver packages ship with a program you can run which installs the driver for you. Typically, this program is named <i><b>setup.exe</b></I>. There will often be numerous other files (in the package) along with setup.exe, but these are used only by setup.exe to install driver support. (Once the driver support is installed, you can delete setup.exe and all other files in the package, or save them if you need to reinstall). If the driver package is shipped on a CDROM, the CDROM will typically have a file named <i><b>autorun.inf</b></I> on it. All autorun.inf does is automatically run setup.exe when you insert the CDROM into the drive. (This is a function of Windows' autorun capability. Unless you have this feature disabled, Windows will "autorun" any CDROM with an autorun.inf file on it).
+
+<P>Setup.exe will automatically detect what operating system is on your computer, and install the correct driver. (ie, Many maunfacturers will ship one CDROM containing drivers for several versions of Windows. But not every driver is compatible with all versions of Windows, so the correct one must be installed for your system).
+
+<P>If the driver does not ship with its own setup program, then you will have to manually install the driver yourself. (Some manufacturers farm out their driver development to programmers who don't know how to, or don't take the time to, write a self-installing driver package).
+
+<P>To manually install a driver, the driver should have a <u>.INF</u> file (ie, created by the manufacturer and shipped with the driver). The INF file (ie, the filename ends with a .INF extension) is really just a text file that tells Windows what kind of driver is being installed (ie, digital audio, MIDI, video, printer, etc). It also contains the text that Windows
+uses when it displays the "name" of the driver (ie, not the driver filename, but rather, a more meaningful name which I'll call the "device name") in various displays, such as in the Control Panel's MultiMedia notebook. The INF also lists what the driver filenames are so that Windows knows what files to copy off of the install disk. You can view this INF file in a text editor (and even edit the device name). For example, the Roland RAP-10 INF indicates that the driver supports digital audio, MIDI, and LINE IN (ie, aux). Windows treats these 3 "sections" of the card as if they were 3 separate devices. The device name for each of these sections of my RAP-10 is "Roland Audio Producer". Windows ships with several audio/MIDI drivers for various cards and the INF files (and drivers) for those are included with Windows.
+
+<P><FONT COLOR=RED><B>Note:</B></FONT> Before installing new MIDI/Audio drivers, I recommend that you first manually remove any currently installed drivers that the new drivers are meant to replace, unless the new drivers are written to be installed over those old drivers. Usually, if you're updating new drivers over old drivers written by the same manufacturer for the same card, then there's no need to remove the old drivers first. But, if you had also changed your sound card, or gotten drivers from a different source, then I recommend removing the old drivers. For example, here's how I would go about changing to a different sound card and installing new drivers:
+
+<OL><LI>Boot up your system with its current setup (ie, with your current sound card and drivers).
+<LI>Remove the current drivers. See <A HREF="win95.htm#w2">"How do I remove an audio/MIDI driver?"</A>.
+<LI>ShutDown Windows and turn off the computer.
+<LI>Install the new sound card.
+<LI>Boot up the system. If Windows doesn't autodetect the new card (which Windows won't if the card's drivers weren't included with Windows itself, or if the card isn't Plug-and-Play), then proceed to manually install the new drivers.</OL>
+
+<P>Here are the steps to install a MIDI/audio driver:</P>
+
+<OL><LI>Start the Control Panel's <B>Add New Hardware</B> utility.
+<LI>Click <B>Next</B> to skip the intro screen.
+<LI>Answer <B>No</B> to Windows asking to search your hardware, and click <B>Next</B>.
+<LI>Move down the list until you see <B>Sound, video, and game controllers</B>. Click on (ie, highlight) that item, and click <EM>Next</EM>. Windows will now present a dialog that lists all of the audio/MIDI drivers included with Windows. In the box on the right is listed all of the manufacturers whose drivers are included with Windows. When you select a manufacturer name, the box on the left updates to display those included drivers for that manufacturer's products.
+<LI>If the driver that you want to install is among Window's included drivers, and you wish to use that, simply highlight the driver name, and select OK. Now skip to the last step.
+<P>On the other hand, if you prefer to use drivers other than the included ones (ie, you have updated drivers), or the driver you need isn't included with Windows, then click the <B>Have Disk</B> button instead.
+<LI>Type in the directory where the driver INF file can be found, and click <B>OK</B>.
+<LI>If Windows finds the INF file, it will present a window containing the device name. Highlight that name, and click <B>OK</B>.
+<P><FONT COLOR=RED><B>Note:</B></FONT> If the driver package contains drivers for various versions of windows, or various models of cards, then there may be numerous INF files in the package. You may have to search around, selecting various INF files, until you find one that lists the desired model.
+<LI>Windows will then install the driver, and run whatever setup routine is contained within the driver. Typically, the setup routine will open a window and allow you to specify such things as port address, IRQ number, and DMA channels used for
+digital audio (if supported). Each driver has its own proprietary setup routine, so you'll have to deal with whatever prompt/window pops up at this point.</OL>
+
+<P>After you've installed the driver, you can now configure Windows' (and ultimately, all Windows applications') use of the driver. For example, do you want all Windows programs to send their MIDI output to this driver, and get their MIDI input from this driver? Do you want all programs to use the card's ADC (assuming it has such) to record digital audio (usually stored in
+a WAVE file)? Do you want all programs to use the card's DAC to play digital audio? You use the Control Panel's <B>MultiMedia</B> notebook to configure the card's use. Open the MultiMedia notebook. It has several pages that you can flip to (ie, the tabs are at the top of the notebook).
+
+<P>The first page is called <B>Audio</B>. This page concerns playing and recording digital audio. The page is divided in half, with the <I>Playback</I> settings on top, and the <I>Recording</I> settings below. If your card has a Digital to Analog Converter (ie, for playback) and Analog to Digital Converter (ie, for recording), then your card's device name should be listed in both the dropdown list in the Playback section of the page as well as the dropdown list in the Recording section. Select the device name so that it appears as the "Preferred Device" for both Playback and Recording. Now all Windows apps (as well as Windows itself when it plays "system sounds") will use your card for digital audio playing and recording. For cards that support various sample rates and bit resolutions, you should be able to select a "Preferred quality" for recording. You can also set default values for playback and recording volume. The "Use preferred devices only" setting is only effective if you have more than one digital audio device (and driver) installed. When selected, Windows forces all programs to use just the one "preferred device". When not selected, if some program has the preferred device in use, and another program wants to do something with digital audio, Windows will automatically have the second program use some other digital audio device in your system. Note that it's perfectly OK to have different cards chosen for playback and recording, which is one way to get around the problem of not having a full duplex sound card (ie, one that can record digital audio at the same time that it is playing back previously recorded digital audio).
+
+<P>The above settings don't mean that all programs <u>must</u> use the "preferred device" for digital audio, with those volume and rate/resolution settings. Rather, these are default values (for programs that don't offer ways to change such settings). On the other hand, a Windows program could query all of the digital audio devices installed on your system assuming that you had more than one installed), and let you choose to use any and all devices, maybe even simultaneously for many tracks of digital audio. The program could provide controls with which you adjust volume and rate/resolution, and maybe even additional parameters. But such a program would have to be written to use Windows' MCI API in a fancy manner. Your average CD-ROM Encyclopedia, and other titles that aren't geared for fancy audio work, generally use the preferred device and default settings verbatim.
+
+<P>There is another page in the MultiMedia notebook for <B>MIDI</B>. This page concerns MIDI input and output. If your card has MIDI input and output ports, then your card's device name should appear in the list below "Single Instrument". If you want to set all 16 MIDI channels to come in and go out through that card's MIDI IN and OUT, then select "Single Instrument" (ie, make sure that the dot is highlighted), and then highlight the device name (ie, so that it also appears in the box beneath "Single Instrument").
+
+<P><FONT COLOR=RED><B>Note:</B></FONT> In Windows NT/2000/XP, the MIDI page is missing. Instead, only the one, preferred instrument for MIDI playback (ie, output) is listed under the "Audio" page. There is no facility for configuring any patch remapping via the MultiMedia notebook.
+
+<P><A NAME="wref1">On</A> the other hand, if you have more than one MIDI device installed, and you wish to divide up the 16 MIDI channels between those devices, then select "Custom configuration" instead. For example, assume that you have two cards, an MPU-401 and a Monterrey. You've installed drivers for both, and so there are 2 device names in the MIDI device list. You want to have all MIDI events on channels 1 to 8 go through the MPU-401, and all MIDI events on channels 9 to 16 go through the Monterrey. Click the <B>Configure</B> button, and a window will pop open listing all 16 MIDI channel numbers. Now follow these steps to setup MIDI channel 1.
+
+<OL>
+<LI>Highlight number 1.
+<LI>Click the <B>Change</B> button. Another window will pop open containing a dropdown list with all of the installed device names. (In this example, that's the MPU-401 and Monterrey device names).
+<LI>Select the desired device name, and click <EM>OK</EM>. (In this example, we want the MPU-401).
+</OL>
+
+<P>You've now set MIDI channel 1 to go through the MPU-401. Repeat the steps with channels 2 to 8. Repeat the steps for channels 9 to 16, but select the Monterrey device name instead. (Note that you can select several channels simultaneously for changing, by holding the <EM>SHIFT</EM> key while highlighting channel numbers).
+
+<P>Now, by default, any Windows program that transmits a MIDI message on channel 10 will send that message to the Monterrey's MIDI OUT.
+
+<P>For multi-port (ie, multiple bus) MIDI interfaces, the driver for that device should make it look like each bus on that one card is itself a separate card. Therefore, you should have a unique "device name" for each port on that multi-port interface. For example, maybe port 1 will have a device name of "Brand X MIDI Port 1", whereas port 2 will have a device name
+of "Brand X MIDI Port 2", etc). Hopefully, the driver will also be "multi-client" so that, if desired, you can have different programs simultaneously doing MIDI data transfers to different outputs. (In that case, you'd have to setup "custom configuration" and restrict each program to using different MIDI channels than the other programs).
+
+<P>Note that System Exclusive, as well as System Realtime (ie, MIDI Clock/Start/Stop, MIDI Time Code, etc) messages do not have a "MIDI channel" associated with them. I'm not sure how Windows handles such events given a custom configuration. It may simply output such events to whatever device you've selected for "Single Instrument" or may automatically duplicate all
+System Realtime, Common, and Exclusive messages to all MIDI devices.
+
+<P>Just like with the Audio settings, the above MIDI settings don't mean that all programs <B>must</B> use the "Single Instrument" for MIDI. Rather, this is the default MIDI IN and OUT (for programs that don't offer ways to change such). On the other hand, a Windows program could query all of the MIDI devices installed on your system (assuming that you had more than one installed), and let you choose to use any and all devices, maybe even simultaneously for many MIDI channels (ie, 16 per device). The program could provide controls with which you adjust which MIDI data goes to which device. But such a program would have to be written to use Windows' MCI API in a fancy manner. In fact, CakeWalk Pro does exactly that, which is how it
+supports MIDI interfaces with multiple MIDI busses. Your average CD-ROM Encyclopedia, and other titles that aren't geared for fancy MIDI work, generally use either the "Single Instrument" (ie, one MIDI card) or for "Custom configuration", will automatically have the MIDI data routed to various cards as per your channel/device assignments.
+
+
+
+<P><HR SIZE=5 NOSHADE>
+<P><H2><FONT COLOR=RED><A NAME="w2">How</A> do I remove an audio/MIDI driver?</FONT></H2></P>
+
+<P>Never, never, never manually delete driver files by dragging icons to the Recycle Bin nor typing "del" from a command prompt. That's not the way that you uninstall a driver. There's a difference between uninstalling a driver and deleting
+files on your HD. If you do the latter, then you'll likely still leave behind references (to the now-missing driver files) in Windows' registry and INI files. This can cause all sorts of error messages to pop up. And if you later install other drivers without removing those references, you could end up with a completely confused set of error messages and weird behavior.
+
+<P>The proper way to uninstall a driver is as follows:
+
+<OL>
+<LI>Open Control Panel's "System" notebook.
+<LI>Flip to the "Device Manager" page. There you'll see a listing of all of the hardware in your computer, separated by category.
+
+<P><FONT COLOR=RED><B>Note:</B></FONT> In Windows NT/2000/XP, Device Manager is located by flipping to the "Hardware" page and then clicking the "Device Manager" button.
+
+<LI>You should see a category for sound and gameport devices with a small "+" sign next to it. Click on the + sign and this should drop down a list of the installed audio cards on your system. (Alternately, some sound cards list their driver components under their own category).
+<LI>Highlight (ie, click on) the name of whichever component you wish to remove.
+<LI>Click the "Properties" button.
+<LI>Click the "Remove" button.
+</OL>
+
+<P>If your audio device isn't listed on System notebook's "Device Manager" page, then you'll have to open the MultiMedia notebook and flip to the "Advanced" page. This is like the Device Manager listing, but it only shows MultiMedia components
+broken down into smaller catagories. You'll need to go through each sub-category (ie, "Audio Devices", "MIDI Devices and Instruments", etc) to remove each component that pertains to the device that you wish to remove.
+
+
+
+<P><HR SIZE=5 NOSHADE>
+<P><H2><FONT COLOR=RED><A NAME="w3">I</A> have an external MIDI module (ie, a Roland JV-80) that doesn't have a General MIDI patch set, nor drum note assignments per GM. Whenever I use the software mixer in my sequencer to select a patch, it always selects the wrong patch because it expects a GM patch set. In Win 3.1, I could use the MIDI Mapper to remap the GM patches and drum note assignments so that they selected the proper patches and drum sounds upon my JV-80. Where's the MIDI Mapper for Win95?</FONT></H2>
+
+<P>Microsoft didn't have time to finish rewriting the MIDI Mapper for Win95 before the OS's release. Subsequently, MS created the <A HREF="../midi/software/idfedit.zip">IDFedit.zip</A> utility which you can download from my Web Site now. This utility can be used to create an Instrument Definition File (ie, IDF) in which you determine how the GM patch set and drum note assignments are remapped. Then, you install this IDF as if it were another MIDI device upon your system, and use it for MIDI IN and OUT.
+
+<P>For example, let's assume that the very first GM patch "Acoustic Grand Piano" is actually the second patch upon your JV-80 and you wish to remap GM patch 1 to JV-80 patch 2.
+
+<OL><LI>Run IDFedit.
+<LI>Pull down the "Edit" menu and select "New instrument". This will create a new instrument with a patch set, drum note assignments, a "name" or "ID" (which defaults to "untitled1"), plus other settings. You should see "untitled1" appear in the list box.
+<LI>Double-click upon "untitled1". This brings up the properties notebook with which you enter your settings.
+<LI>First, you'll want to give this instrument a meaningful name. Flip to the "ID" page of the notebook, and type in your desired Instrument Name. For this example, we'll call it "JV-80 GM Patch Set".
+<LI>Leave "Set as default" checked if you want Windows to apply these settings to the default MIDI IN and OUT. (You can always change this later via the MultiMedia notebook's MIDI page. In fact, all this checkmark does is automatically select this new instrument as if you had picked it out of the list below "Single Instrument" on the MIDI page).
+<LI>Now flip to the "Patch Map" page. Here you see a listing of all 128 GM patches. Highlight the "Acoustic Grand Piano", and click the "Edit" button. A dialog appears asking you to which patch to remap this GM Patch. Remember we said that the JV-80's Acoustic Grand Piano is #2, so type a 2 here, and press ENTER. You can then highlight other GM patches and remap them to equivalent patch numbers in your JV-80 patch set. You've now remapped GM to your JV-80. Whenever you use the "JV-80 GM Patch Set" as the output for your sequencer program, this remapping automatically occurs. (If you can't find a respective patch on your module for a given GM patch, then set the GM patch to the closest equivalent. For example, if you only have one piano sound whereas the GM set includes several piano variations, then set all of the GM piano patches to point to that one piano patch. ie, It's OK to set several GM patches to the same patch number).
+<LI>You can flip to the "Percussion Map" page and reassign each GM drum note to a different MIDI note number in order to remap the drum note assignments.
+<LI>Furthermore, you can flip to the "Key Map" page and remap all of the MIDI note numbers for the instrumental parts (ie, not the drum part, usually on channel 10). For example, if you add 12 to each note number in the list, all of the notes sent to the JV-80 will be transposed up an octave (except for the notes on the drum part's channel).
+<LI>The "Channels" page allows you to select which channels are excluded from being affected by this IDF. This is useful if you want to apply different remapping (ie, different IDFs simultaneously) to different MIDI channels going through one MIDI card. For example, assume that you have a Proteus listening to MIDI channels 1 to 8, and a JV-80 listening to channels 9 to 16. These two units have non-GM patch sets, and are different from each other. They are both daisy-chained to one MIDI card in your computer. You'll want to create an IDF that remaps the Proteus patch set (and only affects channels 1 to 8), and another IDF that remaps the JV-80 patch set (and only affects channels 9 to 16). Then, you'll apply both IDFs to that one MIDI card. (In fact, you can create these two sets of IDF settings within one IDF file, by creating a "New Instrument" within IDFEdit, so that you actually have two instrument definitions with the one file. The second instrument will default to a name of "untitled2". That way you'll apply both remappings when you install just the one IDF, and this is more efficient).
+
+<P>You can also choose which MIDI channel the "drum kit" is assigned to (which defaults to channel 10) in case you have a drum box set to a MIDI channel other than 10 and wish to apply the IDF drum note remapping to that MIDI channel.
+
+<LI>The "Info" page simply lets you add more descriptive comments to your IDF.
+<LI>You can click on the "OK" button when you're done with your settings. Then, pull down the "File" menu, select "Save As", and pick out a filename for your IDF.
+</OL>
+
+<P>Once you've saved your new IDF, you can "install" this new instrument.
+
+<OL>
+<LI>Go to Control Panel and open the MultiMedia notebook.
+<LI>Flip to the MIDI page.
+<LI>Click on the "Add New Instrument" button. The "MIDI Instrument Installation Wizard" dialog appears.
+<LI>Highlight the MIDI (hardware port) to which you want your IDF to be applied (ie, the device that you want to use for MIDI IN/OUT in conjunction with these IDF settings). If you only have one device, that is already highlighted.
+<LI>Click on "Next".
+<LI>Click on the "Browse" button and locate your new IDF. Select it. Its filename will now appear as one of the Instrument
+Definitions in the list.
+<LI>Click "Next".
+<LI>Now type in a descriptive name for this instrument. We'll just use "JV-80 GM Patch Set" again.
+<LI>Click "Finish".
+</OL>
+
+<P>"JV-80 GM Patch Set" should now appear in the MultiMedia notebook's list of "Single Instruments". You can select this as if it were a device in your system, and when you do, Windows will apply the remapping to MIDI IN and OUT. This new "device" should also appear in CakeWalk's list of output devices.
+
+<P>You can add as many IDFs as you like, even applying more than one to a given MIDI card. (This may be useful if you have several non-GM multitimbral devices attached to a single MIDI interface. By using "Custom Configuration", and then selecting different IDFs for the various 16 MIDI channels, you can divide up the 16 MIDI channels between those instruments, as well as apply different remappings to each MIDI module. But if dealing with multitimbral instruments, you'll still have to set each instrument to actively ignore MIDI channels reserved for other modules).
+
+<P>If you wish to remove a particular IDF, you can do so. Let's remove our "JV-80 GM Patch Set" IDF.
+
+<OL><LI>Go to Control Panel and open the MultiMedia notebook.
+<LI>Flip to the "Advanced" page (ie, the last page). This displays something
+that looks like Device Manager's list, except that it only contains devices
+pertaining to audio, MIDI, and video. <LI>Click on the small + sign beside
+"MIDI Devices and Instruments". This will drop down a list of all of your
+installed MIDI devices. <LI>There will another + sign next to the MIDI device
+which you've applied the IDF to. For example, let's assume that our IDF had
+been applied to the "Roland Audio Producer" device. Clicking on the + sign drops down
+a list of the IDFs that were applied to this device. You should see "JV-80 GM
+Patch Set" there. <LI>Highlight this IDF. <LI>Click on the "Properties" button at
+the bottom of the page. A new dialog should pop up containing information about
+this IDF. <LI>Click on the "Remove" button. The IDF is no longer applied to the
+MIDI output, and has been removed from Win95's list of instruments. The actual IDF
+itself has not been erased. You can reinstall that file later if desired.</OL>
+
+<P><B>NOTE:</B> Some sequencers support defining patch maps for each of your MIDI
+modules. (For more information, see <A HREF="connect.htm#q4">MIDI connection and
+computer setup</A>). This is more flexible than using an IDF because you can usually define more
+than 128 patches with the former (ie, the sequencer supports banks of patches whereas
+IDFs don't). Plus, the sequencer lets you apply any patch map to any track, regardless
+of MIDI channel, so it's a lot easier to setup.</P>
+
+<P>Just don't use an IDF in conjunction with the built-in patch naming features of your
+sequencer. You don't want to remap your custom patch sets. The exception to this is if your
+sequencer completely bypasses Win95's MultiMedia MIDI setup. Such a sequencer
+would use the "low level" MIDI API of Windows. In this case, you can still setup an IDF for the
+benefit of sequencers and multimedia software that uses the "high level" MCI API of Windows. But
+then, don't select the MIDI Mapper as the output driver for your software that has its own patch
+naming features.</P>
+
+
+
+<P><HR SIZE=5 NOSHADE>
+<P><H2><FONT COLOR=RED><A NAME="w4">I</A> have both a Roland MPU-401 card and a Sound Blaster
+16 card in my computer. When installing Windows, the "auto-detect" found my SB16
+(and installed its drivers) but didn't find my MPU-401 card (nor install its
+drivers). Why did this happen, and how do I get my MPU-401 working?</FONT></H2></P>
+
+<P>Windows' "AutoDetect hardware" only does a search for one (non-PnP) sound card (since
+that's all that is really needed for normal use). As soon as it discovers one 
+card, that's the end of the search for an audio card. Needless to say, the 
+first card that Windows searches for is an SB compatible. I'm not surprised that 
+it found your SB16 (and set that up) before finding your MPU-401.</P>
+
+<P>Also, Windows is written to only check for those sound cards that have drivers that
+are shipped with Windows. If you have a card for which drivers were not included on your
+Windows CDROM (or floppies), Windows will not detect it (unless it's a PnP card. In that case,
+Windows will detect, but if there are no drivers, it will label it an "Unknown device" without
+any driver support).</P>
+
+<P> In conclusion, Windows will not autodetect more than one non-PnP audio/MIDI card. For any
+second card, you'll have to manually install the drivers. Windows will also not autodetect
+any card that it doesn't know anything about. (ie, Windows will not autodetect a card for
+which drivers aren't included with Windows itself). You'll have to manually install the drivers
+for this case too. This is easy to do, and is explained in <A HREF="win95.htm#w1">"How do I
+install/setup an audio/MIDI driver?"</A>.</P>
+
+
+
+
+<P><HR SIZE=5 NOSHADE>
+<P><H2><FONT COLOR=RED><A NAME="w7">When</A> using my 16-bit Windows sequencer software under Windows,
+I get erratic digital audio playback. Sometimes, there's static or tempo glitches.
+Why does this happen, and how can I fix it?</FONT></H2></P>
+
+<P>Most of the problems with old (16-bit) software playing digital audio tracks (ie, recording to,
+or playing from, the hard drive) are due to the differences between Win3.1's and Win95's disk cache
+handling and virtual memory. 16-bit Windows software is written for Win3.1, and consequently may not
+be designed to perform well with Win95's different methods. You can minimize adverse effects Win95
+may have on 16-bit software by forcing the disk cache and virtual memory (ie, swap file on your HD) to
+fixed sizes.<P>
+
+<P>To set Win95's disk cache to a fixed size, load the file SYSTEM.INI (found in your Windows directory)
+into NotePad. Find the line that reads [vcache]. Alter the MinFileCache and MaxFileCache lines below it
+(or add these 2 lines if they aren't already there). If you have a system with 8 MEG of RAM, set both to
+1024. If you have a system with 16 MEG of RAM, set both to 2048. For example, here's what it would look
+like for 16 MEG:</P>
+
+<P><B>[vcache]
+<BR>MinFileCache=2048
+<BR>MaxFileCache=2048</B></P>
+
+<P>Resave the file.</P>
+
+<P>This limits the RAM that Win95 uses for its disk cache. Normally, Win95 allocates all free RAM for that,
+which could interfere with memory allocations that your sequencer is trying to make during playback, and
+cause slowdowns in performance.</P>
+
+<P>To set Win95's virtual memory (ie, swap file) to a fixed size, open Control Panel's System notebook and
+flip to the Performance page. Click on the "Virtual memory" button. Select "Let me specify my own virtual memory
+settings". For the Minimum setting, enter 0. For the Maximum setting, enter 20 if you have 8 MEG of RAM, or 28
+if you have 16 MEG.</P>
+
+<P>This prevents the swap file from growing and shrinking on your hard drive. It's also recommended that you
+defrag your drive afterwards. If you have more than one drive, try putting the swap file on a drive other than
+the one where you'll be recording digital audio.</P>
+
+<P>After the above adjustments, reboot your system.</P>
+
+
+<P><HR SIZE=5 NOSHADE>
+<P><H2><FONT COLOR=RED><A NAME="w5">I</A> can't get any sound from my MS-DOS game programs when I play them
+under Win95 (ie, in a DOS prompt window or screen). I have to reboot the computer in "MS-DOS Mode"
+(ie, without Win95 loading at all) in order to get any sound. Why?</FONT></H2></P>
+
+<P>The problem is that this DOS prompt window or screen is really running under Win95 (ie,
+you're running an MS-DOS shell that uses Win95's "Current Configuration", rather than booting
+into a "New Configuration" without Win95 loaded and in control), and you have incomplete Win95
+drivers for your sound card.</P>
+
+<P>Here's the deal. When you boot into this DOS shell, Win95 is still loaded and in control (ie, you're
+running a Win95 DOS VDM). All of your Win95 drivers are managing access to your hardware, including your
+sound card. In MS-speak, you're using Win95's "Current Configuration". Your system isn't really rebooting
+into DOS so much as it's running DOS on top of Win95. (And that's why you can enter and exit from that DOS
+prompt, back to Win95, so quickly). Whether you select an MS-DOS Prompt from the Start Menu's Programs group,
+or Shutdown to MS-DOS Mode, Win95 is still loaded and in control (if you're using the "Current Configuration").
+In fact, the Win95 drivers for your sound card are always in control of the card, unbeknowst to your MS-DOS
+program even. It's sort of like how a DOS "Terminate and Stay Resident" (TSR) utility can surreptiously wedge
+itself inbetween a program and some hardware.</P>
+
+<P>There are 2 things that your Win95 drivers do. First, they manage interaction between Windows programs and
+your hardware. Secondly, they manage interaction between MS-DOS programs and your hardware... when Win95 is
+still in control. Your MS-DOS programs don't even know that Win95 (and its drivers) are still in control.
+Everytime that your MS-DOS program tries to execute an instruction that reads or writes to hardware, the Intel
+CPU (sneaky guy that it is) immediately "traps" that access and gives control over to Win95 and its drivers, who then
+manage the actual access. (In the process, Win95 also gets a chance to try to implement some crash protection, and
+perform multi-tasking).</P>
+
+<P>Whereas your sound card's Win95 drivers may well support Windows apps access to hardware, it appears that those
+drivers don't properly support access by an MS-DOS program running under Win95. So, you can't run your MS-DOS stuff
+under Win95 (unless you get new Win95 drivers that support MS-DOS programs). What you're going to have to do is
+completely flush Win95 and its drivers out of memory, and reload MS-DOS so that it really is in control. That's
+exactly what happens when you boot into "MS-DOS Mode" without loading Win95. You can also choose to have your MS-DOS
+programs run under a "New Configuration" which causes Win95 to kill itself, and MS-DOS 7.0 (included with Win95)
+then loads.</P>
+
+<P>You can setup that MS-DOS Prompt (or the Shutdown "Restart in MS-DOS Mode")
+to boot into a new configuration of MS-DOS only, instead of using Win95's
+current configuration (and leaving Win95 still in control). The only problem
+is that, now that your DOS programs don't have Win95's drivers managing the
+hardware, for example Win95's drivers for your CDROM and mouse, you're going
+to need to copy some DOS drivers for your mouse and CD-ROM to your HD, and create
+CONFIG.SYS and AUTOEXEC.BAT files that load these drivers.</P>
+
+<P>Here's how to setup your computer so that it boots into MS-DOS only:</P>
+
+<OL><LI>Make sure that you copy MS-DOS drivers to your HD for any
+devices that need such, like your CD-ROM and mouse.
+<LI>Open "Start -> Programs -> Windows Explorer".
+<LI>Go to the "Windows" directory, and find the "Exit to Dos" icon.
+This holds the settings used when you boot into MS-DOS mode via
+"Start -> Programs -> MS-DOS Prompt" or Shutdown with "Restart in MS-DOS
+Mode".
+<LI>Click once on it to open its pop-up menu, and select "Properties".
+<LI>Go to the "Program" page.
+<LI>Click on the "Advanced" button.
+<LI>Select "Specify a new MS-DOS configuration" (instead of "Use
+current MS-DOS configuration"). Now the two boxes below will let you
+enter text. In the top box, you need to type out a CONFIG.SYS file
+exactly like it would have appeared if you only had MS-DOS on your
+system, and you wanted to load your DOS drivers. Of course, you
+need to specify everything. You need to load your mouse driver for
+MS-DOS. You need to load your CD-ROM driver for MS-DOS (probably using
+MSCDEX if you've got an IDE CD-ROM). You may need to copy these
+MS-DOS drivers from the disks shipped with your mouse and CD-ROM, to
+someplace on your HD. In short, you need to recreate CONFIG.SYS like
+it would be for MS-DOS, and copy any MS-DOS drivers for your mouse,
+CDROM, and sound card to your HD. For example, here's an example of
+the lines that I typed into the CONFIG.SYS box. I'm loading my mouse
+driver MOUSE.EXE, and my CD-ROM driver d011v110.sys. I'm not using any
+driver for my Vibra16 sound card (but the SB applets need an
+environment variable set).
+
+<P>REM Stuff that you probably need
+<BR>DOS=HIGH,UMB
+<BR>Device=C:\WINDOWS\Himem.sys
+<BR>FILES=20
+<BR>REM Set this to the last drive on your system
+<BR>LastDriveHigh=E
+<BR>REM Here's my CD-ROM driver. Your driver may have a different name. 
+<BR>REM It may require you to use "Device" instead of "DeviceHigh".
+<BR>REM Consult your CDROM manual.
+<BR>DeviceHigh=C:\d011v110.sys /d:mscd000 /n:1</P>
+
+<P>Now, in the lower box, you need to type the lines for an AUTOEXEC.BAT
+file. Here's what I use:</P>
+
+<P>REM A place where programs can toss garbage files. It must exist
+<BR>SET TMP=C:\WINDOWS\TEMP
+<BR>SET TEMP=C:\WINDOWS\TEMP
+<BR>REM Just for the shell's prompt
+<BR>SET PROMPT=&p$g
+<BR>REM Where Win95 system files reside
+<BR>SET winbootdir=C:\WINDOWS
+<BR>REM Where MS-DOS can find system files
+<BR>SET PATH=C:\WINDOWS;C:\WINDOWS\COMMAND
+<BR>REM This is for the Sound Blaster Vibra16 PnP applets
+<BR>SET BLASTER=A220 I5 D1 H5 P330 T6
+<BR>REM Here's my mouse driver. Yours may have a different name.
+<BR>C:\MOUSE.EXE
+<BR>REM My CDROM is an IDE unit. Its driver uses MSCDEX to manage
+<BR>REM the driver under MS-DOS.
+<BR>MSCDEX.EXE /d:mscd000 /m:18</P>
+
+<LI>Now select "OK" on the dialogs to close them down and you're in business.</OL>
+
+<P>So what's happening here? What's the difference between "Specify a new
+MS-DOS configuration" and "Use current MS-DOS configuration"? As I explained,
+with the latter, Win95 doesn't reboot the computer. Win95 is still loaded and
+in control, using its Win95 drivers to manage your MS-DOS programs
+use of hardware. But, when you use a "new MS-DOS configuration", Win95
+is completely flushed out of memory, and runs those CONFIG.SYS and
+AUTOEXEC.BAT scripts above. As you'll notice above, I've using my old
+MS-DOS drivers. So this is how you can boot into an environment that
+is the same as MS-DOS running your old drivers or TSRs, and yet, when you go
+back to Win95, you're back to using your new Win95 drivers (and the
+old real-mode drivers or TSRs are flushed from memory again -- which is good
+because, you don't want that stuff loaded with Win95 if you can avoid it). This
+is how you can have your MS-DOS games run without the interference of incomplete
+Win95 drivers that don't support sound for those MS-DOS programs, and yet still
+use those Win95 drivers with Windows programs which are supported.</P>
+
+<P>The disadvantage is that, in order to completely flush Win95 and leave
+MS-DOS totally in control, Win95 has to reboot the computer. So, using "Specify a new MS-DOS
+configuration" will take much longer to switch to than "Use current
+MS-DOS configuration". But, it will allow you to use your old DOS
+TSRs with MS-DOS software, and your new Win95 drivers under Win95
+(without resorting to always loading your old drivers/TSRs under Win95 and
+risking any weirdness between the two simultaneously loaded "old versus new" drivers).
+Plus, if you have Win95 drivers that don't properly support MS-DOS
+programs running under Win95, then you need to boot into MS-DOS mode anyway.</P>
+
+<P>Incidentally, if you prefer to have only certain programs reboot into
+this "MS-DOS only" mode, then instead of performing the above
+procedure on the "Exit to Dos" shortcut, do this on the shortcut for
+the particular MS-DOS program(s) you desire. (ie, Click on the
+program's shortcut to bring up "Properties", and take it from there).</P>
+
+
+<P><HR SIZE=5 NOSHADE>
+<P><H2><FONT COLOR=RED><A NAME="w6">When</A> I opened up Control's Panel's System notebook, and flipped
+to the Device Manager page (ie, to see a list of the hardware in my system), I noticed
+a small, yellow exclamation mark next to my sound card's name. What is this?</FONT></H2></P>
+
+<P>That exclamation mark you see next to a device name in Windows' System Notebook "Device Manager" page indicates a
+conflict (usually IRQ) or that something is wrong with the device's response. (ie, For example, I use SCSI devices
+rather than IDE, so I disabled my motherboard's IDE ports. My Plug and Play BIOS told Windows that I had IDE ports,
+but Windows didn't get any response from them, hence that exclamation mark next to my "PCI IDE controller".
+
+<P>In fact, it's common to see exclamation marks related to Plug And Play ISA cards. Often the devices appear to have several "phantom" units, each one dedicated to whatever IRQs the device supports, and Windows thinks that these are real yet gets no response from them. Hence you may see several instances of a particular Plug and Play ISA card listed, with all but one having an exclamation mark. It's OK to leave these phantom devices, and if Windows ever tells you it detected new hardware the next time you boot, tell Windows to ignore each one of those phantom devices as it pops up a dialog for each, asking you to choose a driver to install). Furthermore, for such phantom devices, you should highlight the name of each one in Device Manager, click on the Properties button, and remove the checkmark for "Original Configuration (current)". Leave only the real device (ie, the one whose IRQ and base is set to what your card really is using) enabled for "Original Configuration".
+
+<P>Furthermore, Device Manager can be used to identify possible hardware conflicts in your system. If you click upon the "Print" button, a dialog will pop up which allows you to print out a listing of what devices are using various IRQ, base I/O addresses, and DMA channels. (The dialog also offers an option, "print to file" to save this text listing in a file on your harddrive. The file will end in a .PRN extension. This is handy if you need to email your settings to tech support). If you look through this list and find a resource being used by more than one hardware device, that would indicate a likely hardware conflict. You should change the DIP switches or jumpers upon one of the devices (or if both devices are PnP, then try to use a software configuration utility to alter one of the device's resources. Better yet, make sure that you're using a PnP BIOS, and it's the latest version).
+
+
+
+
+<P><HR SIZE=5 NOSHADE>
+<P><H2><FONT COLOR=RED><A NAME="w8">When</A> I use Windows NT 4.0 (or Windows 2000 or Windows XP) Control Panel's "Add New Hardware", I can manually locate my sound card's INF file, and NT/2000/XP seems to install the card's Windows 95 driver. But my card does not appear to be operating at all under Windows NT/2000/XP. Why?</FONT></H2></P>
+
+<P>Windows NT/2000/XP uses an entirely different driver model than Windows 95, 98, ME, or Windows 3.1. Windows NT/2000/XP has a 32-bit driver model whereas Windows 3.1 and Windows 95/98/ME still have some 16-bit components in their sound card drivers. You cannot use Windows 3.1 or Windows 95/98/ME drivers under Windows NT/2000/XP. You need a Windows NT/2000/XP driver for your sound card. Although Windows NT/2000/XP recognizes the INF file for a Win3.1 or Win95/98/ME driver (since WinNT/2000/XP drivers also use the INF file for installation purposes), it may appear that WinNT/2000/XP has installed the 16-bit driver, but it can't use such a driver. Typically, you'll get some sort of error message that the driver is not readable when you reboot your system
+
+<P>Recently, Microsoft has created a new driver model (Windows Driver Model, or WDM) which works with both the Windows ME and 2000 and XP operating systems. So a WDM driver written for Windows ME will should work under 2000/XP (and vice versa). Of course, you would need a new driver for your sound card if you wanted one of these WDM drivers. Otherwise, Win2000/XP
+continues to support current Windows NT drivers (so if you can't specifically find a Windows XP driver, then at least try to find a Windows 2000 or Windows NT driver), and Win98 continues to support Win3.1 and Win95 drivers, but neither
+will be able to use the others' current drivers.
+
+</BODY></HTML>

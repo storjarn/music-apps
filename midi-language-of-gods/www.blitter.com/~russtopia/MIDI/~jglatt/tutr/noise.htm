@@ -1,0 +1,38 @@
+<HTML><HEAD><TITLE>Reducing noise on a sound card</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Cheap audio (ie. game) cards are not well known for their ability to reject picking up
+high frequency interference from nearby components. You may want to reposition 
+your cards in their ISA slots to determine if this noise is related to a card 
+next to the sound card. In particular, keep the sound card away from the video 
+or HD controller cards. If possible, leave the two ISA slots next to the sound 
+card empty.
+
+<P>You may even want to consider constructing some extra shielding around the
+sound card. What you do is get 2 thin pieces of copper or aluminum sheeting 
+approximately equal to the width/height of your sound card. Glue a thin piece 
+of cardboard (ie, cut up a shoe box) to each side of each metal sheet. (ie, You
+want to sort of encase each metal sheet in cardboard so that it doesn't make 
+direct contact with any nearby components, including on the sound card). Place 
+these 2 shields around the sound card (ie, one on each side). Connect an 
+insulated wire from each shield to the chassis ground. Furthermore, you should 
+make sure that your audio amp is plugged into the same grounded outlet as 
+you're using for the computer. Also, use shielded audio cables to connect your 
+card's audio outputs to the amp, to avoid picking up any noise from the ISA 
+backplate connector (which touches all of the cards in your ISA bus, and could
+possibly transmit noise between them. But hopefully, your card uses some sort
+of molded, plastic insulation around the output jack itself, so insulated 
+cables are just an extra, probably unnecessary precaution).</P>
+
+<P>But I doubt that any of the above will help you if the noise problem is a 
+result of the sound card's own generated noise from using parts with low Signal
+To Noise ratios. You can't make the components do more than they're designed to
+do. The above shielding will only eliminate noise that isn't supposed to be
+inherent in the card's design (ie, noise resulting from interference with other
+cards). The shielding won't make poor components on your card perform better
+than their design allows.</P>
+
+<P>The biggest source of noise in cards is a poor analog output stage and/or
+poor analog input stage. When you're not using the Line Input on your card, turn
+the volume all of the way down. Also, use the Line Output of the card and run it
+to your own powered speakers or amplifier. Avoid using the Speaker Output on the
+card.</P></BODY></HTML>

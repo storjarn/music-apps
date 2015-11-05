@@ -1,0 +1,75 @@
+<HTML><HEAD><TITLE>MIDI Specification: Running Status</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Running Status</CENTER></FONT></H2>
+
+<P>The MIDI spec allows for a MIDI message to be sent without its Status byte (ie, just its data bytes are sent) <U>as long
+as the previous, transmitted message had the same Status</U>. This is referred to as <B>running status</B>. Running
+status is simply a clever scheme to maximize the efficiency of MIDI transmission (by removing extraneous Status
+bytes). The basic philosophy of running status is that a device must always remember the last Status byte that it received
+(except for RealTime), and if it doesn't receive a Status byte when expected (on subsequent messages), it should assume
+that it's dealing with a running status situation. A device that generates MIDI messages should always remember the last
+Status byte that it sent (except for RealTime), and if it needs to send another message with the same Status, the Status byte
+may be omitted.
+
+<P>Let's take an example of a device creating a stream of MIDI messages. Assume that the device needs to send 3 Note
+On messages (for middle C, E above middle C, and G above middle C) on channel 0. Here are the 3 MIDI messages to
+which I'm referring.
+
+<PRE><B><FONT SIZE=3>0x90 0x3C 0x7F
+0x90 0x40 0x7F
+0x90 0x43 0x7F
+</B></FONT></PRE>
+
+Notice that the Status bytes of all 3 messages are the same (ie, Note On, Channel 0). Therefore the device could
+implement running status for the latter 2 messages, sending the following bytes:
+
+<PRE><B><FONT SIZE=3>0x90 0x3C 0x7F
+0x40 0x7F
+0x43 0x7F
+</B></FONT></PRE>
+
+This allows the device to save time since there are 2 less bytes to transmit. Indeed, if the message that the device sent
+before these 3 also happened to be a Note On message on channel 0, then the device could have omitted the first message's
+Status too.
+
+<P>Now let's take the perspective of a device receiving this above stream. It receives the first message's Status (ie, 0x90)
+and thinks "Here's a Note On Status on channel 0. I'll remember this Status byte. I know that there are 2 more data bytes
+in a Note On message. I'll expect those next". And, it receives those 2 data bytes. Then, it receives the data byte of the
+second message (ie, 0x40). Here's when the device thinks "I didn't expect another data byte. I expected the Status byte of
+some message. This must be a running status message. The last Status byte that I received was 0x90, so I'll assume that
+this is the same Status. Therefore, this 0x40 is the first data byte of another Note On message on channel 0".
+
+<P>Remember that a Note On message with a velocity of 0 is really considered to be a Note Off. With this in mind, you could
+send a whole stream of note messages (ie, turning notes on and off) without needing a Status byte for all but the first
+message. All of the messages will be Note On status, but the messages that really turn notes off will have 0 velocity. For
+example, here's how to play and release middle C utilizing running status:
+
+<PRE><B><FONT SIZE=3>0x90 0x3C 0x7F
+0x3C 0x00     <FONT COLOR=BLUE><-- This is really a Note Off because of 0 velocity</FONT>
+</B></FONT></PRE>
+
+<P>RealTime Category messages (ie, Status of 0xF8 to 0xFF) do not effect running status in any way. Because a RealTime
+message consists of only 1 byte, and it may be received at any time, including interspersed with another message, it should
+be handled transparently. For example, if a 0xF8 byte was received inbetween any 2 bytes of the above examples, the 0xF8
+should be processed immediately, and then the device should resume processing the example streams exactly as it would
+have otherwise. Because RealTime messages only consist of a Status, running status obviously can't be implemented on
+RealTime messages.
+
+<P>System Common Category messages (ie, Status of 0xF0 to 0xF7) cancel any running status. In other words, the
+message after a System Common message <U>must</U> begin with a Status byte. System Common messages
+themselves can't be implemented with running status. For example, if a Song Select message was sent immediately after
+another Song Select, the second message would still need a Status byte.
+
+<P>Running status is only implemented for Voice Category messages (ie, Status is 0x80 to 0xEF).
+
+<P>A recommended approach for a receiving device is to maintain its "running status buffer" as so:
+
+<OL>
+<LI>Buffer is cleared (ie, set to 0) at power up.</LI>
+<LI>Buffer stores the status when a Voice Category Status (ie, 0x80 to 0xEF) is received.</LI>
+<LI>Buffer is cleared when a System Common Category Status (ie, 0xF0 to 0xF7) is received.</LI>
+<LI>Nothing is done to the buffer when a RealTime Category message is received.</LI>
+<LI>Any data bytes are ignored when the buffer is 0.</LI>
+</OL>
+
+</FONT></BODY></HTML>

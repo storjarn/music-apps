@@ -13,7 +13,7 @@
             this.Port = null;
         },
         send: function() {
-            if (this.Port instanceof MIDIOutput) {
+            if (typeof MIDIOutput === 'function' && this.Port instanceof MIDIOutput) {
                 this.Port.send.apply(this.Port, arguments);
             }
         },

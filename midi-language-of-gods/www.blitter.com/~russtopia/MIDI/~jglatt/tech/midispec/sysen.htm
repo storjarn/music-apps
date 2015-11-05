@@ -1,0 +1,24 @@
+<HTML><HEAD><TITLE>MIDI Specification: GM System Enable/Disable</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>GM System Enable/Disable</CENTER></FONT></H2></P>
+
+<P>This Universal SysEx message enables or disables the <A HREF="../../tutr/gm.htm">General MIDI</A> mode of a sound module. Some devices have built-in GM modules or GM Patch Sets in addition to non-GM Patch Sets or non-GM modes of operation. When GM is enabled, it replaces any non-GM Patch Set or non-GM mode with a GM mode/patch set. This allows a device to have modes or Patch
+Sets that go beyond the limits of GM, and yet, still have the capability to be switched into a GM-compliant mode when desirable.
+
+<PRE><B><FONT SIZE=3>0xF0  <FONT COLOR=BLUE>SysEx</FONT>
+0x7E  <FONT COLOR=BLUE>Non-Realtime</FONT>
+0x7F  <FONT COLOR=BLUE>The SysEx channel. Could be from 0x00 to 0x7F.
+      Here we set it to "disregard channel".</FONT>
+0x09  <FONT COLOR=BLUE>Sub-ID -- GM System Enable/Disable</FONT>
+0x<FONT COLOR=RED>NN</FONT>  <FONT COLOR=BLUE>Sub-ID2 -- <FONT COLOR=RED>NN</FONT>=00 for disable, <FONT COLOR=RED>NN</FONT>=01 for enable</FONT>
+0xF7  <FONT COLOR=BLUE>End of SysEx</FONT>
+</FONT></B></PRE>
+
+<P>It is best to respond as quickly as possible to this message, and to be ready to accept incoming note (and other) messages soon after, as this message may be included at the start of a <A HREF="../midifile.htm">General MIDI file</A> to ensure playback by a GM module. Most modules are fully setup in GM mode by 100 milliseconds after receiving the GM System Enable message.
+
+<P>When GM Mode is first enabled, a device should assume that the "Grand Piano" patch (ie, the first GM patch) is the currently selected patch upon all 16 MIDI channels. The device should also internally <A HREF="ctloff.htm">reset all controllers</A> and assume the power-up state described in the <A HREF="../../tutr/gm.htm">General MIDI Specification</A>.
+
+<P>While GM mode is enabled, a device should also ignore Bank Select messages (since GM does not have more than one bank of patches). Only when the GM Disable message is received (with Sub-ID2 = 0 to disable GM mode) will a device then respond to
+Bank Select messages (and knock itself out of GM mode).
+
+</FONT></BODY></HTML>

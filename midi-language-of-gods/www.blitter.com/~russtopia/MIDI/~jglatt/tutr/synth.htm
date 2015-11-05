@@ -1,0 +1,142 @@
+<HTML><HEAD><TITLE>Difference between a synth and a sampler</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Both a synthesizer and sampler (player) are sound generating sources. That is, they make noises. Hopefully,
+they have the ability to play musical pitches (as in the notes of a scale)
+so that a human can use them to play a piece of music. The difference between
+the two is in how the devices make their noises.
+
+<HR><P>Generally, a synthesizer uses oscillators to make sounds. An oscillator
+is an electronic circuit which creates a frequency. In a synthesizer, these
+oscillators may create frequencies which the human ear can detect (ie,
+20-20000hz). A frequency in this range is called a "musical pitch" by a
+musician. For example, the A below middle C has a frequency of 440Hz. Other
+musical notes have different frequencies (and each has a unique frequency).
+These oscillators may be adjusted by a musician to output any frequency
+within human hearing. In other words, the oscillator can play ANY pitch.
+One control that a human might use to adjust the oscillator is the musical
+keyboard (ie, piano keyboard). This has a separate key for each of the
+pitches in the western scale. When the musician presses down the A key below
+middle C, an oscillator is turned on (so that it starts making noise), and
+it is adjusted so that it creates a frequency of 440hz. Viola! The A pitch
+is heard. Pressing a different key will cause the oscillator to produce the
+frequency for that particular musical pitch. Modern synthesizers usually have
+numerous oscillators so that a musician can play chords (ie, several notes
+simultaneously). Each oscillator plays one of the pitches of the chord.</P>
+
+<P>What will it sound like? Well, that depends upon the shape of the waveform
+that the oscillator produces. An oscillator can play that A (440hz) frequency
+with one of a variety of waveforms. Some common ones are: Sine, Square,
+Sawtooth, and Triangle waveforms. Each has a different "tone" to the human
+ear. (This tone is determined by the harmonic structure of the waveform. Each
+of these waveforms has a unique harmonic structure, so we hear each as being
+different than the others). Furthermore, some oscillators can be used to
+electronically modify other oscillators, thus affecting the sound. Lastly,
+there are such things as voltage controlled filters (VCF) and voltage
+controlled amplifiers (VCA) which are extremely important devices capable of
+modifying the sound.</P>
+
+<P>Synthesisors are very good at creating artificial sounds (ie, sounds that
+don't resemble any known acoustic instruments). This is because it is
+relatively easy to electronically manipulate oscillators to produce effects
+that aren't easy to duplicate on acoustic instruments, such as a very wide
+and deep vibrato effect, or ring modulation, etc. On the other hand,
+synthesizers can also be used to mimic real instruments. But, an oscillator
+usually produces a very simple, repetitive waveform which lacks the complexity
+of real instruments' waveforms with their harmonic and inharmonic overtone
+structures. So, it requires elaborate and costly circuitry (in the form of
+VCFs, VCAs, and VCOs) to synthesize most acoustic instruments well.</P>
+
+<P>Examples of synthesizers are the Sequential Circuits Prophet 5, Yamaha DX7,
+and Roland MT-32. Although these keyboards may use vastly different circuitry
+to produce oscillations, they all have circuits that do that (as opposed to
+sampling). The Commodore 64 used a chip that was akin to a synthesizer.
+Many computer cards have FM synthesis, which is another method of synthesizing
+sound comparable to having oscillators controlling other oscillators.</P>
+
+<HR><P>A sample player uses a DAC instead of an oscillator to make its sound. A
+DAC is a Digital to Analog Converter. This converts digital values
+(representing some waveform) into the analog signals that feed an audio
+speaker (so that we can hear the waveform). In other words, the DAC and its
+sample data replace the synthesizer's oscillators. Where do those digital values
+come from? They must either be calculated or sampled. Some software algorithm
+could do the former, but it would require some dedicated (and usually
+expensive) hardware to perform fancy waveform calculations at CD sampling rate
+(44KHz). On the other hand, a software program could calculate the data
+BEFORE playback provided that the computer has enough RAM to store the data.
+Alternately, an ADC (Analog To Digital Converter) can be used to create the
+sample data. This is the opposite of a DAC. A musician takes some real sound
+source (perhaps someone playing a note on a trumpet), places a microphone near
+that sound source, and samples it (ie, records a short "excerpt of sound" just
+like a tape recorder might record that trumpet) using an ADC. Of course, it
+takes a large amount of memory to store all of the data of even a few seconds
+of that trumpet sample. For example, to store a mere 2 seconds of a trumpet
+sound at a 16-bit, 44Khz sample rate would require about 176K of RAM. Now, in
+order to get that sound to sustain for longer than 2 seconds (with only 2
+seconds worth of data), part of the data must be looped; that is, the playback
+hardware (DAC) keeps repeating part of the data again and again while the
+musician holds down a key. To get different pitches, the sample data is played
+slower or faster (ie, data is sent to the DAC slower or faster) depending
+upon whether the musician wants a lower or higher pitch. Usually, a single
+pitch is sampled, for example, a musician samples a trumpet player sustaining
+only a middle C note. Then, using the voice architecture of the sampler,
+simultaneous, multiple playbacks of that one looped waveform can be played,
+with each instance being at a different pitch. In this way, for example, the
+musician can play a C Major chord (ie, C, E, and G notes) using that one
+looped waveform of the middle C note. Here's how that works: when the
+musician presses the middle C key, one of the sampler's "voices" (ie, the
+hardware that handles playing back digital audio data to a DAC) is put into
+action, and it starts playing back the waveform at the originally sampled
+speed, thus giving that middle C pitch. When the musician presses the E key,
+while still holding the C key, a second "voice" in the sampler is put into
+action, and that voice plays the waveform at a faster rate so that the
+middle C waveform is transposed up to an E pitch. Pressing the G key, while
+holding the other two, brings a third voice into action, in which the
+waveform is transposed all the way up to a G pitch. Now you have 3 different
+pitches derived from that one looped waveform of a middle C note, all
+playing polyphonically.</P>
+
+<P>A Sampler excels at reproducing the sounds of real acoustic instruments
+since it uses those very sources to obtain its waveform data. On the negative
+side, the complexity of these waveforms makes the process of looping them very
+difficult. Often, one can hear the telltale "thunk" of mismatched loop points
+or the "thin tone" of a too tight loop (ie, all of the "human" variances
+in volume and timbre that can typically be heard while a real musician
+sustains a note can't fit into a too short loop. That gives the loop an
+artificial, boring, sterile sound). Synthesizers don't have that problem.
+Also, samplers require large amounts of memory to store sample data. Finally,
+transposing a sample (ie, playing it at pitches above or below the original,
+recorded pitch) can produce unnatural effects with the waveform's envelope and
+pitch, although most samplers allow "multi-sampling" so that you can use
+several different waveforms recorded at various pitches to cover the MIDI
+note range, rather than trying to transpose a single waveform all the way
+up and down the entire keyboard.</P>
+
+<P>Examples of samplers include most of the keyboards made within the
+past few years such as EMU Emax and Proteus, Korg M1, Prophet 2000, Roland
+S770, and AKAI S1000. Also, many computer cards have "Wavetable synthesis"
+which means that the card has samples burned into a ROM chip inside of it,
+and these are played via a DAC.</P>
+
+<P>Furthermore, cards with digital audio tracks are a form of sampling. The
+main difference between MIDI samplers and digital audio cards is that the
+latter aren't designed to play looped waveforms. The digital audio card
+simply plays a WAVE file once from beginning to end at the rate at which it
+was originally sampled. This data is usually recorded directly to a Hard
+Drive, and then played back likewise. In other words, the card records/plays
+digital audio analogous to how a cassette tape recorder records/plays
+audio -- but the card uses a Hard Drive to store the audio data whereas
+the cassette player uses magnetic tape.</P>
+
+<P><B>NOTE:</B> The distinction between MIDI samplers and computer audio cards is becoming
+less distinct with newer cards that support "sample loading" whereby the GM
+sound module can load a short, looped WAVE file, usually of a single-pitch,
+and just like a MIDI sampler, play it polyphonically with transposition
+based upon which MIDI note triggers the playback. In essense, these new cards
+are like stripped-down MIDI samplers... but very stripped-down in terms of
+features that modify the playback in realtime.</P>
+
+<P>With MIDI samplers, each waveform is usually a single
+pitch which is then looped in order to allow the musician to sustain it as long
+as desired, and then its playback rate is transposed depending upon which
+musical note the musician presses on the keyboard.</P>
+</BODY></HTML>

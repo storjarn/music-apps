@@ -1,0 +1,52 @@
+<HTML><HEAD><TITLE>MIDI Specification: Note-On</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Note On</CENTER></FONT></H2>
+
+<P>Category: Voice
+
+<P><FONT COLOR=GREEN>Purpose</FONT>
+
+<P>Indicates that a particular note should be played. Essentially, this means that the note starts sounding, but some
+patches might have a long VCA attack time that needs to slowly fade the sound in. In any case, this message indicates that
+a particular note should start playing (unless the velocity is 0, in which case, you really have a <A HREF="noteoff.htm">Note Off</A>). If the
+device is a MultiTimbral unit, then each one of its Parts may sound Note Ons on its own channel. The Part that sounds a
+particular Note On message is the one assigned to the message's MIDI channel.
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0x90 to 0x9F where the low nibble is the MIDI channel.
+
+<P><FONT COLOR=GREEN>Data</FONT>
+<P>Two data bytes follow the Status.
+
+<P>The first data is the note number. There are 128 possible notes on a MIDI device, numbered 0 to 127 (where Middle C is
+note number 60). This indicates which note should be played.
+
+<P>The second data byte is the velocity, a value from 0 to 127. This indicates with how much force the note should be played
+(where 127 is the most force). It's up to a MIDI device how it uses velocity information. Often velocity is be used to tailor the
+VCA attack time and/or attack level (and therefore the overall volume of the note). MIDI devices that can generate Note On
+messages, but don't implement velocity features, will transmit Note On messages with a preset velocity of 64.
+
+<P>A Note On message that has a velocity of 0 is considered to actually be a Note Off message, and the respective note is
+therefore released. See the <A HREF="noteoff.htm">Note Off</A> entry for a description of such. This "trick" was created in order to take
+advantage of <A HREF="run.htm">running status</A>.
+
+<P>A device that recognizes MIDI Note On messages <U>must</U> be able to recognize both a real Note Off as well as a
+Note On with 0 velocity (as a Note Off). There are many devices that generate real Note Offs, and many other devices that
+use Note On with 0 velocity as a substitute.
+
+<P><FONT COLOR=GREEN>Errata</FONT>
+<P>In theory, every Note On should eventually be followed by a respective Note Off message (ie, when
+it's time to stop the note from sounding). Even if the note's sound fades out (due to some VCA envelope decay) before a
+Note Off for this note is received, at some later point a Note Off should be received. For example, if a MIDI device receives
+the following Note On:
+
+<PRE><B>0x90 0x3C 0x40   <FONT COLOR=BLUE>Note On/chan 0, Middle C, velocity could be anything except 0</FONT>
+</B></PRE>Then, a respective Note Off should subsequently be received at some time, as so:
+<PRE><B>0x80 0x3C 0x40   <FONT COLOR=BLUE>Note Off/chan 0, Middle C, velocity could be anything</FONT>
+</B></PRE>Instead of the above Note Off, a Note On with 0 velocity could be substituted as so:
+<PRE><B>0x90 0x3C 0x00   <FONT COLOR=BLUE>Really a Note Off/chan 0, Middle C, velocity must be 0</FONT>
+</B></PRE>If a device receives a Note On for a note (number) that is already playing (ie, hasn't been turned off yet), it the device's
+decision whether to layer another "voice" playing the same pitch, or cut off the voice playing the preceding note of that same pitch in
+order to "retrigger" that note.
+
+</FONT></BODY></HTML>

@@ -1,0 +1,102 @@
+<HTML><HEAD><TITLE>What is a Sequencer?</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+<CENTER><FONT COLOR=RED><B>Introduction</B></FONT></CENTER>
+
+<P><B>A sequencer is a machine that "plays" musical performances.</B> It tells equipment that can make musical sounds (ie, play
+pitches, chords, or make any kind of noise) <U>what</U> musical notes to play, and <U>when</U> to play them. <B>It does
+this using MIDI messages.</B></P>
+
+<P><HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Recording a musical performance using MIDI</B></FONT></CENTER></P>
+
+<P>Most sequencers allow a musician to record his performance into the sequencer just as if he were recording his
+performance upon a cassette tape. <U>But</U>, there is no tape involved, and the sequencer records MIDI messages instead of
+the actual sounds. (The messages are usually stored in RAM during recording, and later saved to a floppy disk or hard
+drive for permanent storage. Most sequencers today save the MIDI messages in <A HREF="midiform.htm">MIDI File
+Format</A> data files). In other words, the sequencer electronically records all of your finger, foot, what-have-you
+movements. It does this by storing all of the MIDI messages which the electronic musical instrument generates when you
+physically play that instrument.</P>
+
+<P>The sequencer also keeps track of a "musical beat" during the recording so that it can record the "rhythm" of your
+movements (ie, the rhythms of your playing). Usually, the sequencer generates a metronome sound which the musician follows
+during the recording phase in order to have the sequencer accurately capture his rhythms while it is storing the generated
+MIDI messages.</P>
+
+<P><HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Playing a musical performance using MIDI</B></FONT></CENTER></P>
+
+<P>Then, upon playback, the sequencer plays the instrument (that you just did) by electronically recreating all of your
+gestures. The sequencer does this by sending back (to that instrument's MIDI IN jack) those MIDI messages that the
+musical instrument generated when you played it. The sequencer doesn't have fingers, so it may send a MIDI message that
+tells an electronic keyboard to pretend that a human has just pressed middle C for example. The keyboard then sounds
+middle C.</P>
+
+<P>Sequencers can send MIDI messages that tell the keyboard to release a key that it played (ie, remove the finger from
+middle C), move the pitch wheel, press down a sustain pedal, turn the volume knob, etc. In other words, a sequencer
+can fully duplicate a musician's performance. (Note that the keyboard only pretends to do these things. That C key doesn't
+physically depress as if some ghost is sitting at the keyboard. It does make the appropriate musical pitch though, so it
+<U>sounds</U> as if there is a ghost playing the keyboard).</P>
+
+<P><HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Advantages of sequencers</B></FONT></CENTER></P>
+
+<P>A sequencer usually has a tempo control so that it can play the performance faster or slower. Unlike with digital
+audio playback, when you change the tempo of the MIDI sequencer's playback, it doesn't alter the pitch nor the timbre
+of the sound. (One exception to this general rule is the use of <A HREF="digaudio.htm#p2">time-stretching</A> to change
+the tempo of a digital audio recording of a musical performance). It alters only the tempo. So, a sequencer offers
+complete control of tempo independent of pitch or timbre changes. So too, this means that you can record a part at a
+slower tempo, and then speed up the playback without any change in timbre or pitch.</P>
+
+<P>MIDI sequencers also offer the facilities to easily transpose musical parts (to other key signatures),
+mute or solo individual parts, reroute musical parts to play upon various sound modules, and make many other changes
+in timbre/volume/panning/effects levels/etc to individual musical parts. These changes can all be (theoretically) done
+in real-time (ie, during playback) without time-consuming calculations made upon the data, unlike with digital
+audio playback.</P>
+
+<P>The sequencer may have many other features to easily edit the performance (even upon a per note basis) so that the
+sequencer can correct the mistakes that you recorded into it. It's infinitely easier than trying to correct mistakes
+recorded onto magnetic tape, or even digital audio recorders, which is why musicians use sequencers so much nowadays.</P>
+
+<P>Most sequencers offer the facility to enter notes (and other control data such as volume/pan/vibrato/etc settings)
+by "step-entering" the data. You don't have to play the musical part in real-time. Instead, you can slowly enter each
+musical note (and other setting), and specify what musical bar and beat upon which it gets "played". This is a boon to
+people whose musical technique is not sufficiently developed to physically play the musical parts in real-time. Some
+sequencers even offer very intuitive interfaces, such as allowing you to step-enter notes by clicking the mouse pointer
+upon a graphical sheet of music manuscript drawn upon the screen. Digital audio recorders do not typically have such
+features. With digital audio recorders, you pretty much have to be able to play some musical parts.</P>
+
+<CENTER>
+<P><TABLE BORDER=0 CELLSPACING=20 NOWRAP>
+<TR>
+<TD><IMG SRC="whatseq1.gif" WIDTH=521 HEIGHT=226 ALT="Step entry on a staff" BORDER=0></TD>
+</TABLE></P>
+</CENTER>
+
+<BLOCKQUOTE><FONT COLOR=BROWN>An example of step entry upon Cakewalk's staff view. I moved the pencil over the staff
+where a G note would occur upon the second beat, and clicked once. This inserted a G note. Because
+I have the quarter note length button depressed, a quarter note is inserted upon that beat.</FONT></BLOCKQUOTE>
+
+<P>A specialized breed of sequencers called "Algorithmic Composition programs" even have the capacity to create
+a complete musical arrangement on your behalf. See <A HREF="algorith.htm">Algorithmic Composition</A> for more details.
+Digital audio recorders do not offer such a feature.</P>
+
+<P><HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Computers as sequencers</B></FONT></CENTER></P>
+
+<P>Most computers have software programs which turn the computer into a sequencer. With a sound card installed inside of
+the computer, the sequencer can playback musical performances without even needing external MIDI
+<A HREF="define.htm#module">sound modules</A> (since most sound cards now have an internal, multitimbral General MIDI
+module, usually a wavetable synth, that can recognize and properly "play" the MIDI messages that the sequencer outputs to
+the sound card's driver).</P>
+
+<P>Examples of sequencer software are CakeWalk, Cubase, Logic, Mark of the Unicorn, etc. There are many such programs, as
+sequencers are perhaps the most often used tools in music production.</P>
+
+<P>An example of a very simple sequencer is Windows MultiMedia Player. This software does not have any facility to record
+MIDI messages, nor edit them. It can only playback a MIDI performance (stored in MIDI File Format). Such <B>simple
+"playback only" sequencers are often called "MIDI Players".</B></P>
+
+<P><HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Support for digital audio playback</B></FONT></CENTER></P>
+
+<P>Because MIDI controls only electronic instruments, and can't record the sound of acoustic instruments or human voice,
+digital audio recording/playback is a feature that is often added to sequencers. The sequencer is designed to
+record/playback tracks of digital audio in sync with the MIDI tracks. See
+<A HREF="digaudio.htm">Digital Audio on a computer</A> for more information about digital audio recording/playback.</P>
+
+</BODY></HTML>

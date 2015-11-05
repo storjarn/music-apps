@@ -1,0 +1,290 @@
+<HTML><HEAD><TITLE>Programming the MPU-401</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+<H1><CENTER><FONT COLOR=GREEN>Programming the MPU-401 in UART mode</FONT></CENTER></H1>
+
+<P><B>NOTE:</B> This document assumes that your program needs to manipulate the MPU-401 hardware directly. Under MS-DOS, you need to do this.
+
+<P>For operating systems such as Windows and OS/2, an application should instead use the operating system functions to do I/O to the MPU-401 (ie, for Windows, see the article <A HREF="winapi.htm">Windows MIDI and Digital Audio Programming</A>). In this case, the information contained herein is only useful if you're writing an MPU-401 device driver for these operating systems.
+
+<P><H2>Background</H2>
+
+<P>The Roland MPU-401 is a MIDI interface card for the IBM PC. It has 2 modes of operation: <B>Intelligent</B> and <B>Uart</B> modes.
+
+<P>In Intelligent mode, the MPU uses its onboard circuitry to provide lots of services to an application. For example, the MPU has an onboard hardware timer that it uses to time-stamp incoming MIDI events, and can be used to determine when to output MIDI events for sequenced playback. The MPU-401 also has an internal metronome that can be set to automatically beep at a rate relative to this timer. There are lots of other useful services that Intelligent mode provides such as managing FSK tape and MTC/SMPTE sync (on some models) and data filtering.
+
+<P>Intelligent mode does quite a bit, and therefore requires the app to supply a rather elaborate interrupt handler, since the MPU needs to
+interrupt the computer for so many various purposes. Furthermore, the MPU is designed to act as the controller. The MPU uses its onboard timer to tell the app when it's time to output the next MIDI message. It doesn't easily let the app use that timer for its own purposes (ie, the app has no direct access to the timer). And when the MPU tells the computer to fed it another byte, the app <U>must</U> do so <U>immediately</U>. The MPU will refuse to do anything else, including even allowing the app to send the MPU a command to do something, until the MPU gets exactly what it asked for. Furthermore, the MPU doesn't have lots of ports for controlling it. It only has 2 bi-directional ports which must serve various purposes, so figuring out what the MPU is doing can be a convoluted process. Finally, unless you're writing a MIDI sequencer, many of the MPU's Intelligent mode functions aren't needed, and in fact, can make things more complicated than need be. Because of all this, Intelligent mode is often not too flexible for an app. It was really designed to help old, slow 8086 computers, by letting the MPU do some of the work of a sequencer. It wasn't designed for flexibility.
+
+<P>UART mode discards all of the above features, and turns the MPU into a simple device that is a slave to the computer. The MPU merely outputs each MIDI byte whenever the app writes that byte to the MPU, and lets the app read incoming MIDI bytes whenever the app chooses to read from the MPU. The app has a lot more control over when it chooses to output and input bytes. Of course, a sequencer app has to manage its own timer for sequencing, and implement a metronome, and do many of the other things that Intelligent mode does. But most modern computers run fast enough that it's no problem for sequencer software to take on all of these duties, and modern OS's like Windows even provide APIs that help manage these duties. Add to the fact that the interrupt handler for UART mode is typically <U>much</U> simpler, and
+very few other computer cards implement Intelligent mode (so an app that works with other cards has to do all of these duties <U>anyway</U>), are some of the reasons why Intelligent mode is hardly ever used today.
+
+<P>Because of the success of the original MPU-401, many <U>ISA</U> computer cards that offer a built-in MIDI interface, are designed to be hardware compatible with the MPU-401, but most implement UART mode only. (PCI cards, as well as interfaces that attach to the serial, parallel, or USB ports have <U>no</U> MPU hardware compatibility whatsoever, and the techniques shown below will not work with those cards).
+
+<P><H2>MPU Ports</H2>
+
+<P>The MPU-401 is an 8-bit card. It has 2, 8-bit ports: <B>DATA</B>, and <B>STATUS\COMMAND</B>. The MPU can be set to various base (I/O) addresses. If it is at the default base address of 330 (hex), then the DATA port is at 330, and the STATUS\COMMAND port is at 331.
+
+<P>The DATA port is where you input and output MIDI bytes. This port is bi-directional. That is, you write to this port when you output MIDI bytes to the MPU, and you read from this same port when you input MIDI bytes from the MPU. The MPU also sends its acknowledge byte (for commands) to the DATA port, so that's also where your app reads any command acknowledge from the MPU. When in Intelligent mode, the MPU also sends other non-MIDI bytes to the DATA port for you to read and decipher in order to discover something the MPU wants you to know about, such as when the MPU's timer has overflowed. I'll call these "MPU Operation bytes". It's this intermixing of MIDI and Operation bytes to the DATA port which makes Intelligent mode so convoluted to utilize. Fortunately, in Uart mode, you never read anything but MIDI bytes from the DATA port, with the exception of an ACK if you send a Reset command.
+
+<P>The STATUS\COMMAND port is also bi-directional. When you write to this port, it's the COMMAND port. This is where you write MPU command bytes (ie, not MIDI bytes) to the MPU. The MPU's Intelligent mode has a large command set. For example, the command byte 85 (hex) starts the MPU's metronome beeping (at a rate that is set by other MPU commands). Most all of these commands are ignored and not implemented when the MPU is in Uart mode. In Uart mode, the MPU recognizes only 1 command; the command to put it back into Intelligent mode, the Reset command. So there. After you write a command byte to the COMMAND port, the MPU acknowledges this command. How does the MPU acknowledge? It sends an FE (hex) byte to its DATA port. So, after you write a byte to the COMMAND port, you need to keep reading bytes from the DATA port until you encounter an FE byte. Keep in mind that any other bytes you read before this FE are MIDI bytes (or Operation bytes if the MPU is in Intelligent mode) which you should be prepared to handle while you're waiting for that FE.
+
+<P>When you read from the STATUS\COMMAND port, it's the STATUS port. The 8-bit byte that you read from this port gives you information about the status of the MPU. The highest bit (7) of this byte is the state of the DATA SET READY (DSR) line. This bit will be clear (0) if the MPU has some incoming MIDI byte (or Ack byte or Operation byte) waiting for you to read. The DSR line will remain low until you've read all of the bytes that the MPU has waiting in its hardware input buffer. You should continue reading bytes from the DATA port until the DSR bit of the STATUS port toggles to a 1 (ie, sets). When that happens, the MPU has no more bytes waiting to be read. The next highest bit (6) is the state of the DATA READ READY (DRR) line. This bit will be clear whenever it's OK for you to write a byte to the MPU's DATA or COMMAND ports. The MPU sets bit 6 of the STATUS port whenever it is <U>not</U> ready for you to write a byte to the DATA or COMMAND ports. You should always make sure that DRR is clear before writing each byte to the MPU's DATA or COMMAND ports. (The MPU will not clear DRR if it has an incoming MIDI byte waiting for you to read, ie, whenever DSR is set. Keep this mind if you try to do polled input instead of using an interrupt handler for input. If you don't install an interrupt handler for MPU MIDI input, you must always check DSR in <U>all</U> of your program loops, and be prepared to read the MPU's DATA port whenever DSR is set).
+
+<P><H2>Uart mode</H2>
+
+<P>When an MPU powers up, it defaults to Intelligent mode (ie, assuming it supports such. Devices which only implement Uart mode typically power up in Uart mode). So, in order to use Uart mode, you need to put the MPU into Uart mode. You do this by sending the command byte 3F (hex) to the MPU's COMMAND port.
+
+<P>Before you do this, it's a good idea to reset the MPU by sending the command byte FF to the COMMAND port. This is the Reset command. Besides clearing out the MPU's input buffer, and running status, this command actually puts the MPU into Intelligent mode. After you send the MPU a command byte, you need to wait for that acknowledge byte from the MPU (ie, at the DATA port). After you get that acknowledge, you can follow up by writing the 3F command byte to kick the MPU into UART mode. Normally, you'd wait for an acknowledge to each written command byte, but the 3F command is an exception. The MPU does not send an acknowledge for this one command, and instead launches right into Uart mode. You're home free now. All you need to do is install your interrupt handler to read incoming MIDI bytes (assuming you want interrupt-driven input as opposed to doing polled input). With output, you need to do polling. The MPU doesn't interrupt the computer after its done outputting a byte.
+
+<P>Here are some 80x86 functions (for MASM) to help you get started using the MPU.
+
+<PRE>
+DataPort dw 330h ;Change this to whatever base address your MPU is at
+StatPort dw 331h ;Change this 1 greater than whatever base address your
+                 ;MPU is at
+
+;************************** is_input() ****************************
+; Checks if there is a byte waiting to be read from the MPU. Clears
+; the Z flag if so. Sets the Z flag if not.
+;
+; Uses registers AL DX
+
+<B>is_input</B> proc near
+     ;---Return state of DATA SET READY. MPU clears this line when it
+     ;   has a byte waiting to be read from its DATA port.
+     mov   dx,StatPort
+     in    al,dx
+     and   al,80h
+     ret
+is_input endp
+
+;************************** get_mpu_in() ***************************
+; Reads a byte from the MPU's DATA port. Returns the byte in AL.
+;
+; Uses register DX
+
+<B>get_mpu_in</B> proc near
+     mov   dx,DataPort
+     in    al,dx
+     ret
+get_mpu_in endp
+
+;************************** is_output() ****************************
+; Checks if it's OK to write a byte to the MPU's COMMAND or DATA ports.
+; Clears the Z flag if so. Sets the Z flag if not.
+;
+; Uses registers AL DX
+
+<B>is_output</B> proc near
+     ;---Return state of DATA READ READY. MPU clears this line when it's
+     ;	 OK for us to write to the MPU's ports.
+     mov   dx,StatPort
+     in    al,dx
+     and   al,40h
+     ret
+is_output endp
+
+;************************* put_mpu_out() ***************************
+; Writes a byte to the MPU's DATA port. The byte is passed in AL.
+;
+; Uses register DX
+
+<B>put_mpu_out</B> proc near
+     mov   dx,DataPort
+     out   dx,al
+     ret
+put_mpu_out endp
+
+;************************** set_uart() ****************************
+; Sets the MPU into Uart mode. If an interrupt handler is already
+; installed for the MPU, then you should disable that interrupt
+; before calling this.
+;
+; Uses registers AL DX
+
+<B>set_uart</B> proc near
+     ;---Wait until it's OK to write to the MPU's ports. Note: if there's
+     ;   something wrong with the MPU, we could be locked in this loop
+     ;   forever. You really should add a little "escape code" within this
+     ;   first loop, or at least a timeout of let's say 1 second.
+sr1: call  is_output
+     jnz   SHORT sr1
+     ;---Send FF command to the MPU.
+     mov   al,0FFh
+     out   dx,al
+     ;---Wait for the MPU to make a byte available for reading from its
+     ;   DATA port. You could also lock up here if you're dealing with
+     ;   a game card that doesn't even implement a bi-directional
+     ;   COMMAND/STATUS port. Therefore, another few seconds time-out is
+     ;   appropriate here, and if a time-out occurs, just jump to sr3.
+again:
+     call  is_input
+     jnz   SHORT again
+     ;---Get the byte and check for an ACK (FE) to the cmd we sent. If
+     ;   not an ACK, discard this and keep looking for that ACK.
+     call  get_mpu_in
+     cmp   al,0FEh
+     jne   SHORT again
+     ;---Wait until it's OK to write to the MPU's ports.
+sr3: call  is_output
+     jnz   SHORT sr3
+     ;---Send 3F command to the MPU
+     mov   al,03Fh
+     out   dx,al
+     ret
+set_uart endp
+</PRE>
+
+First of all, <u>before</u> you install any interrupt handler for MIDI input, put the MPU into Uart mode by calling set_uart(). When this call returns, you can then install an interrupt handler for MPU input. (Consult an MS-DOS book for how to write and install an interrupt handler. By default, the MPU-401 uses IRQ #9, although modern versions have jumpers for setting IRQ). Whenever the MPU receives an incoming MIDI byte, it will interrupt the computer. In your interrupt handler, you should keep reading bytes from DATA port while DSR is low. Here's how you do that:
+
+<PRE>
+    ;---Is there another byte waiting to be read?
+more:
+    call  is_input
+    jnz   SHORT done
+    ;---Yes there is. Read it.
+    call  get_mpu_in
+
+    ;OK. We got the byte in AL. Normally, we'd store it somewhere. But,
+    ;I'm just going to throw it away because this is a do-nothing tutorial.
+
+    ;---Now go back and see if there's another byte waiting to be read.
+    jmp   SHORT more
+done:
+</PRE>
+
+There's just one thing I want to stress. Never, never end your MPU interrupt handler without making sure that you've read all waiting bytes. (ie, Make sure that DSR is clear). If you end your handler leaving DSR set, then the MPU will not cause any further interrupts. If you do lots of other things in your MPU interrupt after you read all bytes, it's best to make one last, further check with is_input() before ending your interrupt handler.
+
+<P>Now whenever you want to output a MIDI byte to the MPU, you need to check if it's OK to do so, and then write it to the DATA port. Here's how you do that:
+
+<PRE>
+    ;---Is it OK to write the MPU ports?
+wait:
+    call  is_output
+    jnz   SHORT wait ;No it isn't. We have to wait.
+    ;---Write the byte. Just for illustration, I'll output a MIDI Clock
+    mov   al,0F8h
+    call  put_mpu_out
+</PRE>
+
+Note that in the above example, we wait for the MPU to be ready to accept a MIDI byte. The MPU may be in the process of outputting a previously written MIDI byte. After all, MIDI transmission is really slow. You may not want to wait for the MPU to finish with that other byte before it lets you write a new byte. Instead, whenever is_output sets the Z flag, you may want to postpone MIDI output, go do something else, and then come back to calling is_output.
+
+<P>Here are the above functions in C.
+
+<PRE><FONT SIZE=3><B><FONT COLOR=GREEN>unsigned short</FONT> DataPort = 0x330; <FONT COLOR=BROWN>/* Change this to whatever base
+                       address your MPU is at */</FONT>
+<FONT COLOR=GREEN>unsigned short</FONT> StatPort = 0x331; <FONT COLOR=BROWN>/* Change this 1 greater than whatever
+                       base address your MPU is at */
+
+/************************** is_input() ****************************
+ Checks if there is a byte waiting to be read from the MPU. Returns
+ 0 if so. Returns non-zero if not.
+*/</FONT>
+
+<FONT COLOR=GREEN>unsigned char</FONT> is_input(<FONT COLOR=GREEN>void</FONT>)
+{
+    <FONT COLOR=BROWN>/* Return state of DATA SET READY. MPU clears this line when it
+       has a byte waiting to be read from its DATA port. */</FONT>
+    <FONT COLOR=GREEN>return</FONT>(inp(StatPort) & 0x80);
+}
+
+<FONT COLOR=BROWN>/************************** get_mpu_in() ***************************
+ Reads a byte from the MPU's DATA port. Returns that byte.
+*/</FONT>
+
+<FONT COLOR=GREEN>unsigned char</FONT> get_mpu_in(<FONT COLOR=GREEN>void</FONT>)
+{
+    <FONT COLOR=GREEN>return</FONT>(inp(DataPort));
+}
+
+<FONT COLOR=BROWN>/************************** is_output() ****************************
+ Checks if it's OK to write a byte to the MPU's COMMAND or DATA ports.
+ Returns 0 if so. Returns non-zero if not.
+*/</FONT>
+
+<FONT COLOR=GREEN>unsigned char</FONT> is_output(<FONT COLOR=GREEN>void</FONT>)
+{
+    <FONT COLOR=BROWN>/* Return state of DATA READ READY. MPU clears this line when it's
+       OK for us to write to the MPU's ports. */</FONT>
+    <FONT COLOR=GREEN>return</FONT>(inp(StatPort) & 0x40);
+}
+
+<FONT COLOR=BROWN>/************************* put_mpu_out() ***************************
+ Writes the passed byte to the MPU's DATA port.
+*/</FONT>
+
+<FONT COLOR=GREEN>void</FONT> put_mpu_out(<FONT COLOR=GREEN>unsigned char</FONT> data)
+{
+     outp(DataPort, data);
+}
+
+<FONT COLOR=BROWN>/************************** set_uart() ****************************
+ Sets the MPU into Uart mode. If an interrupt handler is already
+ installed for the MPU, then you should disable that interrupt
+ before calling this.
+*/</FONT>
+
+<FONT COLOR=GREEN>void</FONT> set_uart(<FONT COLOR=GREEN>void</FONT>)
+{
+     <FONT COLOR=BROWN>/* Wait until it's OK to write to the MPU's ports. Note: if there's
+      something wrong with the MPU, we could be locked in this loop
+      forever. You really should add a little "escape code" within this
+      first loop, or at least a timeout of 1 second. */</FONT>
+    <FONT COLOR=GREEN>while</FONT>(is_output());
+
+     <FONT COLOR=BROWN>/* Send FF command to the MPU. */</FONT>
+     outp(StatPort, 0xFF);
+
+again:
+     <FONT COLOR=GREEN>do</FONT>
+     {
+        <FONT COLOR=BROWN>/* Wait for the MPU to make a byte available for reading from
+           its DATA port.
+           Note that you could also lock up here if you're dealing with
+           a game card that doesn't even implement a bi-directional
+           COMMAND/STATUS port. Therefore, a few second time-out is
+           appropriate here, and if a time-out occurs, jump to skipit. */</FONT>
+        <FONT COLOR=GREEN>while</FONT>(is_input());
+
+        <FONT COLOR=BROWN>/* Get the byte and check for an ACK (FE) to the cmd we sent.
+           If not an ACK, discard this and keep looking for that ACK. */</FONT>
+     } <FONT COLOR=GREEN>while</FONT> (get_mpu_in() != 0xFE);
+
+skipit:
+     <FONT COLOR=BROWN>/* Wait until it's OK to write to the MPU's ports. */</FONT>
+     <FONT COLOR=GREEN>while</FONT>(is_output());
+
+     <FONT COLOR=BROWN>/* Send 3F command to the MPU. */</FONT>
+     outp(StatPort, 0x3F);
+}
+</B></FONT></PRE>
+
+Here's an example of reading input:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=GREEN>unsigned char</FONT> data;
+
+     <FONT COLOR=BROWN>/* Is there another byte waiting to be read? */</FONT>
+     <FONT COLOR=GREEN>while</FONT>(!is_input())
+     {
+       <FONT COLOR=BROWN>/* Yes there is. Read it. */</FONT>
+       data = get_mpu_in();
+
+       <FONT COLOR=BROWN>/* OK. We got the byte. Normally, we'd store it somewhere. But,
+       I'm just going to throw it away because this is a do-nothing
+       tutorial. */</FONT>
+     }
+</B></FONT></PRE>
+Here's an example of writing a byte:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>    /* Is it OK to write the MPU ports? */</FONT>
+    <FONT COLOR=GREEN>while</FONT>(is_output());
+
+    <FONT COLOR=BROWN>/* Write the byte. Just for illustration, I'll output a MIDI Clock */</FONT>
+    put_mpu_out(0xF8);
+</B></FONT></PRE>
+
+<HR>
+<H2>Errata</H2>
+
+<P>As mentioned, most cards implement only UART mode. But some cheap game cards don't even bother implementing a bi-directional COMMAND/STATUS port. They implement only the STATUS port. (The assumption is that, because UART mode doesn't support any commands except the FF command to knock an MPU back into intelligent mode, there's no reason to have a COMMAND port in a UART only card. Instead, the manufacturer saves a few pennies on parts). The implication here is that if you call set_uart(), it will lock up forever in the again loop (ie, while waiting for the ACK). Why? Because the card will never process any command and therefore never ACK to something that the card completely ignores. That's why I recommend adding the timeouts as noted above to set_uart() if you're not sure that you're dealing with a properly designed MPU Uart mode.
+
+</BODY></HTML>

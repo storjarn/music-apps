@@ -1,0 +1,34 @@
+<HTML><HEAD><TITLE>MIDI Specification: MIDI Clock</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>MIDI Clock</CENTER></FONT></H2></P>
+
+<P>Category: System Realtime
+
+<P><FONT COLOR=GREEN>Purpose</FONT>
+<P>Some master device that controls sequence playback sends this timing message to keep a slave device in sync with the
+master. A MIDI Clock message is sent at regular intervals (based upon the master's Tempo) in order to accomplish this.
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0xF8
+
+<P><FONT COLOR=GREEN>Data</FONT>
+<P>None
+
+<P><FONT COLOR=GREEN>Errata</FONT>
+<P>There are 24 MIDI Clocks in every quarter note. (12 MIDI Clocks in an eighth note, 6 MIDI Clocks in a 16th,
+etc). Therefore, when a slave device counts down the receipt of 24 MIDI Clock messages, it knows that one quarter note
+has passed. When the slave counts off another 24 MIDI Clock messages, it knows that another quarter note has
+passed. Etc. Of course, the rate that the master sends these messages is based upon the master's tempo. For example,
+for a tempo of 120 BPM (ie, there are 120 quarter notes in every minute), the master sends a MIDI clock every 20833
+microseconds. (ie, There are 1,000,000 microseconds in a second. Therefore, there are 60,000,000 microseconds in a
+minute. At a tempo of 120 BPM, there are 120 quarter notes per minute. There are 24 MIDI clocks in each quarter
+note. Therefore, there should be 24 * 120 MIDI Clocks per minute. So, each MIDI Clock is sent at a rate of
+60,000,000/(24 * 120) microseconds).
+
+<P>A slave device might receive (from a master device) a Song Select message to cue a specific song to play (out of several songs), a Song Position
+Pointer message to cue that song to start on a particular beat, a MIDI Continue in order to start playback from that beat,
+periodic MIDI Clocks in order to keep the playback in sync with the master, and eventually a MIDI Stop to halt
+playback. See <A HREF="seq.htm">Syncing Sequence Playback</A>.
+
+
+</FONT></BODY></HTML>

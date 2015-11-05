@@ -1,0 +1,1675 @@
+<HTML><HEAD><TITLE>Mixer API</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+In order to understand how the Mixer API works, it's important to first understand the hardware
+layout of a typical audio card. It's necessary to be able to visualize an audio card as having
+distinct, but interconnected, components upon it.
+
+<P>Let's consider a typical, basic audio card. First of all, if the audio card is capable of
+recording digital audio, then it typically has a microphone input jack (with some sort of
+pre-amp), and it also has an analog-to-digital converter (ADC) to convert that analog microphone
+signal to a digital stream. Therefore, it has two components -- the Microphone input component,
+and the ADC component. The Microphone input is piped into the ADC. So, we can represent the
+layout with the following block diagram showing two components, with the signal flow between
+them (ie, the arrow)
+
+<P><CENTER><IMG src="mixer1.gif" WIDTH=92 HEIGHT=138></CENTER>
+
+<P>A typical audio card is also capable of playing back digital audio, so it has a DAC to convert
+the digital stream back to an analog signal, and also it has a speaker output jack (ie, with some
+sort of analog amplifier). Therefore, it has two more components -- the DAC component, and the
+Speaker component. The DAC output is piped to the speakers.
+
+<P><CENTER><TABLE NOBORDER WIDTH=200 HEIGHT=92 NOWRAP>
+<TR>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer1.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer2.gif" WIDTH=92 HEIGHT=138></TD>
+</TR>
+</TABLE></CENTER>
+
+<P>A typical audio card may have some other components. For example, it may have a built-in sound
+module (ie, synth) capable of playing MIDI data. The audio output of this component would
+typically be piped to the speaker output just like the DAC. So, our block diagram now looks like so:
+
+<P><CENTER><TABLE NOBORDER WIDTH=300 HEIGHT=92 NOWRAP>
+<TR>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer1.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer3.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer2.gif" WIDTH=92 HEIGHT=138></TD>
+</TR>
+</TABLE></CENTER>
+
+<P>So too, a typical audio card has a connector to (internally) attach the audio out of the
+computer's CDROM drive (so that an audio CD played in that CDROM drive will sound through the
+computer's speakers). This component is also piped to the speaker output, just like the Synth
+and DAC. Now, our block diagram looks like this:
+
+<P><CENTER><TABLE NOBORDER WIDTH=400 HEIGHT=92 NOWRAP>
+<TR>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer1.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer3.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer2.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer4.gif" WIDTH=92 HEIGHT=138></TD>
+</TR>
+</TABLE></CENTER>
+
+<P>Finally, let's assume that this audio card has a Line In component so that the audio
+signal from an external tape deck or musical instrument or external hardware mixer can be
+attached to this jack and digitized. This component is piped to the ADC component just like
+the Microphone Input component. Here is our finished block diagram which contains 7 components
+(and 5 signal flows -- the arrows that interconnect them):
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=500 HEIGHT=92 NOWRAP>
+<TR>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer5.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer1.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer3.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer2.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer4.gif" WIDTH=92 HEIGHT=138></TD>
+</TR>
+</TABLE></CENTER>
+
+<P>Typically, each one of these components has its own, individual parameters. For example,
+the Synth will usually have its own volume (gain) level. The Internal CD Audio will have its own
+volume level. And the DAC (ie, digital audio, or WAVE playback) will have its own volume level.
+In this way, if the user is playing an audio CD, playing a MIDI file, and playing back a WAVE
+file, simultaneously, he can balance out the volumes of all 3 components as they
+are being output to the speaker jack. So too, the speaker component will typically have its
+own volume -- a Master volume that affects the overall mix of the 3 components piped to the
+speaker out.
+
+<P>Likewise, the Line In and Microphone Input typically have separate volume levels so they can
+be balanced when recording simultaneously from both jacks. And the ADC may have some sort of
+Master Volume which affects the overall recording level of the 2 components piped to it.
+
+<P>A given component may have other parameters that are controllable. For example, each of the
+above components may have its own Mute switch so that the component's sound can be quickly turned
+on/off.
+
+<H2><FONT COLOR="#FF8040">The Mixer device</FONT></H2>
+
+<P>A given audio card has one Mixer device associated with it. All of the various components on
+that card are controlled through that card's one Mixer device. The Windows Mixer API is used to
+access the card's Mixer device. The Mixer API has functions to get a listing of all the various
+components on a particular card, and to adjust all of their parameters. This is a new API added
+to Win95/98 and WinNT (4.X and above), although an add-on to Windows 3.1 makes it available to
+that older OS.
+
+<P><FONT COLOR=RED>NOTE:</FONT> A card's device driver needs extra support to work with the Mixer
+API. Not all Win95 and WinNT drivers have this support. Win3.1 drivers typically do not.
+
+<P>In any computer, there can be more than one installed audio card. You already discovered that
+Windows maintains lists of all of the WAVE and MIDI input/output devices in a system. Since each
+installed audio card has its own Mixer device too (as long as its driver supports such),
+Windows also maintains a list of Mixer devices installed in a system. So for example, if you have
+two audio cards installed in a given system, then there should be two Mixer devices installed as
+well (assuming that the drivers for both audio cards support the mixer API).
+
+<P>Just like with the WAVE and MIDI input/output devices, Windows assigns a numeric ID to each
+Mixer device. So, the Mixer device with an ID of 0 is the first (default) mixer in the system.
+If there is a second audio card, then there should be a second Mixer device with an ID of 1.
+
+<P>Just like with other devices, in order to use a Mixer device, you must first open it
+(with mixerOpen()), and then you may call other Mixer APIs to control the card's line inputs/outputs.
+When finished, you must close the device (with mixerClose())
+
+<H2><FONT COLOR="#FF8040">Opening a Mixer device</FONT></H2>
+
+How does your program choose a mixer device to manipulate? There are several different approaches
+you can take, depending upon how fancy and flexible you want your program to be.
+
+<P>If you simply want to open the preferred Mixer device, then use a Device ID of 0 with
+mixerOpen() as so:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=GREEN>unsigned long</FONT> err;
+HMIXER        mixerHandle;
+
+<FONT COLOR=BROWN>/* Open the mixer associated with the default
+   Audio/MIDI card in the computer */</FONT>
+err = mixerOpen(&mixerHandle, 0, 0, 0, 0);
+<FONT COLOR=GREEN>if</FONT> (err)
+{
+    printf("ERROR: Can't open Mixer Device! -- %08X\n", err);
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    <FONT COLOR=BROWN>/* The mixer device is now open, and its
+      handle is in the variable 'mixerHandle'.
+      You may now use it with other Mixer API
+      functions */</FONT>
+}
+</B></FONT></PRE>
+
+<P>Of course, if the user has no Mixer device installed, the above call returns an error, so
+always check that return value. (The expected error numbers from the Mixer API's are listed
+in MMSYSTEM.H. Unfortunately, unlike with the Wave and Midi low level API's, there is no
+API function to translate these error numbers into strings to present to the user).
+
+<P>So what actually is the preferred Mixer device? Well, that's whatever Mixer device happened to
+have been installed first in a system. If there is only one audio card in the system, then it's a
+good bet that you have the mixer device you want. But, what if you're trying to use the Wave
+Output on a second audio card? You definitely don't want to be using the Mixer device for the
+first card to control the second card's Wave Out volume. (The first card's Mixer doesn't control the
+second card's Wave Output).
+
+<P>So, how do you open the Mixer for the desired card? Fortunately, mixerOpen() allows you to
+pass the device ID or the open handle of some other device associated with desired card. In that
+case, mixerOpen() will ensure that it returns the Mixer device associated with that card's
+other device. So for example, here's how you would open the default WAVE OUT device (ie, the
+WAVE OUT on the default card), and then get the handle to that card's Mixer device:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=GREEN>unsigned long</FONT> err;
+HMIXER        mixerHandle;
+WAVEFORMATEX  waveFormat;
+HWAVEOUT      hWaveOut;
+
+<FONT COLOR=BROWN>/* Open the default WAVE Out Device, specifying my callback.
+   Assume that waveFormat has already been initialized as desired */</FONT>
+err = waveOutOpen(&hWaveOut, WAVE_MAPPER, &waveFormat, (DWORD)WaveOutProc, 0, CALLBACK_FUNCTION);
+<FONT COLOR=GREEN>if</FONT> (err)
+{
+    printf("ERROR: Can't open WAVE Out Device! -- %08X\n", err);
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    <FONT COLOR=BROWN>/* Open the mixer associated with the WAVE OUT device
+       opened above. Note that I pass the handle obtained
+       via waveOutOpen() above */</FONT>
+    err = mixerOpen(&mixerHandle, hWaveOut, 0, 0, MIXER_OBJECTF_HWAVEOUT);
+    <FONT COLOR=GREEN>if</FONT> (err)
+    {
+        printf("ERROR: Can't open Mixer Device! -- %08X\n", err);
+    }
+}
+</B></FONT></PRE>
+
+The key above is in passing not only the handle that you obtain with waveOutOpen() (or
+waveInOpen(), or midiOutOpen(), or midiInOpen()) but also the last parameter of mixerOpen() must
+be MIXER_OBJECTF_HWAVEOUT (or MIXER_OBJECTF_HWAVEIN, or MIXER_OBJECTF_HMIDIOUT, or
+MIXER_OBJECTF_HMIDIIN) to indicate what kind of device handle is being passed to mixerOpen()
+
+<P>Alternately, if you know the device ID number of the desired WAVE OUT device (but haven't yet
+opened its handle via waveOutOpen()), you can pass that device ID to mixerOpen() and instead
+specify MIXER_OBJECTF_WAVEOUT. mixerOpen() will find the Mixer that corresponds to that WAVE Out
+device with the specified ID.
+
+<P>If desired, you can then get the above Mixer's ID (number) from its handle, using mixerGetID()
+as so:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=GREEN>unsigned long</FONT> mixerID;
+
+err = mixerGetID(mixerHandle, &mixerID, MIXER_OBJECTF_HMIXER);
+<FONT COLOR=GREEN>if</FONT> (err)
+{
+    printf("ERROR: Can't get Mixer Device ID! -- %08X\n", err);
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    printf("Mixer Device ID = %d\n", mixerID);
+}
+</B></FONT></PRE>
+
+<H2><FONT COLOR="#FF8040">Listing all of the Mixer devices</FONT></H2>
+
+If you're writing an application where you need to list all of the Mixer devices in the system,
+Windows has a function that you can call to determine how many Mixer devices are in the list.
+This function is called mixerGetNumDevs(). This returns the number of Mixer devices in the list.
+Remember that the Device IDs start with 0 and increment. So if Windows says that there are 3
+devices in the list, then you know that their Device IDs are 0, 1, and 2 respectively. You then
+use these Device IDs with other Windows functions. For example, there is a function you can call
+to get information about one of the devices in the list, such as its name, and what sort of
+other features it has such as how many components it contains, and what type of component each
+one is. You pass the Device ID of the Mixer device which you want to get information about (as
+well as a pointer to a special structure called a MIXERCAPS into which Windows puts the info
+about the device), The name of the function to get information about a particular Mixer device is mixerGetDevCaps().
+
+<P>Here then is an example of going through the list of Mixer devices, and printing the name of
+each one:
+
+<PRE><FONT SIZE=3><B>MIXERCAPS     mixcaps;
+<FONT COLOR=GREEN>unsigned long</FONT> iNumDevs, i;
+
+<FONT COLOR=BROWN>/* Get the number of Mixer devices in this computer */</FONT>
+iNumDevs = mixerGetNumDevs();
+
+<FONT COLOR=BROWN>/* Go through all of those devices, displaying their IDs/names */</FONT>
+<FONT COLOR=GREEN>for</FONT> (i = 0; i < iNumDevs; i++)
+{
+    <FONT COLOR=BROWN>/* Get info about the next device */</FONT>
+    <FONT COLOR=GREEN>if</FONT> (!mixerGetDevCaps(i, &mixcaps, <FONT COLOR=GREEN>sizeof</FONT>(MIXERCAPS)))
+    {
+        <FONT COLOR=BROWN>/* Display its ID number and name */</FONT>
+        printf("Device ID #%u: %s\r\n", i, mixcaps.szPname);
+    }
+}
+</B></FONT></PRE>
+
+<H2><FONT COLOR="#FF8040">About Lines and Controls</FONT></H2>
+
+<P>Up to this point, I have been using the term "component" to refer to a hardware section
+that has its own individual, adjustable parameters. The Mixer API actually concerns itself with
+signal flows. (ie, In our block diagram, the signal flows are the 5 arrows which connect the
+components). The Microsoft documention refers to each signal flow (ie, each arrow in our block
+diagram) as a "source line". So, a Mixer device controls "source lines" -- not components per
+se. It is each "source line" which has its own individual, adjustable parameters -- not a
+component per se. Our example audio card has 5 source lines as far as a Mixer is concerned. From
+here on, whenever you see the word "source line", think of the signal flow between components
+
+<P>I have also been using the term "parameters" to refer to settings that are adjustable on a
+"line", for example a volume level or a mute switch or a bass boast or a pan setting, etc.
+The Microsoft documentation refers to these parameters as "controls" (which can be a
+confusing term since a programmer typically thinks of a control as a graphical window -- part of
+his graphical interface. But in the case of Mixers, we mean "audio controls").
+
+<P>So for example, it's not really the "Microphone Input" component itself which concerns the
+Mixer API. Rather, it's the signal flow between the "Microphone Input" and "ADC"
+components. The "Microphone Input" volume control adjusts the volume of this signal flowing
+between the Microphone Input and ADC components.
+
+<P>For further illustration of the difference between components and source lines, let's add
+another feature to our example sound card. Sometimes, you'd like the Microphone Input to not only
+pipe through the ADC (so that you can record it), but also to pipe through the speakers (so that
+you can monitor the signal that you're actually recording, and hear what it sounds like through
+the speakers). So, let's adjust our block diagram to show the signal from the "Microphone Input"
+as going to both the ADC and the speakers.
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=500 HEIGHT=92 NOWRAP>
+<TR>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer7.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer6.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer3.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer2.gif" WIDTH=92 HEIGHT=138></TD>
+<TD WIDTH=92 HEIGHT=138><IMG src="mixer4.gif" WIDTH=92 HEIGHT=138></TD>
+</TR>
+</TABLE></CENTER>.
+
+<P>Notice that we now have 6 "source lines" (arrows). And there are two source lines from the
+"Microphone Input", even though it is only one component on our card. Each source line has its
+own settings. For example, there is a volume control for the "Microphone Input" source line
+going into the ADC (so that you can set the recording level for your WAVE recording software).
+There is another, separate volume control for the "Microphone Input" source line going to the
+speakers (so that you can set the monitor level of the microphone, separate from the recording
+level). These source lines may each have their own mute switches (so that you can, for example,
+have the "Microphone Input" signal going to only the ADC, but not the Speakers). They may have other controls
+as well, and each line's controls will be separate from the other line's controls.
+
+<P>There is another important concept to discuss in regard to lines. There are such things as
+"destination lines", and we differentiate between source lines and destination lines. What are
+those? Well, a destination line has other lines -- source lines -- flowing into it. In our block
+diagram, the "Speaker Out" is a destination line, since it has signals from the  "Internal CD Audio",
+"Synth", "DAC Wave Out" and "Microphone
+Input" flowing into it. And the latter 4 are source lines. They are source lines to the "Speaker Out"
+destination line since their signals flow into the "Speaker Out" line. Source lines always have to flow
+into some destination line. (ie, A source line cannot exist without being attached to one destination line).
+
+<P>So, whereas source lines are the arrows in our block diagram, destination lines are actual
+components in our block diagram.
+
+<P>So too, the "ADC Wave Input" is a destination line in our example card. It has 2 source
+lines flowing into it -- the "Microphone Input" and "Line In". Those two lines are not source
+lines to the "Speaker Out" since they do not flow into it. Similiarly, the 4 source lines
+flowing into the "Speaker Out" are not source lines to the "ADC Wave Input" destination line,
+since they don't flow into the latter.
+
+<P>Like source lines, destination lines can have controls. And each destination line's controls
+are separate from the other lines' controls. For example, the "Speaker Out" may have a volume
+control. This would function as a master volume for all 4 source lines going to the Speaker
+Out destination line. (And each of those 4 source lines has its own individual volume level
+control).
+
+<P><FONT COLOR=RED>NOTE:</FONT> Although a card may have a stereo component (for example,
+typically the "Speaker Out" upon most cards is stereo), this is considered one line. It has 2
+channels, but it nevertheless is one line on the Mixer device. Indeed, a component could have
+more than 2 channels, and still be considered only one line. In conclusion, lines are not the
+same thing as channels. In some ways, it may be helpful to think of a line like a MIDI cord.
+One MIDI cord connects two components, but there can be several channels going over that one
+cord. The same thing is true of a line.
+
+<P>In conclusion, our example card has 6 source lines and 2 destination lines. The 4 source
+lines labeled "Internal CD Audio", "Synth", "DAC Wave Out" and "Microphone Input" are attached
+to the "Speaker Out" destination line. The 2 source lines labeled "Microphone Input" and "Line
+In" are attached to the "ADC Wave Input" destination line.
+
+<H2><FONT COLOR="#FF8040">Line IDs and Types</FONT></H2>
+
+<P>Every line in a mixer must have a unique ID number. Every line also has a type. This is just a
+numeric value that describes what type of line it is. These are defined in the MMSYSTEM.H
+include file. For example, a line may have a type of MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER to
+indicate that it is a signal from a built-in sound module.
+
+<P>The allowable types for source lines are as so:
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_SRC_DIGITAL</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A digital source, for example, a SPDIF input jack.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_SRC_LINE</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A line input source. Typically used for a line input jack, if there is a separate microphone input (ie, MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE).</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Microphone input (but also used for a combination of Mic/Line input if there isn't a separate line input source).</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Musical synth. Typically used for a card that contains a synth capable of playing MIDI. This would be the audio out of that built-in synth.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>The audio feed from an internal CDROM drive (connected to the sound card).</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_SRC_TELEPHONE</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Typically used for a telephone line's incoming audio to be piped through the computer's speakers, or the telephone line in jack for a built-in modem.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_SRC_PCSPEAKER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Typically, to allow sound, that normally goes to the computer's built-in speaker, to instead be routed through the card's speaker output. The motherboard's system speaker connector would be internally connected to some connector on the sound card for this purpose.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Wave playback (ie, this is the card's DAC).</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_SRC_AUXILIARY</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>An aux jack meant to be routed to the Speaker Out, or to the ADC (for WAVE recording). Typically, this is used to connect external, analog equipment (such as tape decks, the audio outputs of musical instruments, etc) for digitalizing or playback through the sound card.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_SRC_ANALOG</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>May be used similiarly to MIXERLINE_COMPONENTTYPE_SRC_AUXILIARY (although I
+have seen some mixers use this like MIXERLINE_COMPONENTTYPE_SRC_PCSPEAKER). In general, this would be some analog connector on the sound card which is only accessible internally, to be used to internally connect some analog component inside of the computer case so that it plays through the speaker out.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_SRC_UNDEFINED</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Undefined type of source. If none of the others above are applicable.</TD></TR>
+</TABLE></CENTER>
+
+<P>The allowable types for destination lines are as so:
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_DST_DIGITAL</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A digital destination, for example, a SPDIF output jack.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_DST_LINE</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A line output destination. Typically used for a line output jack, if there is a separate speaker output (ie, MIXERLINE_COMPONENTTYPE_DST_SPEAKERS).</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_DST_MONITOR</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Typically a "Monitor Out" jack to be used for a speaker system separate from the main speaker out. Or, it could be some built-in monitor speaker on the sound card itself, such as a speaker for a built-in modem.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_DST_SPEAKERS</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>The audio output to a pair of speakers (ie, the "Speaker Out" jack).</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_DST_HEADPHONES</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Typically, a headphone output jack.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_DST_TELEPHONE</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Typically used to daisy-chain a telephone to an analog modem's "telephone out" jack.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_DST_WAVEIN</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>The card's ADC (to digitize analog sources, for example, in recording WAVE files of such).</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_DST_VOICEIN</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>May be some sort of hardware used for voice recognition. Typically, a microphone source line would be attached to this.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERLINE_COMPONENTTYPE_DST_UNDEFINED</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Undefined type of destination. If none of the others above are applicable.</TD></TR>
+</TABLE></CENTER>
+
+<P><H2><FONT COLOR="#FF8040">Control IDs and Types</FONT></H2>
+
+<P>Each line can have one or more adjustable "audio controls". (But, it's possible that a line could have no controls
+at all). For example, the Synth line may have a volume fader and a mute switch. Each control has a type. These are defined in the MMSYSTEM.H include file. For example, the volume fader would have a type of MIXERCONTROL_CONTROLTYPE_VOLUME.
+The Mute switch would have a type of MIXERCONTROL_CONTROLTYPE_MUTE.
+
+<P>Every control also has a unique ID number. No two controls may have the same ID number, even if they belong to 2 different lines.
+
+<P>The control types are divided up into classes. These classes are roughly based upon what type of value a control adjusts, and therefore what kind of graphical user interface you would normally present to the enduser to let him adjust that control's value. For example, you would normally present a graphical fader to allow the user to adjust a control of the type MIXERCONTROL_CONTROLTYPE_VOLUME. On the other hand, you'd typically use a graphical (checkmark) button to allow him to adjust a control of type MIXERCONTROL_CONTROLTYPE_MUTE (since that control has only two possible values, or states).
+
+<P>The allowable classes for controls are as so:
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CT_CLASS_FADER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP><A NAME="chart1">A</A> control that is adjusted by a vertical fader, with a linear scale of positive values (ie, 0 is the lowest possible value). A MIXERCONTROLDETAILS_UNSIGNED structure is used to retrieve or set the control's value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CT_CLASS_LIST</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control that is adjusted by a listbox containing numerous "values" to be selected. The user will single-select, or perhaps multiple-select if desired, his choice of value(s). A MIXERCONTROLDETAILS_BOOLEAN structure is used to retrieve or set the control's value. A MIXERCONTROLDETAILS_LISTTEXT structure is also used to retrieve the text description of each item of this control.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CT_CLASS_METER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control that is adjusted by a graphical meter. A MIXERCONTROLDETAILS_BOOLEAN, MIXERCONTROLDETAILS_SIGNED, or MIXERCONTROLDETAILS_UNSIGNED structure is used to retrieve or set the control's value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CT_CLASS_NUMBER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control that is adjusted by numeric entry. The user enters a signed integer, unsigned integer, or integer decibel value. A MIXERCONTROLDETAILS_SIGNED or MIXERCONTROLDETAILS_UNSIGNED structure is used to retrieve or set the control's value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CT_CLASS_SLIDER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control that is adjusted by a horizontal slider with a linear scale of negative and positive values. (ie, Generally, 0 is the mid or "neutral" point). A MIXERCONTROLDETAILS_SIGNED structure is used to retrieve or set the control's value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CT_CLASS_SWITCH</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control that is has only two states (ie, values), and is therefore adjusted via a button. A MIXERCONTROLDETAILS_BOOLEAN structure is used to retrieve or set the control's value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CT_CLASS_TIME</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control that allows the user to enter a time value, such as Reverb Decay Time. It is a positive, integer value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CT_CLASS_CUSTOM</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A custom class of control. If none of the others above are applicable.</TD></TR>
+</TABLE></CENTER>
+
+<P>Each class has certain types associated with it. For example, the MIXERCONTROL_CT_CLASS_FADER class has the following 5 types associated with it:
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_VOLUME</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Volume fader. The range of allowable values is 0 through 65,535.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_BASS</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Bass boost fader. The range of allowable values is 0 through 65,535.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_TREBLE</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Treble boost fader. The range of allowable values is 0 through 65,535.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_EQUALIZER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A graphic EQ. The range of allowable values for each band is 0 through 65,535. A MIXERCONTROLDETAILS_LISTTEXT structure is used to retrieve the text label for each band of the EQ. Typically, this control will also have its MIXERCONTROL_CONTROLF_MULTIPLE flag set, since the EQ will likely have numerous bands.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_FADER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A generic fader, to be used when none of the above are applicable. The range of allowable values is 0 through 65,535.</TD></TR>
+</TABLE></CENTER>
+
+<P>In fact, if you look at MMSYSTEM.H, you'll note that a control with a type of MIXERCONTROL_CONTROLTYPE_VOLUME is defined as MIXERCONTROL_CT_CLASS_FADER | MIXERCONTROL_CT_UNITS_UNSIGNED + 1. The class is actually contained in the top 4 bits of the type. So if you know a control's type, then you determine its class by masking off the top 4 bits. For example, assume
+that you've queried a control's type, and stored the value returned by the Mixer API in your variable named "type". Here's how you'd figure out it's class:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=GREEN>unsigned long</FONT>   type;
+
+<FONT COLOR=BROWN>/* Figure out the class based upon the top 4 bits of its type */</FONT>
+<FONT COLOR=GREEN>switch</FONT> (MIXERCONTROL_CT_CLASS_MASK & type)
+{
+    <FONT COLOR=GREEN>case</FONT> MIXERCONTROL_CT_CLASS_FADER:
+    {
+        printf("It's a fader class.");
+        <FONT COLOR=GREEN>break</FONT>;
+    }
+    <FONT COLOR=GREEN>case</FONT> MIXERCONTROL_CT_CLASS_LIST:
+    {
+        printf("It's a list class.");
+        <FONT COLOR=GREEN>break</FONT>;
+    }
+    <FONT COLOR=GREEN>case</FONT> MIXERCONTROL_CT_CLASS_METER:
+    {
+        printf("It's a meter class.");
+        <FONT COLOR=GREEN>break</FONT>;
+    }
+    <FONT COLOR=GREEN>case</FONT> MIXERCONTROL_CT_CLASS_NUMBER:
+    {
+        printf("It's a number class.");
+        <FONT COLOR=GREEN>break</FONT>;
+    }
+    <FONT COLOR=GREEN>case</FONT> MIXERCONTROL_CT_CLASS_SLIDER:
+    {
+        printf("It's a slider class.");
+        <FONT COLOR=GREEN>break</FONT>;
+    }
+    <FONT COLOR=GREEN>case</FONT> MIXERCONTROL_CT_CLASS_TIME:
+    {
+        printf("It's a time class.");
+        <FONT COLOR=GREEN>break</FONT>;
+    }
+    <FONT COLOR=GREEN>case</FONT> MIXERCONTROL_CT_CLASS_CUSTOM:
+    {
+        printf("It's a custom class.");
+        <FONT COLOR=GREEN>break</FONT>;
+    }
+}
+</B></FONT></PRE>
+
+<P>The MIXERCONTROL_CT_CLASS_SWITCH class has the following 7 types associated with it:
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_BOOLEAN</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control with a boolean value. The value is an integer that is either 0 (FALSE) or non-zero (TRUE).</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_BUTTON</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control whose value is 1 when the button is pressed (ie, some feature/action is enabled), or 0 if not pressed (ie, no action is taken). For example, this type of control may be used by a talkback button or pedal sustain -- the action/feature is on only while the button is pressed, and otherwise is not applicable.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_LOUDNESS</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control whose value is 1 to boost bass frequencies, or 0 for normal (ie, no boost). (A MIXERCONTROL_CONTROLTYPE_BASS fader control may be used to set the actual amount of boost, in conjunction with this control turning the boost on/off)</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_MONO</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control whose value is 1 for mono operation (ie, all channels are summed into one), or 0 for normal (ie, stereo or multi-channel).</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_MUTE</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control whose value is 1 to mute some feature, or 0 for normal (ie, no mute).</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_ONOFF</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control whose value is 1 to enable some feature/action, or 0 to disable that feature/action. The difference between this and MIXERCONTROL_CONTROLTYPE_BUTTON is that the latter's 0 value doesn't disable the feature/action per se, but rather, simply represents a "not applicable" state for the feature/action. MIXERCONTROL_CONTROLTYPE_ONOFF would be similiar to a real on/off switch (ie, a checkmark button in Windows parlance) whereas MIXERCONTROL_CONTROLTYPE_BUTTON would be more akin to a "momentary switch" (ie, a pushbutton). The difference between MIXERCONTROL_CONTROLTYPE_ONOFF and MIXERCONTROL_CONTROLTYPE_BOOLEAN is merely the labeling/grahics that would be shown on the user interface. The former is "ON" when its value is 1. The latter is "TRUE" when its value is 1. So typically, the two buttons would be represented by different labels and/or graphics to reflect that difference in semantics.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_STEREOENH</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control whose value is 1 to enable a stereo enhance feature (ie, increase stereo separation), or 0 for normal (ie, no enhance).</TD></TR>
+</TABLE></CENTER>
+
+<P>The MIXERCONTROL_CT_CLASS_LIST class has the following 4 types associated with it:
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_SINGLESELECT</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Allows one selection out of a choice of many selections. For example, this can be used to select a reverb type out of choice of many types (ie, Hall, Plate, Room, etc).</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_MULTIPLESELECT</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Like MIXERCONTROL_CONTROLTYPE_SINGLESELECT, but allows the selection of more than one item simultaneously.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_MUX</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Allows the selection of one audio line out of several choices of audio lines. For example, to allow a source line to be routed to one of several possible destination lines -- this control could list all of the possible choices of destination lines, and allow one to be chosen.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_MIXER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Like MIXERCONTROL_CONTROLTYPE_MUX, but allows the selection of more than one audio line simultaneously. For example, this control could be for a reverb component which allows several source lines to be simultaneously routed to it, and this control determines which source lines are selected for routing to the reverb.</TD></TR>
+</TABLE></CENTER>
+
+<P>The MIXERCONTROL_CT_CLASS_METER class has the following 4 types associated with it:
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_BOOLEANMETER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A meter whose integer value is either 0 (ie, FALSE) or non-zero (TRUE). A MIXERCONTROLDETAILS_BOOLEAN struct is used to set/retrieve its value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_PEAKMETER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control with a value that is an integer whose allowable, maximum range is -32,768 (lowest) through 32,767 (highest). In other words, its value is a SHORT. A MIXERCONTROLDETAILS_SIGNED struct is used to set/retrieve its value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_SIGNEDMETER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control with a value that is an integer whose allowable, maximum range is -2,147,483,648 (lowest) through 2,147,483,647 (highest) inclusive. In other words, its value is a LONG. A MIXERCONTROLDETAILS_SIGNED struct is used to set/retrieve its value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_UNSIGNEDMETER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Like MIXERCONTROL_CONTROLTYPE_SIGNEDMETER, but its allowable, maximum value range is from 0 (lowest) to 4,294,967,295. In other words, its value is a ULONG. A MIXERCONTROLDETAILS_UNSIGNED struct is used to set/retrieve its value.</TD></TR>
+</TABLE></CENTER>
+
+<P>Some of the allowable types for the MIXERCONTROL_CT_CLASS_NUMBER class are similiar to the MIXERCONTROL_CT_CLASS_METER class types. But with the MIXERCONTROL_CT_CLASS_NUMBER class, you would typically use an Edit control for the graphical user interface to allow him to enter a value. The MIXERCONTROL_CT_CLASS_METER would typically use some sort of graphical display similiar to an audio meter. MIXERCONTROL_CT_CLASS_NUMBER class has the following 4 types associated with it:
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_SIGNED</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control with a value that is an integer whose allowable, maximum range is -2,147,483,648 (lowest) through 2,147,483,647 (highest) inclusive. In other words, its value is a LONG. A MIXERCONTROLDETAILS_SIGNED struct is used to set/retrieve its value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_UNSIGNED</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>Like MIXERCONTROL_CONTROLTYPE_SIGNEDMETER, but its allowable, maximum value range is from 0 (lowest) to 4,294,967,295. In other words, its value is a ULONG. A MIXERCONTROLDETAILS_UNSIGNED struct is used to set/retrieve its value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_PERCENT</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control whose integer value is a percent. A MIXERCONTROLDETAILS_UNSIGNED struct is used to set/retrieve its value.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_DECIBELS</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control with a value that is an integer whose allowable, maximum range is -32,768 (lowest) through 32,767 (highest). In other words, its value is a SHORT. Each increment is a tenth of a decibel. A MIXERCONTROLDETAILS_SIGNED struct is used to set/retrieve its value.</TD></TR>
+</TABLE></CENTER>
+
+<P>The MIXERCONTROL_CT_CLASS_SLIDER class has the following 3 types associated with it:
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_SLIDER</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A slider with a value that is an integer whose allowable, maximum range is -32,768 (lowest) through 32,767 (highest). In other words, its value is a SHORT.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_PAN</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A slider with a value that is an integer whose allowable, maximum range is -32,768 (far left) through 32,767 (far right). In other words, its value is a SHORT. It represents pan position in the stereo spectrum, where 0 is center position.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_QSOUNDPAN</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A slider with a value that is an integer whose allowable, maximum range is -15 (lowest) through 15 (highest). In other words, its value is a SHORT. It represents Qsound's expanded sound setting.</TD></TR>
+</TABLE></CENTER>
+
+<P>The MIXERCONTROL_CT_CLASS_TIME class has the following 2 types associated with it:
+
+<P><CENTER>
+<TABLE NOBORDER WIDTH=100%>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_MICROTIME</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control with a value that is an integer whose allowable, maximum range is 0 (lowest) through 4,294,967,295. In other words, its value is a ULONG. Its value represents an amount of time in microseconds.</TD></TR>
+<TR><TD WIDTH=50% VALIGN=TOP BGCOLOR="#FF9999">MIXERCONTROL_CONTROLTYPE_MILLITIME</TD><TD WIDTH=50% BGCOLOR="#99CCCC" VALIGN=TOP>A control with a value that is an integer whose allowable, maximum range is 0 (lowest) through 4,294,967,295. In other words, its value is a ULONG. Its value represents an amount of time in milliseconds.</TD></TR>
+</TABLE></CENTER>
+
+<P>The MIXERCONTROL_CT_CLASS_CUSTOM class is a proprietary class. A Mixer that uses such a type of control could expect only an application that is written specifically for that Mixer to understand what types of controls are in this class, and what structures to use to set/retrieve their values. (Perhaps even proprietary structures could be used)
+
+<H2><FONT COLOR="#FF8040">MIXERLINE structures, and enumerating lines</FONT></H2>
+
+One way to get information about a mixer's lines, if you don't know what particular lines it has (ie, you don't know
+the types of lines it has, nor know their ID numbers), is to first call mixerGetDevCaps() to fetch information about
+that Mixer device into a MIXERCAPS structure. Using information in this structure, you can determine how many
+destination lines are on the card. From there, you can enumerate (ie, fetch information about) each destination line,
+and the source lines to each destination line. And after you enumerate the lines, you can enumerate the controls for
+each line.
+
+<P>Let's examine such an approach and study the structures that are associated with the Mixer API.
+
+<P>In order to better understand the Mixer API, we should take a peek inside of the Mixer Device for our example audio
+card, and examine its internal structures which are used with the Mixer API. We'll assume that this Mixer Device is
+written in C, and therefore uses C structures.
+
+<P>As noted previously, the Mixer API mixerGetDevCaps() is used to fetch information about a Mixer Device. It fills in
+a MIXERCAPS structure. In particular, the <B><I>cDestinations</I></B> field of the MIXERCAPS tells you how many
+destination lines are on the card. It doesn't tell you how many total lines (ie, destination and source lines) there
+are. It counts only destination lines. As you'll recall, our example audio card has 2 destination lines. We'll fill
+in the other fields, such as the Mixer name and product ID with arbitrary values for the purposes of this tutorial.
+Assume that this mixer is the first installed mixer in the system (ie, ID = 0). Here then is our Mixer Device's
+MIXERCAPS structure (which is defined in MMSYSTEM.H):
+
+<PRE><FONT SIZE=3><B>MIXERCAPS mixercaps = {
+    0,       <FONT COLOR=BROWN>/* manufacturer id */</FONT>
+    0,       <FONT COLOR=BROWN>/* product id */</FONT>
+    0x0100,  <FONT COLOR=BROWN>/* driver version #. Note that the high 8-bits
+             are the version, and low 8-bits are revision. So,
+             our driver version is 1.0 */</FONT>
+    "Example Sound Card", <FONT COLOR=BROWN>/* product name */</FONT>
+    0,       <FONT COLOR=BROWN>/* Support bits. None are currently defined */</FONT>
+    2,       <FONT COLOR=BROWN>/* # of destination lines */</FONT>
+};
+</B></FONT></PRE>
+
+<P>Here is an example of passing a MIXERCAPS to mixerGetDevCaps() and letting Windows fill it in with the above
+values. (Assume that we have already opened the mixer and stored its handle into our variable "mixerHandle").
+
+<PRE><FONT SIZE=3><B>MIXERCAPS     mixcaps;
+MMRESULT      err;
+
+<FONT COLOR=BROWN>/* Get info about the first Mixer Device */</FONT>
+<FONT COLOR=GREEN>if</FONT> (!(err = mixerGetDevCaps((UINT)mixerHandle, &mixcaps, <FONT COLOR=GREEN>sizeof</FONT>(MIXERCAPS))))
+{
+    <FONT COLOR=BROWN>/* Success. We can continue on with our tutorial below */</FONT>
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetDevCaps()\n", err);
+}
+</B></FONT></PRE>
+
+<P>Information about a line is contained in a MIXERLINE structure (as defined in MMSYSTEM.H). Let's assume that our
+"Speaker Out" destination line has two controls -- a volume slider (to control the overall mix to the speakers) and
+a mute switch (to mute the overall mix). Here's the MIXERLINE structure for our "Speaker Out" destination:
+
+<PRE><FONT SIZE=3><B>MIXERLINE mixerline_SpkrOut = {
+    <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE),              <FONT COLOR=BROWN>/* size of MIXERLINE structure */</FONT>
+    0,                              <FONT COLOR=BROWN>/* zero based index of destination line */</FONT>
+    0,                              <FONT COLOR=BROWN>/* zero based source index (used only if 
+                                       this is a source line) */</FONT>
+    0xFFFF0000,                     <FONT COLOR=BROWN>/* unique ID # for this line */</FONT>
+    MIXERLINE_LINEF_ACTIVE,         <FONT COLOR=BROWN>/* state/information about line */</FONT>
+    0,                              <FONT COLOR=BROWN>/* driver specific information */</FONT>
+    MIXERLINE_COMPONENTTYPE_DST_SPEAKERS,  <FONT COLOR=BROWN>/* component type */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of channels this line supports */</FONT>
+    4,                              <FONT COLOR=BROWN>/* # of source lines connected (used
+                                       only if this is a destination line) */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of controls in this line */</FONT>
+    "Spkr Out",                     <FONT COLOR=BROWN>/* Short name for this line */</FONT>
+    "Speaker Out",                  <FONT COLOR=BROWN>/* Long name for this line */</FONT>
+    MIXERLINE_TARGETTYPE_WAVEOUT,   <FONT COLOR=BROWN>/* MIXERLINE_TARGETTYPE_xxxx */</FONT>
+    <FONT COLOR=BROWN>/* The following info is just some info about the Mixer Device for this
+    line, prepended to the above info. It's mostly just for reference. */</FONT>
+    0,       <FONT COLOR=BROWN>/* device ID of our Mixer */</FONT>
+    0,       <FONT COLOR=BROWN>/* manufacturer id */</FONT>
+    0,       <FONT COLOR=BROWN>/* product id */</FONT>
+    0x0100,  <FONT COLOR=BROWN>/* driver version # */</FONT>
+    "Example Sound Card", <FONT COLOR=BROWN>/* product name */</FONT>
+};
+</B></FONT></PRE>
+
+<P>There are a few things to note here. First, notice that the <B><I>dwComponentType</I></B> for the "Speaker Out"
+destination line is one of the types for a destination line -- appropriately, MIXERLINE_COMPONENTTYPE_DST_SPEAKERS to
+indicate that it's a speaker output. I've chosen a value of 0xFFFF0000 for the <B><I>dwLineID</I></B>. The Mixer
+Device programmer may chose any value he wishes for this field, but no other line in this mixer may have the same
+value for its <B><I>dwLineID</I></B> (as you'll notice later). Also, note that since our speaker output is stereo,
+the <B><I>cChannels</I></B> field is 2. As you'll recall, there are 4 source lines connected to our "Speaker Out"
+destination line, so the <B><I>cConnections</I></B> field is 4. The name fields are nul-terminated strings. They
+can be anything that the Mixer Device programmer chooses, but the shorter name is meant to be used as a label for
+any tightly spaced graphical controls. When the MIXERLINE_LINEF_ACTIVE bit is set in the <B><I>fdwLine</I></B> field,
+this simply means that the line has not been disabled (such as what may happen if it were muted).
+
+<P>The <B><I>dwDestination</I></B> field is an index value based from 0. The first destination line in a mixer will
+have an index value of 0 (as in our example above). The second destination line will have an index of 1. The third
+destination line will have an index of 2. Etc. This is the same concept as how Windows enumerates Mixer Devices
+(ie, where the first installed Mixer Device has an ID of 0). The index value is not necessarily the same as a line's
+ID number (as you can see from the example above). What is the purpose of an index, and why do we need both an index
+and an ID number? As you may guess, the index number is primarily used when you need to enumerate what lines a Mixer
+has. Until you enumerate the lines (ie, fetch information about each line), you don't know the ID numbers of any of
+the lines. So, you need to use indexes with the mixer API to enumerate lines. But once you have retrieved info about
+a line, and therefore know its ID number, then you can alter its settings more directly. So, index numbers are
+primarily useful for initially enumerating lines and controls to find their ID numbers and types. And then the ID
+numbers are primarily useful for subsequently performing direct manipulation of the lines and controls.
+
+<P>Now let's take a look at the MIXERLINE structure for our "ADC Wave Input" destination line. Let's assume that it
+also has two controls -- a volume slider (to control the overall mix to the ADC) and a mute switch (to mute the
+overall mix). Here's the MIXERLINE structure for our "ADC Wave Input" destination:
+
+<PRE><FONT SIZE=3><B>MIXERLINE mixerline_WaveIn = {
+    <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE),              <FONT COLOR=BROWN>/* size of MIXERLINE structure */</FONT>
+    1,                              <FONT COLOR=BROWN>/* zero based index of destination line */</FONT>
+    0,                              <FONT COLOR=BROWN>/* zero based source index (used only if 
+                                       this is a source line) */</FONT>
+    0xFFFF0001,                     <FONT COLOR=BROWN>/* unique ID # for this line */</FONT>
+    MIXERLINE_LINEF_ACTIVE,         <FONT COLOR=BROWN>/* state/information about line */</FONT>
+    0,                              <FONT COLOR=BROWN>/* driver specific information */</FONT>
+    MIXERLINE_COMPONENTTYPE_DST_WAVEIN,  <FONT COLOR=BROWN>/* component type */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of channels this line supports */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of source lines connected (used
+                                       only if this is a destination line) */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of controls in this line */</FONT>
+    "Wave In",                      <FONT COLOR=BROWN>/* Short name for this line */</FONT>
+    "Wave Input",                   <FONT COLOR=BROWN>/* Long name for this line */</FONT>
+    MIXERLINE_TARGETTYPE_WAVEIN,    <FONT COLOR=BROWN>/* MIXERLINE_TARGETTYPE_xxxx */</FONT>
+    <FONT COLOR=BROWN>/* The following info is just some info about the Mixer Device for this
+    line, prepended to the above info. It's mostly just for reference and is only valid if the
+	Target Type field is not MIXERLINE_TARGETTYPE_UNDEFINED. */</FONT>
+    0, 0, 0, 0x0100, "Example Sound Card",
+};
+</B></FONT></PRE>
+
+<P>Notice that the <B><I>dwComponentType</I></B> for the "ADC Wave Input" destination line is 
+MIXERLINE_COMPONENTTYPE_DST_WAVEIN to indicate that it's a wave input. Also, I've chosen a value of 0xFFFF0001 for the
+<B><I>dwLineID</I></B> -- a different value than the "Speaker Out" destination line. Also, note that since our
+sound card is capable of digitizing in stereo, the <B><I>cChannels</I></B> field is 2. As you'll recall, there are 2
+source lines connected to our "ADC Wave Input" destination line, so the <B><I>cConnections</I></B> field is 2. Finally,
+note that the <B><I>dwDestination</I></B> field is 1, since this is the second destination line in the Mixer.
+
+<P>The mixer API mixerGetLineInfo() fills in a MIXERLINE struct for a specified line. This is how you retrieve
+info about a line. If you don't know a line's ID number (as would be the case when you're first enumerating the
+lines), then you can reference it by index. You pass mixerGetLineInfo() the value MIXER_GETLINEINFOF_DESTINATION
+to notify it that you want to reference the line by its index value. For example, here's how you would retrieve
+info about the first destination line in our example Mixer. Before calling mixerGetLineInfo() and passing it a
+MIXERLINE to fill in, you must initialize 2 fields. The <B><I>cbStruct</I></B> field must be set to the size of
+the MIXERLINE struct you're passing, and the <B><I>dwDestination</I></B> field must be set to the index value of the
+line whose info you wish to retrieve. Remember that the first destination line has an index of 0, so to retrieve
+its info, we set dwDestination to 0.
+
+<PRE><FONT SIZE=3><B>MIXERLINE     mixerline;
+MMRESULT      err;
+
+<FONT COLOR=BROWN>/* Get info about the first destination line by its index */</FONT>
+mixerline.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE);
+mixerline.dwDestination = 0;
+
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetLineInfo((HMIXEROBJ)mixerHandle, &mixerline, MIXER_GETLINEINFOF_DESTINATION)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetLineInfo()\n", err);
+}
+</B></FONT></PRE>
+
+<P>When the above call returns, mixerGetLineInfo() will have filled in our MIXERLINE struct as per the "Speaker Out"
+(mixerline_SpkrOut) MIXERLINE struct shown above. (After all, the "Speaker Out" is the first line in our example
+Mixer -- it has an index of 0).
+
+<P>Now, if you want to fetch info about the second destination line in the mixer, the only thing different is the
+index value you stuff into the <B><I>dwDestination</I></B> field, as so:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* Get info about the second destination line by its index */</FONT>
+mixerLine.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE);
+mixerLine.dwDestination = 1;
+
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetLineInfo((HMIXEROBJ)mixerHandle, &mixerLine, MIXER_GETLINEINFOF_DESTINATION)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetLineInfo()\n", err);
+}
+</B></FONT></PRE>
+
+<P>When the above call returns, mixerGetLineInfo() will have filled in our MIXERLINE struct as per the "ADC Wave
+Input" (mixerline_WaveIn) MIXERLINE struct shown above. (After all, the "ADC Wave Input" is the second line in our
+example Mixer -- it has an index of 1).
+
+<P>Now, you should see how you can enumerate the destination lines by their indexes. Here is an example of printing
+out the names of all destination lines in our Mixer:
+
+<PRE><FONT SIZE=3><B>MIXERCAPS     mixcaps;
+MIXERLINE     mixerline;
+MMRESULT      err;
+<FONT COLOR=GREEN>unsigned long</FONT> i;
+
+<FONT COLOR=BROWN>/* Get info about the first Mixer Device */</FONT>
+<FONT COLOR=GREEN>if</FONT> (!(err = mixerGetDevCaps((UINT)mixerHandle, &mixcaps, <FONT COLOR=GREEN>sizeof</FONT>(MIXERCAPS))))
+{
+    <FONT COLOR=BROWN>/* Print out the name of each destination line */</FONT>
+    <FONT COLOR=GREEN>for</FONT> (i = 0; i < mixercaps.cDestinations; i++)
+    {
+        mixerline.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE);
+        mixerline.dwDestination = i;
+
+        <FONT COLOR=GREEN>if</FONT> (!(err = mixerGetLineInfo((HMIXEROBJ)mixerHandle, &mixerline, MIXER_GETLINEINFOF_DESTINATION)))
+        {
+            printf("Destination #%lu = %s\n", i, mixerline.szName);
+        }
+    }
+}
+</B></FONT></PRE>
+
+<P>Now, we need to enumerate the source lines for each destination line. We also use
+an index value to reference each source line. The first source line, for a given destination line, has an index
+value of 0. The second source line, for that destination line, has an index of 1. The third source line has an
+index of 2. Etc. Remember that the "Speaker Out" had 4 source lines going into it: "Internal CD Audio", "Synth",
+"DAC Wave Out" and "Microphone Input". So their respective index values are 0, 1, 2, and 3. Let's look at the
+MIXERLINE structs for those 4 source lines. Assume that each one of them has 2 controls, a volume slider and
+a mute switch. Also, assume that each one is a stereo source.
+
+<PRE><FONT SIZE=3><B>MIXERLINE mixerline_CD = {
+    <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE),
+    0,                              <FONT COLOR=BROWN>/* zero based index of destination line */</FONT>
+    0,                              <FONT COLOR=BROWN>/* zero based source index */</FONT>
+    0x00000000,                     <FONT COLOR=BROWN>/* unique ID # for this line */</FONT>
+    MIXERLINE_LINEF_ACTIVE|MIXERLINE_LINEF_SOURCE, <FONT COLOR=BROWN>/* state/information about line */</FONT>
+    0,
+    MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC,  <FONT COLOR=BROWN>/* component type */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of channels this line supports */</FONT>
+    0,                              <FONT COLOR=BROWN>/* Not applicable for source lines */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of controls in this line */</FONT>
+    "CD Audio",                     <FONT COLOR=BROWN>/* Short name for this line */</FONT>
+    "Internal CD Audio",            <FONT COLOR=BROWN>/* Long name for this line */</FONT>
+    MIXERLINE_TARGETTYPE_UNDEFINED, <FONT COLOR=BROWN>/* MIXERLINE_TARGETTYPE_xxxx */</FONT>
+    0, 0, 0, 0x0100, "Example Sound Card",
+};
+
+MIXERLINE mixerline_Synth = {
+    <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE),
+    0,                              <FONT COLOR=BROWN>/* zero based index of destination line */</FONT>
+    1,                              <FONT COLOR=BROWN>/* zero based source index */</FONT>
+    0x00000001,                     <FONT COLOR=BROWN>/* unique ID # for this line */</FONT>
+    MIXERLINE_LINEF_ACTIVE|MIXERLINE_LINEF_SOURCE,
+    0,
+    MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER,  <FONT COLOR=BROWN>/* component type */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of channels this line supports */</FONT>
+    0,                              <FONT COLOR=BROWN>/* Not applicable for source lines */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of controls in this line */</FONT>
+    "Synth",                        <FONT COLOR=BROWN>/* Short name for this line */</FONT>
+    "Synth",                        <FONT COLOR=BROWN>/* Long name for this line */</FONT>
+    MIXERLINE_TARGETTYPE_UNDEFINED, <FONT COLOR=BROWN>/* MIXERLINE_TARGETTYPE_xxxx */</FONT>
+    0, 0, 0, 0x0100, "Example Sound Card",
+};
+
+MIXERLINE mixerline_WaveOut = {
+    <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE),
+    0,                              <FONT COLOR=BROWN>/* zero based index of destination line */</FONT>
+    2,                              <FONT COLOR=BROWN>/* zero based source index */</FONT>
+    0x00000002,                     <FONT COLOR=BROWN>/* unique ID # for this line */</FONT>
+    MIXERLINE_LINEF_ACTIVE|MIXERLINE_LINEF_SOURCE,
+    0,
+    MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT,  <FONT COLOR=BROWN>/* component type */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of channels this line supports */</FONT>
+    0,                              <FONT COLOR=BROWN>/* Not applicable for source lines */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of controls in this line */</FONT>
+    "Wave Out",                     <FONT COLOR=BROWN>/* Short name for this line */</FONT>
+    "DAC Wave Out",                 <FONT COLOR=BROWN>/* Long name for this line */</FONT>
+    MIXERLINE_TARGETTYPE_WAVEOUT,   <FONT COLOR=BROWN>/* MIXERLINE_TARGETTYPE_xxxx */</FONT>
+    0, 0, 0, 0x0100, "Example Sound Card",
+};
+
+MIXERLINE mixerline_Mic = {
+    <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE),
+    0,                              <FONT COLOR=BROWN>/* zero based index of destination line */</FONT>
+    3,                              <FONT COLOR=BROWN>/* zero based source index */</FONT>
+    0x00000003,                     <FONT COLOR=BROWN>/* unique ID # for this line */</FONT>
+    MIXERLINE_LINEF_ACTIVE|MIXERLINE_LINEF_SOURCE,
+    0,
+    MIXERLINE_COMPONENTTYPE_SRC_MICROPHONE,  <FONT COLOR=BROWN>/* component type */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of channels this line supports */</FONT>
+    0,                              <FONT COLOR=BROWN>/* Not applicable for source lines */</FONT>
+    2,                              <FONT COLOR=BROWN>/* # of controls in this line */</FONT>
+    "Mic",                          <FONT COLOR=BROWN>/* Short name for this line */</FONT>
+    "Microphone Input",             <FONT COLOR=BROWN>/* Long name for this line */</FONT>
+    MIXERLINE_TARGETTYPE_WAVEIN,    <FONT COLOR=BROWN>/* MIXERLINE_TARGETTYPE_xxxx */</FONT>
+    0, 0, 0, 0x0100, "Example Sound Card",
+};
+</B></FONT></PRE>
+
+<P>One thing that you'll note is, unlike with the destination lines, the MIXERLINEs for all source lines have their
+MIXERLINE_LINEF_SOURCE flag bit set. When this bit is set, you know that you have info on a source line. Secondly,
+note that the zero-based index for the destination line is 0. That's because all of the above source lines connect
+to the "Speaker Out" destination line, which is the first line in our mixer (and therefore has an index value of 0).
+Next, note that the zero-based source indexes for the 4 source lines are 0, 1, 2, and 3, respectively. Finally, note
+that the ID of each source line is unique -- unlike any other line, including any of the destination lines.
+
+<P>The mixer API mixerGetLineInfo() fills in a MIXERLINE struct for a source line too. Again, you can reference a
+source line by its index, but you also need to know the index of its respective destination line. You pass
+mixerGetLineInfo() the value MIXER_GETLINEINFOF_SOURCE to notify it that you want to reference the line by its
+index value. For example, here's how you would retrieve info about the first source line (of the "Speaker Out"
+destination line) in our example Mixer. Before calling mixerGetLineInfo() and passing it a MIXERLINE to fill in,
+you must initialize 3 fields. The <B><I>cbStruct</I></B> field must be set to the size of the MIXERLINE struct
+you're passing, the <B><I>dwSource</I></B> field must be set to the index value of the source line whose info you
+wish to retrieve, and the <B><I>dwDestination</I></B> field must be set to the index value of the destination
+line to which this source line connects.
+
+<PRE><FONT SIZE=3><B>MIXERLINE     mixerline;
+MMRESULT      err;
+
+<FONT COLOR=BROWN>/* Get info about the first source line (of the first destination line) by its index */</FONT>
+mixerline.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE);
+mixerline.dwDestination = 0;
+mixerline.dwSource = 0;
+
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetLineInfo((HMIXEROBJ)mixerHandle, &mixerline, MIXER_GETLINEINFOF_SOURCE)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetLineInfo()\n", err);
+}
+</B></FONT></PRE>
+
+<P>When the above call returns, mixerGetLineInfo() will have filled in our MIXERLINE struct as per the "Internal
+CD Audio" (mixerline_CD) MIXERLINE struct shown above. So for example, you can extract its line ID number from the
+MIXERLINE's dwLineID field.
+
+<P>Now, if you want to fetch info about the second source line of the "Speaker Out" destination line, the only thing
+different is the index value you stuff into the <B><I>dwSource</I></B> field, as so:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* Get info about the second source line by its index */</FONT>
+mixerline.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE);
+mixerline.dwDestination = 0;
+mixerline.dwSource = 1;
+
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetLineInfo((HMIXEROBJ)mixerHandle, &mixerline, MIXER_GETLINEINFOF_SOURCE)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetLineInfo()\n", err);
+}
+</B></FONT></PRE>
+
+<P>When the above call returns, mixerGetLineInfo() will have filled in our MIXERLINE struct as per the "Synth"
+(mixerline_Synth) MIXERLINE struct shown above.
+
+<P>Now, you should see how you can enumerate the source lines (of each destination line) by their indexes. Here is an
+example of printing out the names of all destination lines, and their source lines, in our Mixer:
+
+<PRE><FONT SIZE=3><B>MIXERCAPS     mixcaps;
+MIXERLINE     mixerline;
+MMRESULT      err;
+<FONT COLOR=GREEN>unsigned long</FONT> i, n, numSrc;
+
+<FONT COLOR=BROWN>/* Get info about the first Mixer Device */</FONT>
+<FONT COLOR=GREEN>if</FONT> (!(err = mixerGetDevCaps((UINT)mixerHandle, &mixcaps, <FONT COLOR=GREEN>sizeof</FONT>(MIXERCAPS))))
+{
+    <FONT COLOR=BROWN>/* Print out the name of each destination line */</FONT>
+    <FONT COLOR=GREEN>for</FONT> (i = 0; i < mixercaps.cDestinations; i++)
+    {
+        mixerline.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE);
+        mixerline.dwDestination = i;
+
+        <FONT COLOR=GREEN>if</FONT> (!(err = mixerGetLineInfo((HMIXEROBJ)mixerHandle, &mixerline, MIXER_GETLINEINFOF_DESTINATION)))
+        {
+            printf("Destination #%lu = %s\n", i, mixerline.szName);
+
+            <FONT COLOR=BROWN>/* Print out the name of each source line in this destination */</FONT>
+            numSrc = mixerline.cConnections;
+            <FONT COLOR=GREEN>for</FONT> (n = 0; n < numSrc; n++)
+            {
+                mixerline.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE);
+                mixerline.dwDestination = i;
+                mixerline.dwSource = n;
+
+                <FONT COLOR=GREEN>if</FONT> (!(err = mixerGetLineInfo((HMIXEROBJ)mixerHandle, &mixerline, MIXER_GETLINEINFOF_SOURCE)))
+                {
+                    printf("\tSource #%lu = %s\n", i, mixerline.szName);
+                }
+            }
+        }
+    }
+}
+</B></FONT></PRE>
+
+<H2><FONT COLOR="#FF8040">Getting info about a line by its ID</FONT></H2>
+
+Once you know a line's ID number (which you can extract from the MIXERLINE's dwLineID after enumerating the line as
+shown above), you can later retrieve info on it by referencing its ID (instead of its index). If you're dealing
+with a source line, you do not need to know the index of the destination line to which the source line is
+connected. You merely initialize the MIXERLINE's <B><I>dwLineID</I></B> field to the ID number of the desired
+line, and then specify MIXER_GETLINEINFOF_LINEID when calling mixerGetLineInfo() as so:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* Get info about the "Microphone Input" source line by its ID */</FONT>
+mixerline.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE);
+mixerline.dwLineID = 0x00000003; <FONT COLOR=BROWN>/* The ID for "Microphone Input" */</FONT>
+
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetLineInfo((HMIXEROBJ)mixerHandle, &mixerline, MIXER_GETLINEINFOF_LINEID)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetLineInfo()\n", err);
+}
+</B></FONT></PRE>
+
+<P>The above works with both destination and source lines. Once you know a line's ID, you can directly retrieve
+info on it without needing to know anything about indexes.
+
+<H2><FONT COLOR="#FF8040">Getting info about a line by its Type</FONT></H2>
+
+Often, you don't need to know about all of the lines in a Mixer. You may be writing a program that would deal only
+with a specific type of line. For example, let's say that you're writing a simple MIDI file player. Now, certain
+components of our example sound card are of no use to you at all. MIDI is not digital audio data, so the "DAC Wave
+In" component (and all source lines running into it) are of no concern to you. Likewise, the "Internal CD Audio",
+"DAC Wave Out" and "Microphone Input" source lines to the "Speaker Out" destination line are of no concern to you.
+The only component on our card which is capable of dealing with the playback of MIDI data is the "Synth" component
+that goes to the "Speaker Out". It is this line's controls that will affect the playback of MIDI data.
+
+<P>So, rather than enumerating all of the lines in the mixer until you come to the one with the
+MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER type, mixerGetLineInfo() lets you directly get info about a line that
+matches your desired type. You merely initialize the MIXERLINE's <B><I>dwComponentType</I></B> field to the
+desired type of line, and then specify MIXER_GETLINEINFOF_COMPONENTTYPE when calling mixerGetLineInfo() as so:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* Get info about a "Synth" type of source line */</FONT>
+mixerline.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINE);
+mixerline.dwComponentType = MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER; <FONT COLOR=BROWN>/* We want a Synth type */</FONT>
+
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetLineInfo((HMIXEROBJ)mixerHandle, &mixerline, MIXER_GETLINEINFOF_COMPONENTTYPE)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetLineInfo()\n", err);
+}
+</B></FONT></PRE>
+
+<P>This will fill in the MIXERLINE struct with info about the first line in the Mixer which has a type of
+MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER. (If there are no such lines in the Mixer, a MIXERR_INVALLINE error is
+returned). Once you have that info, you can then directly manipulate its controls. This saves having to enumerate
+and search for a desired line when your needs are specific.
+
+<H2><FONT COLOR="#FF8040">MIXERCONTROL structures, and enumerating controls</FONT></H2>
+
+You use the mixer API mixerGetLineControls() to retrieve info about controls for a line. This API fills in a
+MIXERCONTROL struct with info about a control.
+
+<P>Let's examine the MIXERCONTROL struct. As mentioned before, our "Speaker Out" destination line has 2 controls;
+a volume slider, and a mute switch. Each one of these controls will have one MIXERCONTROL associated with
+it. Let's examine the MIXERCONTROL for each of these controls:
+
+<PRE><FONT SIZE=3><B>MIXERCONTROL mixerctl_Spkr_Vol = {
+    <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROL),            <FONT COLOR=BROWN>/* size of a MIXERCONTROL */</FONT>
+    0x00000000,                      <FONT COLOR=BROWN>/* unique ID # for this control */</FONT>
+    MIXERCONTROL_CONTROLTYPE_VOLUME, <FONT COLOR=BROWN>/* type of control */</FONT>
+    MIXERCONTROL_CONTROLF_UNIFORM,   <FONT COLOR=BROWN>/* flag bits */</FONT>
+    0,                               <FONT COLOR=BROWN>/* # of items per channels (used only if the
+                                     MIXERCONTROL_CONTROLF_MULTIPLE flag bit is also set) */</FONT>
+    "Volume",                        <FONT COLOR=BROWN>/* Short name for this control */</FONT>
+    "Speaker Out Volume",            <FONT COLOR=BROWN>/* Long name for this control */</FONT>
+    0,                               <FONT COLOR=BROWN>/* Minimum value to which this control can be set */</FONT>
+    65535,                           <FONT COLOR=BROWN>/* Maximum value to which this control can be set */</FONT>
+    0, 0, 0, 0,                      <FONT COLOR=BROWN>/* These fields are reserved for future use */</FONT>
+    31,                              <FONT COLOR=BROWN>/* Step amount for the value */</FONT>
+    0, 0, 0, 0, 0,                   <FONT COLOR=BROWN>/* These fields are reserved for future use */</FONT>
+};
+
+MIXERCONTROL mixerctl_Spkr_Mute = {
+    <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROL),
+    0x00000001,                      <FONT COLOR=BROWN>/* unique ID # for this control */</FONT>
+    MIXERCONTROL_CONTROLTYPE_MUTE,   <FONT COLOR=BROWN>/* type of control */</FONT>
+    MIXERCONTROL_CONTROLF_UNIFORM,
+    0,
+    "Mute",                          <FONT COLOR=BROWN>/* Short name for this control */</FONT>
+    "Speaker Out Mute",              <FONT COLOR=BROWN>/* Long name for this control */</FONT>
+    0,                               <FONT COLOR=BROWN>/* Minimum value to which this control can be set */</FONT>
+    1,                               <FONT COLOR=BROWN>/* Maximum value to which this control can be set */</FONT>
+    0, 0, 0, 0,
+    0,                               <FONT COLOR=BROWN>/* Step amount for the value */</FONT>
+    0, 0, 0, 0, 0,
+};
+</B></FONT></PRE>
+
+<P>There are several things to note above. First, note that each control has a unique ID. These ID numbers don't have
+to be unique with regard to the IDs of lines. (For example, the control ID of the mixerctl_Spkr_Vol control happens to
+be the same as the line ID of the mixerline_CD line). But, each control must have an ID unique from any other control,
+including the controls of other lines. (For example, the volume slider of the "Speaker Out" line can't have the same ID
+number as the mute switch of the "ADC Wave In" line).
+
+<P>I have set the MIXERCONTROL_CONTROLF_UNIFORM flag. What this means is that, although the "Speaker Out" is stereo
+(ie, it has 2 channels), there is not a separate volume control for each channel. (There are not individual, left
+channel and right channel volume settings). There is only one volume setting for both channels, and therefore both
+channels will be set to the same volume always. (Later, we'll study controls that aren't uniform).
+
+<P>Also note that each control has an appropriate type. The volume slider has a MIXERCONTROL_CONTROLTYPE_VOLUME type,
+and the mute switch has a MIXERCONTROL_CONTROLTYPE_MUTE type.
+
+<P>The MIXERCONTROL tells you what the min and max values can be for the control. For example, the volume slider can
+be set to any value inbetween 0 and 65,535. 0 is the minimum setting (ie, volume is lowest), and 65,535 is the
+maximum setting (ie, volume is loudest). So, does that mean that the volume slider has 65,535 discrete steps? (ie,
+Can it be set to <U>any</U> value from 0 to 65,535, inclusive)? Not necessarily. You also have to look at the step
+amount field. This tells you how many valid steps the control has. In this case, we have 31 valid steps. This means
+that the first valid setting is 0, but the second valid setting is 65,535 - (65,535/31) and the third valid setting
+is 65,535 - (65,535/(31*2)), etc. In other words, we have only 31 valid settings within that 0 to 65,535 range. (NOTE:
+the dwMinimum/dwMaximum fields are declared in a union with the lMinimum/lMaximum fields. You'll reference the former
+two when dealing with a control type with an unsigned value -- ie, a control type whose value is set with a
+MIXERCONTROLDETAILS_BOOLEAN or MIXERCONTROLDETAILS_UNSIGNED struct. You'll reference the latter two when dealing with
+a control type with a signed value -- ie, a control type whose value is set with a MIXERCONTROLDETAILS_SIGNED struct).
+
+
+<P>Enumerating controls is a bit different than enumerating lines. For one thing, you don't employ indexes with
+controls. Secondly, you can retrieve info about a single control only if you already know its control ID number.
+Otherwise, you must simultaneously retrieve info for <U>all</U> the controls for a given line.
+
+<P>Obviously, when you're first enumerating the controls for a line, you don't know the ID of each control. So you
+need to retrieve info on all of the controls with a single call to mixerGetLineControls(). In this case, you need
+to pass mixerGetLineControls() an array of MIXERCONTROL structs. There must be one struct for every control in the
+line.
+
+<P>For example, we know that our "Speaker Out" destination line has 2 controls; a volume slider, and a mute switch.
+(Remember that its MIXERLINE's cControls field is 2).
+So, to retrieve information about them, we must pass mixerGetLineControls() an array containing 2 MIXERCONTROL
+structs. We must also pass the value MIXER_GETLINECONTROLSF_ALL to indicate we want info on all the controls. We
+also pass a special structure called a MIXERLINECONTROLS which we must first initialize. This structure tells
+mixerGetLineControls() for which line we want to receive info about its controls. We also provide the pointer
+to our array of MIXERCONTROL structs via this additional struct. Here then is an example of retrieving info about all
+the controls in the "Speaker Out" line.
+
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* Let's just declare an array of 2 MIXERCONTROL structs since
+   we know that the "Speaker Out" has 2 controls. For a real program,
+   you typically won't know ahead of time how big an array you'll need,
+   and therefore would instead allocate an appropriately sized array */</FONT>
+MIXERCONTROL       mixerControlArray[2];
+MIXERLINECONTROLS  mixerLineControls;
+MMRESULT           err;
+
+mixerLineControls.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINECONTROLS);
+
+<FONT COLOR=BROWN>/* The "Speaker Out" line has a total of 2 controls. And
+   that's how many we want to retrieve info for here */</FONT>
+mixerLineControls.cControls = 2;
+
+<FONT COLOR=BROWN>/* Tell mixerGetLineControls() for which line we're retrieving info.
+   We do this by putting the desired line's ID number in dwLineID.
+   The "Speaker Out" line has an ID of 0xFFFF0000 */</FONT>
+mixerLineControls.dwLineID = 0xFFFF0000;
+
+<FONT COLOR=BROWN>/* Give mixerGetLineControls() the address of our array of
+   MIXERCONTROL structs big enough to hold info on all controls */</FONT>
+mixerLineControls.pamxctrl = &mixerControlArray[0];
+
+<FONT COLOR=BROWN>/* Tell mixerGetLineControls() how big each MIXERCONTROL is. This
+   saves having to initialize the cbStruct of each individual
+   MIXERCONTROL in the array */</FONT>
+mixerLineControls.cbmxctrl = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROL);
+
+<FONT COLOR=BROWN>/* Retrieve info on all controls for this line simultaneously */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetLineControls((HMIXEROBJ)mixerHandle, &mixerLineControls, MIXER_GETLINECONTROLSF_ALL)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetLineControls()\n", err);
+}
+</B></FONT></PRE>
+
+<P>When mixerGetLineControls() returns above, our mixerControlArray[] array will have been filled in.
+mixerControlArray[0] will have been filled in as per the mixerctl_Spkr_Vol MIXERCONTROL struct shown above,
+and mixerControlArray[1] will have been filled in as per the mixerctl_Spkr_Mute MIXERCONTROL struct shown above. So,
+you can, for example, extract their control ID numbers from their respective MIXERCONTROL's dwControlID field.
+
+<P>It's possible to retrieve info on only one control, if you know its ID or Type. But it is not possible to retrieve
+info on more than one control, but less than the total number of controls. For example, assume that our "Speaker Out"
+had 5 controls (instead of only 2). You couldn't retrieve info on only the first 3, for example. You can either
+retrieve info on one (out of the 5) at a time, or all 5 of them at once. (ie, It's either one at a time, or all).
+
+<H2><FONT COLOR="#FF8040">Getting info about a control by its ID</FONT></H2>
+
+Once you know a control's ID number (which you can extract from its MIXERCONTROL's dwControlID field after enumerating
+the control as shown above), you can later retrieve info on just this one control by referencing its ID. You don't even
+need to know the ID of the line to which this control belongs. And you aren't forced to retrieve info for all of the other
+controls in this line. You merely initialize the MIXERLINECONTROLS's <B><I>dwControlID</I></B> field to the ID number
+of the desired control, and then specify MIXER_GETLINECONTROLSF_ONEBYID when calling mixerGetLineControls() as so:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* We need only 1 MIXERCONTROL struct since
+   we're fetching info for only 1 control */</FONT>
+MIXERCONTROL       mixerControlArray;
+MIXERLINECONTROLS  mixerLineControls;
+MMRESULT           err;
+
+mixerLineControls.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINECONTROLS);
+
+<FONT COLOR=BROWN>/* We want to fetch info on only 1 control */</FONT>
+mixerLineControls.cControls = 1;
+
+<FONT COLOR=BROWN>/* Tell mixerGetLineControls() for which control we're retrieving
+   info. We do this by putting the desired control's ID number in
+   dwControlID. The "Speaker Out" line's volume slider has an ID
+   of 0x00000000 */</FONT>
+mixerLineControls.dwControlID = 0x00000000;
+
+<FONT COLOR=BROWN>/* Give mixerGetLineControls() the address of the
+   MIXERCONTROL struct to hold info */</FONT>
+mixerLineControls.pamxctrl = &mixerControlArray;
+
+<FONT COLOR=BROWN>/* Tell mixerGetLineControls() how big the MIXERCONTROL is. This
+   saves having to initialize the cbStruct of the MIXERCONTROL itself */</FONT>
+mixerLineControls.cbmxctrl = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROL);
+
+<FONT COLOR=BROWN>/* Retrieve info on only the volume slider control for the "Speaker Out" line */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetLineControls((HMIXEROBJ)mixerHandle, &mixerLineControls, MIXER_GETLINECONTROLSF_ONEBYID)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetLineControls()\n", err);
+}
+</B></FONT></PRE>
+
+<H2><FONT COLOR="#FF8040">Getting info about a control by its Type</FONT></H2>
+
+Often, you don't need to know about all of the controls in a line. You may be writing a program that would deal only
+with a specific type of control. For example, let's say that you're writing a simple MIDI file player and the only
+control you want to present to the enduser is the volume slider of the "Synth". You saw earlier how you could search
+for that MIDI playback component by Type and fill in a MIXERLINE struct with info about it, such as its line ID.
+You can then use that line ID to search for a particular type of control within that line, For example, you can
+search for a control with a type of MIXERCONTROL_CONTROLTYPE_VOLUME.
+
+<P>So, rather than enumerating all of the controls in the line until you come to the one with the
+MIXERCONTROL_CONTROLTYPE_VOLUME type, mixerGetLineControls() lets you directly get info about a line that
+matches your desired type. You merely initialize the MIXERLINECONTROLS's <B><I>dwControlType</I></B> field to the
+desired type of control, and then specify MIXER_GETLINECONTROLSF_ONEBYTYPE when calling mixerGetLineControls() as so.
+(Assume that you've already fetched the line ID for the "Synth" line, and stored it in "SynthID").
+
+<PRE><FONT SIZE=3><B>MIXERCONTROL       mixerControlArray;
+MIXERLINECONTROLS  mixerLineControls;
+MMRESULT           err;
+
+mixerLineControls.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERLINECONTROLS);
+
+<FONT COLOR=BROWN>/* Tell mixerGetLineControls() for which line we're retrieving info.
+   We do this by putting the desired line's ID number in dwLineID */</FONT>
+mixerLineControls.dwLineID = SynthID;
+
+<FONT COLOR=BROWN>/* We want to fetch info on only 1 control */</FONT>
+mixerLineControls.cControls = 1;
+
+<FONT COLOR=BROWN>/* Tell mixerGetLineControls() for which type of control we're
+   retrieving info. We do this by putting the desired control type
+   in dwControlType */</FONT>
+mixerLineControls.dwControlType = MIXERCONTROL_CONTROLTYPE_VOLUME;
+
+<FONT COLOR=BROWN>/* Give mixerGetLineControls() the address of the MIXERCONTROL
+   struct to hold info */</FONT>
+mixerLineControls.pamxctrl = &mixerControlArray;
+
+<FONT COLOR=BROWN>/* Tell mixerGetLineControls() how big the MIXERCONTROL is. This
+   saves having to initialize the cbStruct of the MIXERCONTROL itself */</FONT>
+mixerLineControls.cbmxctrl = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROL);
+
+<FONT COLOR=BROWN>/* Retrieve info on only any volume slider control for this line */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetLineControls((HMIXEROBJ)mixerHandle, &mixerLineControls, MIXER_GETLINECONTROLSF_ONEBYTYPE)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetLineControls()\n", err);
+}
+</B></FONT></PRE>
+
+<P>This will fill in the MIXERCONTROL struct with info about the first control in the line which has a type of
+MIXERCONTROL_CONTROLTYPE_VOLUME. (If there are no such controls in the line, a MIXERR_INVALCONTROL error is
+returned). Once you have that info, you can then directly manipulate that control. For example, you can extract its
+control ID number from the MIXERCONTROL's dwControlID field. This saves having to enumerate and search for a desired
+control when your needs are specific.
+
+<H2><FONT COLOR="#FF8040">Retrieving and setting a control's value</FONT></H2>
+
+Now we're getting to the whole purpose of a mixer; to retrieve a control's value (so that you can display its
+current setting to the enduser), and to set a control's value (so that you can allow the enduser to adjust it).
+
+<P>To retrieve or set a control's value, you must know its control ID. You use mixerGetControlDetails() to
+retrieve its current value, and mixerSetControlDetails() to set it to a specific value. These functions utilize a
+MIXERCONTROLDETAILS struct. You initialize certain fields to tell mixerGetControlDetails()/mixerSetControlDetails()
+what control whose value you're retrieving/setting, and you also supply a pointer to another structure that will
+contain the actual value.
+
+<P>For example, let's consider retrieving the current value of the "Speaker Out" line's volume slider. By now,
+you know how to get info on that control, for example, its ID number. In order to retrieve a control's value, we
+need to supply a special structure into which its value is returned. What kind of structure do we use? Well,
+that depends upon what type of control it is. The volume slider is a MIXERCONTROL_CONTROLTYPE_VOLUME type. If
+you go back to the <A HREF="mixer.htm#chart1">chart about the fader class of controls</A>, it tells you that its
+value is retrieved using a MIXERCONTROLDETAILS_UNSIGNED
+struct. This struct has only one field into which the control's value is returned; dwValue. So we supply a
+MIXERCONTROLDETAILS_UNSIGNED struct to mixerGetControlDetails() (via the MIXERCONTROLDETAILS struct). Here then
+is an example, of retrieving and printing the current value of the "Speaker Out" line's volume slider:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* We need a MIXERCONTROLDETAILS_UNSIGNED struct to retrieve the
+   value of a control whose type is MIXERCONTROL_CONTROLTYPE_VOLUME */</FONT>
+MIXERCONTROLDETAILS_UNSIGNED value;
+MIXERCONTROLDETAILS          mixerControlDetails;
+MMRESULT                     err;
+
+mixerControlDetails.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS);
+
+<FONT COLOR=BROWN>/* Tell mixerGetControlDetails() which control whose value we
+   want to retrieve. We do this by putting the desired control's
+   ID number in dwControlID. Remember that the "Speaker Out" line's
+   volume slider has an ID of 0x00000000 */</FONT>
+mixerControlDetails.dwControlID = 0x00000000;
+
+<FONT COLOR=BROWN>/* This is always 1 for a MIXERCONTROL_CONTROLF_UNIFORM control */</FONT>
+mixerControlDetails.cChannels = 1;
+
+<FONT COLOR=BROWN>/* This is always 0 except for a MIXERCONTROL_CONTROLF_MULTIPLE control */</FONT>
+mixerControlDetails.cMultipleItems = 0;
+
+<FONT COLOR=BROWN>/* Give mixerGetControlDetails() the address of the
+   MIXERCONTROLDETAILS_UNSIGNED struct into which to return the value */</FONT>
+mixerControlDetails.paDetails = &value;
+
+<FONT COLOR=BROWN>/* Tell mixerGetControlDetails() how big the MIXERCONTROLDETAILS_UNSIGNED is */</FONT>
+mixerControlDetails.cbDetails = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS_UNSIGNED);
+
+<FONT COLOR=BROWN>/* Retrieve the current value of the volume slider control for this line */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetControlDetails((HMIXEROBJ)mixerHandle, &mixerControlDetails, MIXER_GETCONTROLDETAILSF_VALUE)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetControlDetails()\n", err);
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    printf("It's value is %lu\n", value.dwValue);
+}
+</B></FONT></PRE>
+
+<P>To set a control's value, you simply fill in the special structure that contains the value, and pass it to
+mixerSetControlDetails().  You also specify MIXER_SETCONTROLDETAILSF_VALUE. Here is an example of setting the
+"Speaker Out" line's volume slider to a value of 31:
+
+<PRE><FONT SIZE=3><B>MIXERCONTROLDETAILS_UNSIGNED value;
+MIXERCONTROLDETAILS          mixerControlDetails;
+MMRESULT                     err;
+
+mixerControlDetails.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS);
+
+<FONT COLOR=BROWN>/* Tell mixerSetControlDetails() which control whose value we
+   want to set. We do this by putting the desired control's
+   ID number in dwControlID. Remember that the "Speaker Out" line's
+   volume slider has an ID of 0x00000000 */</FONT>
+mixerControlDetails.dwControlID = 0x00000000;
+
+<FONT COLOR=BROWN>/* This is always 1 for a MIXERCONTROL_CONTROLF_UNIFORM control */</FONT>
+mixerControlDetails.cChannels = 1;
+
+<FONT COLOR=BROWN>/* This is always 0 except for a MIXERCONTROL_CONTROLF_MULTIPLE control */</FONT>
+mixerControlDetails.cMultipleItems = 0;
+
+<FONT COLOR=BROWN>/* Give mixerSetControlDetails() the address of the
+   MIXERCONTROLDETAILS_UNSIGNED struct into which we place the value */</FONT>
+mixerControlDetails.paDetails = &value;
+
+<FONT COLOR=BROWN>/* Tell mixerSetControlDetails() how big the MIXERCONTROLDETAILS_UNSIGNED is */</FONT>
+mixerControlDetails.cbDetails = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS_UNSIGNED);
+
+<FONT COLOR=BROWN>/* Store the value */</FONT>
+value.dwValue = 31;
+
+<FONT COLOR=BROWN>/* Set the value of the volume slider control for this line */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mixerSetControlDetails((HMIXEROBJ)mixerHandle, &mixerControlDetails, MIXER_SETCONTROLDETAILSF_VALUE)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerSetControlDetails()\n", err);
+}
+</B></FONT></PRE>
+
+<H2><FONT COLOR="#FF8040">Multi-channel controls</FONT></H2>
+
+As mentioned, when a control's MIXERCONTROL_CONTROLF_UNIFORM flag bit is set, then it doesn't have individual
+values for each one of its channels. For example, with the "Speaker Out", there is not a separate volume for the
+left and right channels of this stereo line.
+
+<P>But if a control's MIXERCONTROL_CONTROLF_UNIFORM flag bit is <U>not</U> set, and it has more than one channel,
+then each channel has its own value. For this reason, you'll need more than one of the special structures to
+retrieve/set the values for all channels. For example, let's assume that the volume slider for the "Speaker Out" does
+not have its MIXERCONTROL_CONTROLF_UNIFORM flag bit set. Since the Speaker Out line has 2 channels, that means that
+we need 2 MIXERCONTROLDETAILS_UNSIGNED structs to retrieve/set the value for the Left and Right channels' volumes
+respectively. We need to use an array of MIXERCONTROLDETAILS_UNSIGNED structs. The first MIXERCONTROLDETAILS_UNSIGNED
+struct will be for the first (ie, Left) channel, and the second MIXERCONTROLDETAILS_UNSIGNED struct will be for the
+second (ie, Right) channel. Here is an example of retrieving the values of the left and right channels of our
+volume slider for the "Speaker Out" line:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* We need 2 MIXERCONTROLDETAILS_UNSIGNED structs to retrieve the
+   values of a stereo control that is not MIXERCONTROL_CONTROLF_UNIFORM */</FONT>
+MIXERCONTROLDETAILS_UNSIGNED value[2];
+MIXERCONTROLDETAILS          mixerControlDetails;
+MMRESULT                     err;
+
+mixerControlDetails.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS);
+
+<FONT COLOR=BROWN>/* Tell mixerGetControlDetails() which control whose value we
+   want to retrieve. We do this by putting the desired control's
+   ID number in dwControlID. Remember that the "Speaker Out" line's
+   volume slider has an ID of 0x00000000 */</FONT>
+mixerControlDetails.dwControlID = 0x00000000;
+
+<FONT COLOR=BROWN>/* We want to retrieve values for both channels */</FONT>
+mixerControlDetails.cChannels = 2;
+
+<FONT COLOR=BROWN>/* This is always 0 except for a MIXERCONTROL_CONTROLF_MULTIPLE control */</FONT>
+mixerControlDetails.cMultipleItems = 0;
+
+<FONT COLOR=BROWN>/* Give mixerGetControlDetails() the address of the
+   MIXERCONTROLDETAILS_UNSIGNED array into which to return the values */</FONT>
+mixerControlDetails.paDetails = &value[0];
+
+<FONT COLOR=BROWN>/* Tell mixerGetControlDetails() how big each MIXERCONTROLDETAILS_UNSIGNED is */</FONT>
+mixerControlDetails.cbDetails = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS_UNSIGNED);
+
+<FONT COLOR=BROWN>/* Retrieve the current values of both channels */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetControlDetails((HMIXEROBJ)mixerHandle, &mixerControlDetails, MIXER_GETCONTROLDETAILSF_VALUE)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetControlDetails()\n", err);
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    printf("The left channel's volume is %lu\n", value[0].dwValue);
+    printf("The right channel's volume is %lu\n", value[1].dwValue);
+}
+</B></FONT></PRE>
+
+<P>To set the values of both channels, you fill in the values of both MIXERCONTROLDETAILS_UNSIGNED structs. Here is
+an example of setting the left channel's volume to 31 and the right channel's volume to 0.
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* We need 2 MIXERCONTROLDETAILS_UNSIGNED structs to set the
+   values of a stereo control that is not MIXERCONTROL_CONTROLF_UNIFORM */</FONT>
+MIXERCONTROLDETAILS_UNSIGNED value[2];
+MIXERCONTROLDETAILS          mixerControlDetails;
+MMRESULT                     err;
+
+mixerControlDetails.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS);
+
+<FONT COLOR=BROWN>/* Tell mixerSetControlDetails() which control whose value we
+   want to set. We do this by putting the desired control's
+   ID number in dwControlID. Remember that the "Speaker Out" line's
+   volume slider has an ID of 0x00000000 */</FONT>
+mixerControlDetails.dwControlID = 0x00000000;
+
+<FONT COLOR=BROWN>/* We want to set values for both channels */</FONT>
+mixerControlDetails.cChannels = 2;
+
+<FONT COLOR=BROWN>/* This is always 0 except for a MIXERCONTROL_CONTROLF_MULTIPLE control */</FONT>
+mixerControlDetails.cMultipleItems = 0;
+
+<FONT COLOR=BROWN>/* Give mixerSetControlDetails() the address of the
+   MIXERCONTROLDETAILS_UNSIGNED structs into which we place the values */</FONT>
+mixerControlDetails.paDetails = &value[0];
+
+<FONT COLOR=BROWN>/* Tell mixerSetControlDetails() how big each MIXERCONTROLDETAILS_UNSIGNED is */</FONT>
+mixerControlDetails.cbDetails = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS_UNSIGNED);
+
+<FONT COLOR=BROWN>/* Store the left channel's value */</FONT>
+value[0].dwValue = 31;
+
+<FONT COLOR=BROWN>/* Store the right channel's value */</FONT>
+value[1].dwValue = 0;
+
+<FONT COLOR=BROWN>/* Set the left/right values of the volume slider control for this line */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mixerSetControlDetails((HMIXEROBJ)mixerHandle, &mixerControlDetails, MIXER_SETCONTROLDETAILSF_VALUE)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerSetControlDetails()\n", err);
+}
+</B></FONT></PRE>
+
+<P>Of course, a control may have even more than 2 channels. You always need an array of special structures large
+enough to accomodate all channels for a given control, so typically, you'll allocate the array as needed.
+
+<P>It is not legal to retrieve or set only some of the channels. For example, if a control has 8 channels, it's not
+legal to try to retrieve the values of only the first 2 channels. You must always retrieve/set the values of all
+channels simultaneously. But there is one caveat to this rule. It concerns setting a value. If you set only the
+value for the first channel, then mixerSetControlDetails() automatically treats the control as if it was
+MIXERCONTROL_CONTROLF_UNIFORM. The net result is that all channels get set to that one value. So, you can quickly
+set all channels to the same value just by setting the value of only the first channel.
+
+<H2><FONT COLOR="#FF8040">Multi-item controls</FONT></H2>
+
+You won't often encounter multi-item controls. A multi-item control is one that has several values associated with
+each channel. An example could be a graphic equalizer control. Let's study a simple example. Assume that you have
+the following 3 band graphic equalizer built into a sound card:
+
+<P><CENTER><IMG src="mixer8.gif" WIDTH=113 HEIGHT=101></CENTER>
+
+<P>This control has three values associated with it -- the value for the "Low" band, the value for the "Mid" band,
+and the value for the "High" band. (ie, It is assumed that each band can be set to a different value, otherwise it
+would be a fairly useless graphic EQ). The way that this would be represented is a a multi-item control. It has
+3 items (ie, values) associated with it.
+
+<P>Let's further assume that this control is in the "Speaker Out" line.
+
+<P>Let's examine its MIXERCONTROL struct. A multi-item control has the MIXERCONTROL_CONTROLF_MULTIPLE bit set of its
+MIXERCONTROL's <I><B>dwControlType</B></I> field. The MIXERCONTROL's <I><B>cMultipleItems</B></I> field will also
+tell how many items are in each channel.
+
+<PRE><FONT SIZE=3><B>MIXERCONTROL mixerctl_EQ = {
+    <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROL),            <FONT COLOR=BROWN>/* size of a MIXERCONTROL */</FONT>
+    0x00000002,                      <FONT COLOR=BROWN>/* unique ID # for this control */</FONT>
+    MIXERCONTROL_CONTROLTYPE_EQUALIZER, <FONT COLOR=BROWN>/* type of control */</FONT>
+    MIXERCONTROL_CONTROLF_UNIFORM|MIXERCONTROL_CONTROLF_MULTIPLE,   <FONT COLOR=BROWN>/* flag bits */</FONT>
+    3,                               <FONT COLOR=BROWN>/* # of items per channel */</FONT>
+    "EQ",                            <FONT COLOR=BROWN>/* Short name for this control */</FONT>
+    "Graphic Equalizer",             <FONT COLOR=BROWN>/* Long name for this control */</FONT>
+    0,                               <FONT COLOR=BROWN>/* Minimum value to which this control can be set */</FONT>
+    65535,                           <FONT COLOR=BROWN>/* Maximum value to which this control can be set */</FONT>
+    0, 0, 0, 0,                      <FONT COLOR=BROWN>/* These fields are reserved for future use */</FONT>
+    31,                              <FONT COLOR=BROWN>/* Step amount for the value */</FONT>
+    0, 0, 0, 0, 0,                   <FONT COLOR=BROWN>/* These fields are reserved for future use */</FONT>
+};
+</B></FONT></PRE>
+
+<P>First of all, note that the ID is different than all of the other controls for this Mixer. Also, note that its
+MIXERCONTROL_CONTROLF_MULTIPLE flag bit is set. The <I><B>cMultipleItems</B></I> field is set to 3 to indicate that
+there are 3 items per channel. (But since I made this control MIXERCONTROL_CONTROLF_UNIFORM, it still has
+only 3 values total, even though the "Speaker Out" line is stereo. In other words, the value for each band affects
+both channels equally).
+
+<P>To query the values for all 3 bands, we need an array of 3 structures to fetch the values. What kind of structures?
+Well, the MIXERCONTROL_CONTROLTYPE_EQUALIZER control type is of the fader class, and you'll remember that all the
+types in that class use a MIXERCONTROLDETAILS_UNSIGNED struct to set/fetch values. Here's how we query the current
+values of the 3 bands:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* We need 3 MIXERCONTROLDETAILS_UNSIGNED structs to retrieve the
+   values of this control */</FONT>
+MIXERCONTROLDETAILS_UNSIGNED value[3];
+MIXERCONTROLDETAILS          mixerControlDetails;
+MMRESULT                     err;
+
+mixerControlDetails.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS);
+
+<FONT COLOR=BROWN>/* Tell mixerGetControlDetails() which control whose value we
+   want to retrieve */</FONT>
+mixerControlDetails.dwControlID = 0x00000002;
+
+<FONT COLOR=BROWN>/* It's a MIXERCONTROL_CONTROLF_UNIFORM control, so the values
+   for all channels are the same as the first */</FONT>
+mixerControlDetails.cChannels = 1;
+
+<FONT COLOR=BROWN>/* There are 3 items per channel */</FONT>
+mixerControlDetails.cMultipleItems = 3;
+
+<FONT COLOR=BROWN>/* Give mixerGetControlDetails() the address of the
+   MIXERCONTROLDETAILS_UNSIGNED array into which to return the values */</FONT>
+mixerControlDetails.paDetails = &value[0];
+
+<FONT COLOR=BROWN>/* Tell mixerGetControlDetails() how big each MIXERCONTROLDETAILS_UNSIGNED is */</FONT>
+mixerControlDetails.cbDetails = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS_UNSIGNED);
+
+<FONT COLOR=BROWN>/* Retrieve the current values of all 3 bands */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetControlDetails((HMIXEROBJ)mixerHandle, &mixerControlDetails, MIXER_GETCONTROLDETAILSF_VALUE)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetControlDetails()\n", err);
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    printf("The Low band is %lu\n", value[0].dwValue);
+    printf("The Mid band is %lu\n", value[1].dwValue);
+    printf("The High band is %lu\n", value[2].dwValue);
+}
+</B></FONT></PRE>
+
+<P>To set the values of all 3 bands, you fill in the values of the MIXERCONTROLDETAILS_UNSIGNED structs. Here is
+an example of setting the Low band to 31, the Mid band to 0, and the High band to 62.
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* We need 3 MIXERCONTROLDETAILS_UNSIGNED structs to set the
+   values of the 3 bands */</FONT>
+MIXERCONTROLDETAILS_UNSIGNED value[3];
+MIXERCONTROLDETAILS          mixerControlDetails;
+MMRESULT                     err;
+
+mixerControlDetails.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS);
+
+<FONT COLOR=BROWN>/* Tell mixerSetControlDetails() which control whose values we
+   want to set */</FONT>
+mixerControlDetails.dwControlID = 0x00000002;
+
+<FONT COLOR=BROWN>/* The values for all channels are the same as the first channel */</FONT>
+mixerControlDetails.cChannels = 1;
+
+<FONT COLOR=BROWN>/* We're setting all 3 bands */</FONT>
+mixerControlDetails.cMultipleItems = 3;
+
+<FONT COLOR=BROWN>/* Give mixerSetControlDetails() the address of the
+   MIXERCONTROLDETAILS_UNSIGNED structs into which we place the values */</FONT>
+mixerControlDetails.paDetails = &value[0];
+
+<FONT COLOR=BROWN>/* Tell mixerSetControlDetails() how big each MIXERCONTROLDETAILS_UNSIGNED is */</FONT>
+mixerControlDetails.cbDetails = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS_UNSIGNED);
+
+<FONT COLOR=BROWN>/* Store the Low band's value */</FONT>
+value[0].dwValue = 31;
+
+<FONT COLOR=BROWN>/* Store the Mid band's value */</FONT>
+value[1].dwValue = 0;
+
+<FONT COLOR=BROWN>/* Store the High band's value */</FONT>
+value[2].dwValue = 62;
+
+<FONT COLOR=BROWN>/* Set the values of the 3 bands for this control */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mixerSetControlDetails((HMIXEROBJ)mixerHandle, &mixerControlDetails, MIXER_SETCONTROLDETAILSF_VALUE)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerSetControlDetails()\n", err);
+}
+</B></FONT></PRE>
+
+<P>Now let's remove that MIXERCONTROL_CONTROLF_UNIFORM flag bit of the MIXERCONTROL. Now, each channel's items have
+individual values. Since the "Speaker Out" has 2 channels, that means we have a total of 2 (channels) * 3 (items), or
+6 values total for this control. Our graphic EQ now looks like this:
+
+<P><CENTER><TABLE NOBORDER WIDTH=200 NOWRAP CELLSPACING=20>
+<TR>
+<TD WIDTH=113 HEIGHT=101><IMG src="mixer8.gif" WIDTH=113 HEIGHT=101></TD>
+<TD WIDTH=113 HEIGHT=101><IMG src="mixer8.gif" WIDTH=113 HEIGHT=101></TD>
+</TR>
+<TR>
+<TD WIDTH=113 VALIGN=TOP ALIGN=CENTER><B>Left Channel</B></TD>
+<TD WIDTH=113 VALIGN=TOP ALIGN=CENTER><B>Right Channel</B></TD>
+</TR>
+</TABLE></CENTER>
+
+<P>We're going to need 6 MIXERCONTROLDETAILS_UNSIGNED structs to fetch the values of all items in all channels. Oh,
+and in the preceding example, I assumed what the labels were for those items. What you really should do is ask the
+Mixer to provide you with the labels if you wish to print them out. To do this, you must supply an array of
+MIXERCONTROLDETAILS_LISTTEXT structs, just like how you use an array of MIXERCONTROLDETAILS_UNSIGNED structs to
+fetch the values of all items in all channels
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BROWN>/* We need 6 MIXERCONTROLDETAILS_UNSIGNED structs to retrieve the
+   values of this control */</FONT>
+MIXERCONTROLDETAILS_UNSIGNED value[6];
+<FONT COLOR=BROWN>/* We need 6 MIXERCONTROLDETAILS_LISTTEXT structs to retrieve the
+   labels of all items */</FONT>
+MIXERCONTROLDETAILS_LISTTEXT label[6];
+MIXERCONTROLDETAILS          mixerControlDetails;
+MMRESULT                     err;
+
+mixerControlDetails.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS);
+
+<FONT COLOR=BROWN>/* Tell mixerGetControlDetails() which control whose value we
+   want to retrieve */</FONT>
+mixerControlDetails.dwControlID = 0x00000002;
+
+<FONT COLOR=BROWN>/* Our "Speaker Out" has 2 channels */</FONT>
+mixerControlDetails.cChannels = 2;
+
+<FONT COLOR=BROWN>/* There are 3 items per channel */</FONT>
+mixerControlDetails.cMultipleItems = 3;
+
+<FONT COLOR=BROWN>/* Give mixerGetControlDetails() the address of the
+   MIXERCONTROLDETAILS_UNSIGNED array into which to return the values */</FONT>
+mixerControlDetails.paDetails = &value[0];
+
+<FONT COLOR=BROWN>/* Tell mixerGetControlDetails() how big each MIXERCONTROLDETAILS_UNSIGNED is */</FONT>
+mixerControlDetails.cbDetails = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS_UNSIGNED);
+
+<FONT COLOR=BROWN>/* Retrieve the current values of all 3 bands for both channels */</FONT>
+<FONT COLOR=GREEN>if</FONT> ((err = mixerGetControlDetails((HMIXEROBJ)mixerHandle, &mixerControlDetails, MIXER_GETCONTROLDETAILSF_VALUE)))
+{
+    <FONT COLOR=BROWN>/* An error */</FONT>
+    printf("Error #%d calling mixerGetControlDetails()\n", err);
+}
+<FONT COLOR=GREEN>else</FONT>
+{
+    unsigned long   i,n;
+
+    <FONT COLOR=BROWN>/* Let's fetch the labels of all the items */</FONT>
+
+    mixerControlDetails.cbStruct = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS);
+    mixerControlDetails.dwControlID = 0x00000002;
+    mixerControlDetails.cChannels = 2;
+    mixerControlDetails.cMultipleItems = 3;
+
+    <FONT COLOR=BROWN>/* Give mixerGetControlDetails() the address of the
+       MIXERCONTROLDETAILS_LISTTEXT array into which to return the labels */</FONT>
+    mixerControlDetails.paDetails = &label[0];
+
+    <FONT COLOR=BROWN>/* Tell mixerGetControlDetails() how big each MIXERCONTROLDETAILS_LISTTEXT is */</FONT>
+    mixerControlDetails.cbDetails = <FONT COLOR=GREEN>sizeof</FONT>(MIXERCONTROLDETAILS_LISTTEXT);
+
+    <FONT COLOR=BROWN>/* Retrieve the labels of all items for both channels, Note
+       that I specify MIXER_GETCONTROLDETAILSF_LISTTEXT */</FONT>
+    <FONT COLOR=GREEN>if</FONT> ((err = mixerGetControlDetails((HMIXEROBJ)mixerHandle, &mixerControlDetails, MIXER_GETCONTROLDETAILSF_LISTTEXT)))
+    {
+        <FONT COLOR=BROWN>/* An error */</FONT>
+        printf("Error #%d calling mixerGetControlDetails()\n", err);
+    }
+    <FONT COLOR=GREEN>else</FONT>
+    {
+        <FONT COLOR=BROWN>/* Print the values of all items */</FONT>
+        <FONT COLOR=GREEN>for</FONT> (i = 0; i < 2; i++)
+        {
+            printf("Channel %lu:\n", i+1);
+
+            <FONT COLOR=GREEN>for</FONT> (n = 0; n < 3; n++)
+            {
+                printf("\tThe %s item is %lu\n", label[3 * i + n].szName, value[3 * i + n].dwValue);
+            }
+        }
+    }
+}
+</B></FONT></PRE>
+
+<P>It is not legal to retrieve or set only some of items of a control. For example, if a control has 8 items, it's not
+legal to try to retrieve the values of only the first 2 items. You must always retrieve/set the values of all
+items for all channels simultaneously. The one caveat to this rule is that if you set only the items for the first
+channel, then mixerSetControlDetails() automatically treats the control as if it was MIXERCONTROL_CONTROLF_UNIFORM.
+The net result is that the items for all channels get set to the same values as the first channel. So, you can quickly
+set all channels to the same values just by setting the items of only the first channel.
+
+<H2><FONT COLOR="#FF8040">Notification of changes</FONT></H2>
+
+In my above examples, I have shown that the mixer device is always opened with mixerOpen() and
+its handle retrieved for use with other mixer functions. This is not always necessary. In fact,
+the mixer API has been designed so that, instead of passing a handle to an open mixer wherever
+any mixer function specifies such an arg, you can instead pass the mixer ID number of the
+desired mixer. So, you do not need to open a mixer explicitly.
+
+<P>But there are advantages to explicitly opening a mixer (with mixerOpen()) for as long as you
+need to do operations upon it. First, this prevents the mixer from somehow being "unloaded"
+(presumably by the audio card's driver). Secondly, when you have a mixer open, you can instruct
+Windows to send you a special message (to the Window procedure of some window that you've created)
+whenever any line's state has changed (for example, if the line is muted), or the value of some
+control has been changed. You get sent such a message not only when you change a line's state or
+a control's value, but also when any other program also opens that mixer (ie, more than one
+program can open the same mixer simultaneously) and changes a line or control. So, you can keep
+your program in sync with any changes made to the mixer by any other program.
+
+<P>When you call mixerOpen(), you specify the handle to your own window which you wish Windows
+to send its special "mixer messages". Pass your window handle as the third arg to mixerOpen(). Also
+specify CALLBACK_WINDOW as the last arg.
+
+<P>There are 2 special "mixer messages". MM_MIXM_LINE_CHANGE is sent to your window procedure
+whenever a line's state is changed. MM_MIXM_CONTROL_CHANGE is sent whenever a control's value
+is changed.
+
+<P>For MM_MIXM_LINE_CHANGE, the WPARAM argument to your window procedure is the handle of the
+open mixer whose line has changed. The LPARAM argument is the ID number of the line whose state
+has changed.
+
+<P>For MM_MIXM_CONTROL_CHANGE, the WPARAM argument to your window procedure is the handle of the
+open mixer whose line has changed. The LPARAM argument is the ID number of the control whose value
+has changed.
+
+<H2><FONT COLOR="#FF8040">Conclusion</FONT></H2>
+
+The Mixer API is one of the most complicated APIs regarding Windows multi-media. It may take awhile to absorb
+this tutorial and apply it to your needs. But the Mixer API gives you a way to make adjustments to the settings
+of any sound card without needing to be specifically written for that card.
+
+<P>For more information about structures and APIs about mixers, see <A HREF="http://msdn.microsoft.com/library/psdk/multimed/mixer_65ut.htm">Microsoft Developer
+Network's reference upon audio mixers</A>
+
+<P>Microsoft makes a freely downloadable example of using the Mixer API. But I found this code to be too terse
+in its use of comments, and also had a lot of code not really related to the Mixer API and not needed. I have
+pared down this example to mostly code pertinent to the Mixer API, and profusely commented the code. You 
+can download my version of <A HREF="../midi/software/dev/winapi/msmixer.zip">Microsoft's
+Mixer Device Example</A> to show how to display information on all Mixer devices and their lines/controls, as well
+as adjust controls' values. Included are the Project Workspace files for Visual C++ 4.0, but since it is an ordinary
+C Windowed app, any Windows C compiler should be able to compile it.
+
+</BODY></HTML>

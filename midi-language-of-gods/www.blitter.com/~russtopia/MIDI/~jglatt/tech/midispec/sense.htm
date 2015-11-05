@@ -1,0 +1,42 @@
+<HTML><HEAD><TITLE>MIDI Specification: Active Sense</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Active Sense</CENTER></FONT></H2></P>
+
+<P>Category: System Realtime
+
+<P><FONT COLOR=GREEN>Purpose</FONT>
+<P>A device sends out an Active Sense message (at least once) every 300 milliseconds if there has been no other activity
+on the MIDI buss, to let other devices know that there is still a good MIDI connection between the devices.
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0xFE
+
+<P><FONT COLOR=GREEN>Data</FONT>
+<P>None
+
+<P><FONT COLOR=GREEN>Errata</FONT>
+<P>When a device receives an Active Sense message (from some other device), it should expect to receive additional
+Active Sense messages at a rate of one approximately every 300 milliseconds, whenever there is no activity on the MIDI
+buss during that time. (Of course, if there are other MIDI messages happening at least once every 300 mSec,
+then Active Sense won't ever be sent. An Active Sense only gets sent if there is a 300 mSec "moment of silence" on the
+MIDI buss.  You could say that a device that sends out Active Sense "gets nervous" if it has nothing to do for over 300
+mSec, and so sends an Active Sense just for the sake of reassuring other devices that this device still exists). If a
+message is missed (ie, 0xFE nor any other MIDI message is received for over 300 mSec), then a device assumes that the
+MIDI connection is broken, and turns off all of its playing notes (which were turned on by incoming Note On messages,
+versus ones played on the local keyboard by a musician). Of course, if a device never receives an Active Sense message to
+begin with, it should not expect them at all. So, it takes one "nervous" device to start the process by initially sending out an
+Active Sense message to the other connected devices during a 300 mSec moment of silence on the MIDI bus.
+
+<P>This is an optional feature that only a few devices implement (ie, notably Roland gear). Many devices don't ever initiate
+this minimal "safety" feature.
+
+<P>Here's a flowchart for implementing Active Sense. It assumes that the device has a hardware timer that ticks once every
+millisecond. A variable named <B>Timeout</B> is used to count the passing milliseconds. Another variable
+named <B>Flag</B> is set when the device receives an Active Sense message from another device, and therefore
+expects to receive further Active Sense messages.
+
+<P><CENTER><IMG SRC="sens.gif"></CENTER>
+
+<P><CENTER><B>The logic for active sense detection</B></CENTER>
+
+</FONT></BODY></HTML>

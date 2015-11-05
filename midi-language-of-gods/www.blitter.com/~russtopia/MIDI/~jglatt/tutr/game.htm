@@ -1,0 +1,56 @@
+<HTML><HEAD><TITLE>MIDI for Game Players (and other morons)</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Let's not beat around the bush. Your idea of a classy evening of high-brow entertainment is stomping through piles of "virtual intestines" in Quake. You don't want to know about all of this "Geek MIDI stuff". You just want to know how to get your sound card to best play distorted sound effects of laser-guided, heat-seeking snot-rockets exploding while a "heavy metal" music track plays in the background loud enough to drown out the neighbors' screams for you to "turn down that shit!".
+
+<P>A typical sound card has two distinct sections. There is a digital audio section, and a MIDI playback section.
+
+<P>The digital audio section has a Digital to Analog (DAC) chip which plays sound effects and voice (stored as digital audio data, sometimes in WAVE files). Nowadays, most games will also have a music soundtrack stored in digital audio form, and therefore will use the digital audio section for music playback too, in which case it may not use the card's MIDI section at all. (ie, The game software
+mathematically mixes all of the sound effects, voice, and music data during play, sending the final, mixed digital audio track to the sound card's digital audio section). Many of today's games employ "CD music" soundtracks. The music soundtrack is not only stored in digital audio form, but is also contained on the CDROM. The game software instructs the CD player to play that digital audio track at a certain point in the game, and the output of the CDROM is piped through your sound card to your speakers, mixed with the sound card's DAC by the sound card itself.
+
+<P>But since digital audio takes up a lot more disk space than MIDI data, some game software uses MIDI to play the (instrumental) background music. The card's digital audio section doesn't handle MIDI data, so the card has another section which is a built-in "MIDI sound module". This section handles MIDI (ie, music) playback. In old cards, this section was an FM Synth (ie, used FM synthesis, involving oscillators, to produce sound). This design was rather primitive and unimpressive sounding. Later designs added a WaveTable Synth (ie, used looped digital audio waveforms of various instruments, stored in a ROM on the card itself). So most cards have two sections that play MIDI data; the FM Synth and the WaveTable Synth. Only one of these sections is used by a game. The FM Synth is used by old games that were
+written before wavetable synth sections appeared (and therefore the software isn't written to control the wavetable). The WaveTable Synth is supported by new game software.
+
+<P><B>Note</B>: Actually the FM and WaveTable Synths upon many sound cards aren't designed to accept MIDI data. They accept a much cruder form of "musical instructions" first developed by the premier makers of crude game standards; Creative Labs. But, we'll just call it MIDI for the sake of simplicity, since it is a form of musical instructions, like MIDI is.
+
+<P>For games that use MIDI for music playback, you may want to read the basic article <A HREF="whatmidi.htm">What is MIDI?</A> before continuing further with this FAQ.
+
+<P>Because the wavetable sound modules in virtually all sound cards nowadays, such as the SB Live, are General MIDI, multitimbral sound modules, you may also wish to read the following 2 articles:
+
+<P><A HREF="multi.htm">What is MultiTimbral?</A>
+<BR><A HREF="http://www.borg.com/~jglatt/tech/gm.htm">General MIDI</A>
+
+<P>Also, there is much information about MS-DOS sound card support (ie, older games, prior to DirectX) and game card support in the article <A HREF="midicard.htm">Audio Cards and MIDI Interfaces for a computer</A>. This should be read before proceeding. If you're using only game software that requires DirectX, then MS-DOS hardware issues are irrelevant to you. Instead, what most concerns you is driver support. You want stable drivers with fully-implemented DirectSound and Direct3D support.
+
+<P><H2><A NAME="q1">I</A> have a Sound Blaster 16. When I run the install program for many older MS-DOS games, it tells me that my card supports a "General MIDI driver." I select this, and the install program accepts this choice without question. But, when I start up the game (ie, and actually test this choice), I hear no music whatsoever.</H2>
+
+<P>The <B>General MIDI</B> option for older, MS-DOS game software works by sending MIDI messages to an MPU-401 compatible MIDI OUT port. It is expected that you'll have a General MIDI sound module attached to this MIDI OUT port. Some sound cards, such as Roland's SCC-1 or RAP-10, or Yamaha SW60XG, have their internal (ie, built-in) GM wavetable module attached to this MPU-401 MIDI OUT port, so when you select the "General MIDI" music option in games, the card's wavetable section plays the music.
+
+<P>The SB16 <B>does</B> have an MPU-401 compatible MIDI OUT port (and the game software can find this and will therefore report that the card supports "General MIDI" in theory), but it's attached to *no* sound module by default. The SB16's FM synth section is not attached to this port. The FM synth section is addressed separately, in a completely different manner, which is why you need to select the "SB FM Synth" option in order to hear music. Likewise, the internal (built-in) wavetable synths in the AWE32 or SB32 are not attached to this MPU-401 MIDI OUT port. The built-in wavetable also has its own address, which is why you need software that specifically supports the SB's built-in wavetable.
+
+<P>If you add an external GM module to your SB16's MIDI OUT, then you'll hear music from the game's "General MIDI" option. Alternately, if you add a daughterboard to your SB16 (such as a Roland SCD-10 or Yamaha DB50XG), this internally attaches to the SB16's MIDI OUT port, and will work the game's GM music option.
+
+<P>The AWE32 and SB32 ship with a DOS TSR that allows the game's "General MIDI" option to work with the built-in wavetable module. How does this work if the software is supposedly writing to the MIDI OUT port, but the wavetable isn't physically attached to that port? Well, through some CPU trickery, the DOS TSR wedges itself inbetween the game and the SB, and every time the game tries to write to the MPU MIDI OUT port, the TSR grabs that data and reroutes it to the SB wavetable synth, sometimes altering the data if necessary. Needless to say, such a ruthless, intrusive software scheme sometimes adversely affects the game's performance, and maybe even won't work at all with some games.
+
+<P>Sometimes, running MS-DOS game software under Windows (ie, not rebooting into MS-DOS mode, but rather, running the software in a DOS box) allows the Windows driver for the card to intercept the software's attempts to access the hardware, just like a DOS TSR. That's why, with some Windows drivers, you can get the General MIDI option to make sound when the MS-DOS software is running under Windows, but not when you boot into MS-DOS itself. Furthermore, the Windows driver may even intercept old game software that uses only the FM Synth section of the card (ie, doesn't know how to use either the built-in WaveTable nor General MIDI) and will reroute that music data to the WaveTable Synth. Hence, you'll get a dramatic improvement in sound quality running that game under Windows with such a driver, rather than under MS-DOS. But again, these software tricks sometimes adversely affect performance, slowing down game play or even resulting in music
+playback glitches or stuck notes.
+
+<P>On the other hand, if your game sound doesn't work under Win95, but does work when you boot off of an MS-DOS boot disk, then see the answer to the question <A HREF="win95.htm#w5">Why can't I get sound from my MS-DOS game programs run under Win95?</A>.
+
+
+
+<P><H2><A NAME="q2">Do</A> I need to use an MPU-401 driver in order to control the daughterboard plugged into my Sound Blaster?</H2>
+
+<P><B>NOOOOOOO!!!!</B> Don't ever use an MPU-401 driver unless you plugged your daughterboard into a real Roland MPU-401 MIDI card. The drivers that came with your sound card, and are supplied by your card's manufacturer, always handle the operation of any daughterboard (ie, even a Roland daughterboard such as the SCD-10 or SCD-15). And especially don't try to use an MPU-401 driver to control the same card that you have other drivers simultaneously controlling. That's like sticking your head in the toilet in order to wash your hair.
+
+<P>For more info read the answer to <A HREF="rap10use.htm#q8">Do I use the Windows MPU-401 device driver with my SCD-10 or SCD-15?</A>.
+
+
+
+<P><H2><A NAME="q3">How</A> should I setup Win95/98 so that it runs older MS-DOS game software in either MS-DOS mode or a DOS box well?</H2>
+
+<P>See the answer to the question <A HREF="win95.htm#w5">Why can't I get sound from my MS-DOS game programs run under Win95?</A> for a discussion of setting up MS-DOS mode, as well as cleaning out real-mode drivers from Win95's bootup.
+
+<P>Furthermore, I recommend setting Win95's disk cache and virtual memory to fixed sizes. See the answer to the question
+<A HREF="win95.htm#w7">"How do I get my 16-bit sequencer program to have more stable digital audio under Win95?"</A>.
+
+</BODY></HTML>

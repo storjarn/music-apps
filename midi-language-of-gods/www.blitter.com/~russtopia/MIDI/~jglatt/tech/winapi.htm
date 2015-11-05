@@ -1,0 +1,293 @@
+<HTML><HEAD><TITLE>Windows Programming</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Unlike with some other operating systems, in Windows, a program should refrain from directly
+reading and writing hardware ports on a sound card. Whenever possible, a program should
+instead call functions in the Windows operating system, which will do the
+actual hardware reading and writing for you (in conjunction with the sound
+card's Windows device driver). For writing data to the card, you pass that data
+to an operating system function that sends that data to the card's device driver,
+which in turn writes that data to the card. For reading data from the card, you call
+an operating system function that causes the driver to read some data from the
+card, perhaps placing that data into a buffer whose address you've specified. In
+this way, you'll create a Windows program that will:
+
+<OL>
+<LI>continue to operate under versions of Windows which restrict access to
+hardware, in order to implement "crash protection" (for example, Windows NT/2000/XP). Typically,
+such versions allow drivers to operate in special "modes" that allow hardware access, but
+restrict programs from the same access.
+
+<P><LI>work with a wide range of sound cards and MIDI interfaces. It's the driver that has the
+hardware specific code in it, not your program. The drivers for various hardware
+all look the same to the program and operating system. (ie, Every driver has the same set
+of functions in it, which are called by the operating system using one "standard"
+method for all. Therefore, your program automatically supports all such drivers and their hardware
+by virtue of calling Windows operating system functions).</P>
+</OL>
+
+<P>So, is there a "standard" that all Windows sound/MIDI drivers are written
+to follow (ie, such that each driver has the same set of functions, to be
+called using the same method)? Yes. This is called Windows "Media Control
+Interface" (ie, MCI). The Windows MIDI Mapper, the MCI Sequencer Device 
+(driver), and the MCI Wave Audio Device (driver) are 3 parts of MCI that
+are particularly relevant to sound/MIDI cards.</P>
+
+<P>When a user buys a sound/MIDI card, he installs the Windows MCI driver that ships with it
+(for example, using Windows Control Panel's <I>Add new Hardware</I>. See the
+explanation of <A HREF="../tutr/win95.htm#w1">installing a driver under Win95</A> for more
+details). Virtually <U>every</U> PC sound/MIDI card ships with a Windows MCI driver for that
+card. You should never have to write a Windows driver for a card unless you're the manufacturer
+of that card. As a program developer, you don't care what particular brand/model card is being
+used (as long as it supports what you need to do). You don't even need to know the name of
+the driver, because you call it indirectly via functions in the Windows operating system.</P>
+
+<P><B>Note:</B> Windows programs that call these MIDI and digital audio functions in the Windows
+operating system should include the header MMSYSTEM.H (and MMREG.H for Win32), and also be linked
+with the library WINMM.LIB (or MMSYSTEM.DLL if a Win3.1 program).</P>
+
+<H2>Windows' lists of devices</H2>
+
+In any computer, there can be more than one installed card capable of inputting or outputting MIDI
+data. Likewise, there can be more than one installed card capable of recording/playing digital
+audio data. (Needless to say, each card will have its own driver installed). For this
+reason, Windows maintains a list of all of the installed devices that support MIDI and
+Digital Audio. The list of devices that support MIDI is a separate list from the list
+of devices that support Digital Audio. So, if one card happens to support both Digital
+Audio and MIDI, a name for it will appear in both lists. In fact, Windows differentiates between
+devices that support MIDI input and devices that support MIDI output, and maintains separate
+lists for each. So, if one card happens to support both MIDI input and output, a name for it will
+appear in both lists. Likewise, Windows maintains separate lists for devices that record Digital
+Audio as well as devices that play Digital Audio.
+
+<P>Therefore, Windows maintains 4 lists:</P>
+
+<OL><LI>Devices that can input (or create) MIDI data.
+<P><LI>Devices that can output MIDI data (or play it upon some sort of built-in sound module).
+<P><LI>Devices that can record (or create) Digital Audio data.
+<P><LI>Devices that can output (ie, usually play) Digital Audio data.</OL>
+
+<P>For a card that can input/output MIDI data, as well as record/play Digital Audio data, a name for
+it will appear in all 4 lists.</P>
+
+<P>What name for a device appears in each list? Well, that is entirely up to the card's device driver. It is
+the card's device driver that tells Windows into which lists Windows should place the card's name, and what
+name to use for each list. And in fact, if the card has several different components that can logically fit
+into one list, then the device driver may tell Windows to put several component names into that list.</P>
+
+<P>Let's take an example for illustration: A Creative Labs' AWE32 sound card. This card has the following components:</P>
+
+<OL><LI>An ADC that can record stereo Digital Audio.
+<P><LI>A DAC that can play stereo Digital Audio.</P>
+<P><LI>A MIDI In port that can input MIDI data.</P>
+<P><LI>A MIDI Out port that can output MIDI data.</P>
+<P><LI>An FM Synth sound module that can play MIDI data.</P>
+<P><LI>A Wavetable Synth sound module that can play MIDI data.</P></OL>
+
+<P>Notice that the last 3 components can all fit into the list of devices that support outputting or playing MIDI
+data. So, the AWE32 driver is going to tell Windows to put 3 names into that one list. For example, the driver may
+tell Windows to put the name "AWE32 MIDI Out" into the list. The driver may tell Windows to also put the name
+"AWE32 FM Synth" into that same list. Finally, the driver may tell Windows to also put the name "AWE32 Wavetable
+Synth" into that same list. Although these 3 components are all on the same card, to Windows, they represent 3
+individual devices that are capable of outputting/playing MIDI data, and Windows treats them as if they really are
+3 separate devices. (Incidentally, there is no particular rules about naming the components. I just arbitrarily
+picked the above 3 names, although they do make sense. A manufacturer can put any names he wants into his driver
+for inclusion into those Windows lists).</P>
+
+<P>Of course, the AWE32 driver will also tell Windows to put the name "AWE32 Digital Audio In" into the list of
+devices that support recording Digital Audio. The driver will also tell Windows to put the name "AWE32 Digital
+Audio Out" into the list of devices that support playing Digital Audio. Finally, the driver will also tell Windows
+to put the name "AWE32 MIDI In" into the list of devices that support recording or creating MIDI data.</P>
+
+<P>Windows assigns a <B>Device ID</B> (ie, merely an unsigned long numeric value) to each name in its lists. The
+first device in each list gets a value of 0, and the subsequent devices have increasing values for their IDs. (ie,
+The second device in a list has a Device ID of 1, the third device has an ID of 2, etc).</P>
+
+<P>So in our above example, the 3 components that the AWE32 device driver told Windows to add to the list of devices
+that support playing MIDI data ("AWE32 MIDI Out", "AWE32 FM Synth", and "AWE32 Wavetable Synth") will have Device IDs
+of 0, 1, and 2 respectively (assuming that they were added to the list in that order and are the first 3 names to be
+added to the list).</P>
+
+<P>In fact, drivers for MIDI interfaces that have multiple MIDI Outputs typically add a separate name to the list
+for each MIDI Output, for example "MIDI Out #1 for Brand X card", "MIDI Out #2 for Brand X card", etc.</P>
+
+<P>The one caveat to this is the "MIDI Mapper" device driver which is part of Windows. This doesn't appear in the
+list of devices that support outputting MIDI data, although the MIDI Mapper is indeed a device to which your program
+can output MIDI data. MIDI Mapper always has a Device ID of -1.</P>
+
+<P>For a discussion of writing a program that properly shares MIDI inputs and outputs,
+see <A HREF="share.htm">Managing MIDI Ports</A>.</P>
+
+<H2>Low level API</H2>
+
+The "low level" Windows functions are called that because they require that your program does a lot of the
+work of recording/playing MIDI and Digital Audio data, short of actually manipulating the sound card hardware.
+
+<P>For example, if you want to play a MIDI file (ie, play a musical sequence), then you have to load
+the MIDI data contained within that file, use a (Windows software) timer to determine when it is time
+to output each MIDI message, and when that time occurs, pass that message (ie, its data bytes) to a
+Windows function that actually outputs the bytes.</P>
+
+<P>If you want to record a MIDI file, then you have to tell Windows to notify you when the card's driver has
+input the next MIDI message and to request Windows to pass you those MIDI data bytes, use a (Windows software)
+timer to timestamp that MIDI message, and write the bytes to disk (typically in MIDI File Format).</P>
+
+<P>Because your program does most of the work, you have a lot of control over the playback/recording
+process, such as the ability to vary tempo, or perform filtering/mixing/transposing/etc of data on-the-fly.</P>
+
+<P>For a more indepth discussion of writing a program that uses the Low level MIDI functions,
+see <A HREF="lowmidi.htm">Low level MIDI API</A>.</P>
+
+<P>There are also low level functions for Digital Audio. Again, these require that you do a lot of
+work to record/play the digital audio data.</P>
+
+<P>For example, if you want to play a WAVE file (ie, play digital audio), then you have to load the digital audio data
+contained within that file in "blocks" (ie, usually filling a buffer of 4K of data at a time), and feed it to a
+Windows function that actually outputs the data. In order to get a smooth, continuous playback of digital audio, you
+typically have to do double-buffering (ie, while the card is playing back one buffer of 4K data, you need to be
+simultaneously filling a second buffer with the next 4K of data).</P>
+
+<P>If you want to record a WAVE file, then Windows has to feed you a continuous stream of those
+blocks of data, and you must write each block to disk (typically in WAVE File Format). In order
+to get a smooth, continuous recording of digital audio, you typically have to do double-buffering
+(ie, while the card is recording one buffer of 4K data, you need to be simultaneously writing the
+buffer containing the previous 4K of data to disk).</P>
+
+<P>For a more indepth discussion of writing a program that uses the Low level Digital Audio functions,
+see <A HREF="lowaud.htm">Low level Digital Audio API</A>.</P>
+
+<H2>High level API</H2>
+
+The "high level" Windows functions are called that because they relieve your program of a lot of the
+burden of recording/playing MIDI and Digital Audio data.
+
+<P>For example, if you want to play a MIDI file (ie, play a musical sequence), then you merely call one Windows
+function, specifying the name of the MIDI file to be played back. Windows will open the MIDI file and load the
+MIDI data contained within that file, use a (Windows software) timer to determine when it is time to output each
+MIDI message, and actually output the bytes. In other words, Windows plays the MIDI file in the background while
+your program can go on to do other things simultaneously.</P>
+
+<P>If you want to record a MIDI file, then you merely call one Windows function, specifying the
+name of the MIDI file to be created. Again, Windows does all of the work of reading the incoming
+MIDI data, time-stamping each message, and writing the data to disk in MIDI File Format. (NOTE: At
+this time, Windows does not offer High level API support for MIDI recording).</P>
+
+<P>But because your program doesn't do most of the work, you lose a lot of control over the
+playback/recording process, such as being able to perform filtering of data on-the-fly, etc. You're
+pretty much limited to being able to stop, start, pause, rewind, and fast-forward the playback.</P>
+
+<P>For a more indepth discussion of writing a program that uses the High level MIDI functions,
+see <A HREF="highmidi.htm">High level MIDI API</A>.</P>
+
+<P>There is also a high level API for playing/recording WAVE files. Just like with the High level MIDI
+API, Windows does a lot of the work (ie, completely loads and plays the WAVE file in the background),
+but again, you lose a lot of control over the actual playback (for example being able to do on-the-fly
+mixing of digital audio -- to implement virtual tracks. For a more indepth discussion of virtual tracks,
+see the article <A HREF="../tutr/digaudio.htm#p1">Digital Audio on a computer</A>).</P>
+
+<P>For a more indepth discussion of writing a program that uses the High level Digital Audio functions,
+see <A HREF="highaud.htm">High level Digital Audio API</A>.</P>
+
+<H2>A new, "inbetween" MIDI API</H2>
+
+A further option for MIDI sequencing (ie, the playback of musical excerpts using MIDI events)
+under Win95/98/ME/2000/XP and WinNT (4.X and above only) is to use the Stream API. This allows you to store a MIDI
+message in a special structure that contains a field that specifies the amount of time to delay
+before outputting the MIDI message. Windows does the actual timing of the MIDI playback. Unlike
+with the High level MIDI API, you still load the MIDI data and feed each message (or more likely a
+block of messages) to Windows (ie, so you have more control over the playback on a per-message basis),
+but you no longer have to time the playback. In other words, the Stream API is useful for playing back
+musical sequences where you still have a lot of control over individual events and can therefore perform
+various filtering and modification of MIDI data on-the-fly, but don't want to deal with timing issues
+(which is particularly aggravating under Win95/98/ME due to the timing discrepancies of 32-bit MultiMedia
+Timer callbacks).
+
+<P>Currently, the Stream API supports playback only (not recording -- ie, it can't supply you with
+time-stamped incoming MIDI messages). So, if you need to do MIDI recording, you'll have to use the
+Low level MIDI API and a MultiMedia Timer, or use DirectMusic.</P>
+
+<P>For a more indepth discussion of writing a program that uses the MIDI Stream functions,
+see <A HREF="stream.htm">MIDI Stream API</A>.</P>
+
+<H2>A new, fancier Digital Audio API</H2>
+
+<P>Many game programs use lots of digital audio for sound effects, and various waveforms often have to be mixed
+on-the-fly. For this purpose, Microsoft devised a new set of functions called "DirectSound" (ie, part of
+DirectX) under Win95/98/ME/2000/XP and WinNT (4.X and above only). These functions let the operating system
+take care of mixing several waveforms to a sound card's stereo DAC.</P>
+
+<P>DirectX versions prior to 6.1 support playback, but not recording.</P>
+
+<P>A card's device driver should have extra support to work well with the DirectSound API
+(although older drivers not directly supporting DirectSound may work with this API albeit
+very inefficiently and/or with some features disabled).</P>
+
+<P>For a more indepth discussion of writing a program that uses the DirectSound functions,
+see <A HREF="directx.htm">DirectSound API</A>.</P>
+
+<H2>A new, less archaic MIDI API</H2>
+
+<P>Many game programs also use MIDI for background music. For this purpose, Microsoft devised a new set of
+functions called "DirectMusic" (ie, part of DirectX) under Win95/98/ME/2000/XP and WinNT (4.X and above only).
+These functions are a bit newer than the older low level MIDI API, and address some of the oddities/discrepancies
+that plague the legacy MIDI API.</P>
+
+<P>DirectX versions prior to 6.0 do not include DirectMusic, and versions prior to 6.1 support only playback.</P>
+
+<P>A card's device driver should have extra support to work well with the DirectMusic API
+(although older drivers not directly supporting DirectMusic may work with this API albeit
+very inefficiently and/or with some features disabled).</P>
+
+<P>For a more indepth discussion of writing a program that uses the DirectMusic functions,
+see <A HREF="directmu.htm">DirectMusic API</A>.</P>
+
+<H2>Miscellaneous Functions (ie, the Mixer API, and Aux API)</H2>
+
+The Mixer API has functions to get a listing of all of the various inputs and outputs on a
+particular card (ie, how many Aux inputs, Line inputs, Mic inputs, Line outputs, etc, it has), and to
+adjust all of the volumes of these various components, as well as perform other operations such as
+muting inputs. This is a new API added to Win95/98/ME/2000/XP and WinNT (4.X and above only).
+
+<P>A card's device driver needs extra support to work with the Mixer API. Not all Windows
+drivers have this support. Win3.1 drivers do not.</P>
+
+<P>For a more indepth discussion of writing a program that uses the Mixer functions,
+see <A HREF="mixer.htm">Mixer API</A>.</P>
+
+<P>Older drivers should at least support the Aux API. Just like with the lists for devices that
+support MIDI input and output, and Digital Audio playback and recording, Windows maintains a list
+of all devices that have Aux outputs. (And again, a card's device driver instructs Windows to put
+some name into this list). The Aux functions allow a program to control the volume (and perhaps
+other settings) of each Aux output. Typically, audio from a CDROM or the audio output of a voice
+modem is connected to a sound card's Aux output. (ie, So, it's the volume of these that you're affecting).</P>
+
+<P>For a more indepth discussion of writing a program that uses the Aux functions,
+see <A HREF="auxapi.htm">Aux API</A>.</P>
+
+<H2>MultiMedia File functions</H2>
+
+When programs use the low level MIDI and Digital Audio API, they typically have to open, read, and
+write MIDI and WAVE File Format files. To help parse <A HREF="aboutiff.htm">Interchange File Format</A>
+types of files (ie, files whose data is arranged into nested chunks), Windows has a MultiMedia File
+(ie, Mmio) API.
+
+<P>For a more indepth discussion of writing a program that uses the MultiMedia File API,
+see <A HREF="mmio.htm">MultiMedia File API</A>.</P>
+
+<H2>Misc Topics</H2>
+
+<HR>
+
+The following online Windows book is available for download. It gives more information
+about the Windows MIDI and digital audio functions (as well as Aux API and MultiMedia Timer
+API). But note that this book dates back to Windows 3.1, so some newer features, APIs, and notes may
+be omitted. Use the tutorials on this site for more uptodate information.
+
+<P><A HREF="../midi/software/dev/winmm.zip">Windows MultiMedia System Book</A></P>
+
+<HR>
+
+<P>For a more indepth discussion of the history of why and how the Windows MIDI and
+digital audio functions came to be, read the introduction to the article
+<A HREF="../tutr/midicard.htm">Audio cards and MIDI Interfaces for a computer</A>.</P>
+
+</BODY></HTML>

@@ -1,0 +1,23 @@
+<HTML><HEAD><TITLE>MIDI Specification: Reset</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Reset</CENTER></FONT></H2></P>
+
+<P>Category: System Realtime
+
+<P><FONT COLOR=GREEN>Purpose</FONT>
+<P>The device receiving this should reset itself to a default state, usually the same state as when the device was turned
+on. Often, this means to turn off all playing notes, turn the local keyboard on, clear running status, set Song Position to 0,
+stop any timed playback (of a sequence), and perform any other standard setup unique to the device. Also, a device may
+choose to kick itself into Omni On, Poly mode if it has no facilities for allowing the musician to store a default mode.
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0xFF
+
+<P><FONT COLOR=GREEN>Data</FONT>
+<P>None
+
+<P><FONT COLOR=GREEN>Errata</FONT>
+<P>A Reset message should never be sent automatically by any MIDI device. Rather, this should only be sent when a
+musician specifically tells a device to do so.
+
+</FONT></BODY></HTML>

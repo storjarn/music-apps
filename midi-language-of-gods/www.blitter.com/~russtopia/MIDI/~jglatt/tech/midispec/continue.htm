@@ -1,0 +1,22 @@
+<HTML><HEAD><TITLE>MIDI Specification: MIDI Continue</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>MIDI Continue</CENTER></FONT></H2></P>
+
+<P>Category: System Realtime
+
+<P><FONT COLOR=GREEN>Purpose</FONT>
+<P>Some master device that controls sequence playback sends this message to make a slave device resume playback
+from its current "Song Position". The current Song Position is the point when the song/sequence was previously stopped,
+or previously cued with a Song Position Pointer message.
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0xFB
+
+<P><FONT COLOR=GREEN>Data</FONT>
+<P>None
+
+<P><FONT COLOR=GREEN>Errata</FONT>
+<P>Often, the slave device has its playback tempo synced to the master via MIDI Clock. See
+<A HREF="seq.htm">Syncing Sequence Playback</A>.
+
+</FONT></BODY></HTML>

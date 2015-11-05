@@ -1,0 +1,24 @@
+<HTML><HEAD><TITLE>MIDI File Format: Tempo</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<FONT COLOR=BLUE><H3><CENTER>Tempo</CENTER></H3></FONT></P>
+
+<P>FF 51 03 <I><FONT COLOR=RED><B>tt tt tt</B></FONT></I>
+
+<P>Indicates a tempo change. The 3 data bytes of <B>tt tt tt</B> are the tempo in microseconds per quarter note. In other
+words, the microsecond tempo value tells you how long each one of your sequencer's "quarter notes" should be. For example,
+if you have the 3 bytes of 07 A1 20, then each quarter note should be 0x07A120 (or 500,000) microseconds long.
+
+<P>So, the MIDI file format expresses tempo as "the amount of time (ie, microseconds) per quarter note".
+
+<P><B><FONT COLOR=RED>NOTE:</FONT></B> If there are no tempo events in a MIDI file, then the
+tempo is assumed to be 120 BPM
+
+<P>In a format 0 file, the tempo changes are scattered throughout the one
+MTrk. In format 1, the very first MTrk should consist of only the tempo (and time signature) events
+so that it could be read by some device capable of generating a "tempo map". It is best not to
+place MIDI events in this MTrk. In format 2, each
+MTrk should begin with at least one initial tempo (and time signature) event.
+
+<P>See also: <A HREF="ppqn.htm">Tempo and Timebase</A>.
+
+</FONT></BODY></HTML>

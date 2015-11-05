@@ -1,0 +1,16 @@
+<HTML><HEAD><TITLE>MIDI File Format: Text</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<FONT COLOR=BLUE><H3><CENTER>Text</CENTER></H3></FONT></P>
+
+<P>FF 01 <I><FONT COLOR=GREEN><B>len</B></FONT></I> <I><FONT COLOR=RED><B>text</B></FONT></I>
+
+<P>Any amount of text (amount of bytes = <I><FONT COLOR=GREEN><B>len</B></FONT></I>) for any
+purpose. It's best to put this event at the beginning of an MTrk. Although this text could be
+used for any purpose, there are other text-based Meta-Events for such things as orchestration,
+lyrics, track name, etc. This event is primarily used to add "comments" to a MIDI file which a
+program would be expected to ignore when loading that file.
+
+<P>Note that <I><FONT COLOR=GREEN><B>len</B></FONT></I> could be a series of bytes since it
+is expressed as a variable length quantity.
+
+</FONT></BODY></HTML>

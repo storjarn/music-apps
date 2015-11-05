@@ -1,0 +1,60 @@
+<HTML><HEAD><TITLE>Creating effects (delay, reverb, etc) with MIDI</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+<P>I have often been asked if there is any software to do digital effects upon MIDI output (ie, distortion, chorus, delay, etc). Some people have the idea that they would like to use software that implements the same effects upon their sequencer's MIDI tracks as is offered upon a hardware effects unit.
+
+<P>Remember that MIDI is not audio data. MIDI is control data. That is, the MIDI stream is electrical digital signals that convey "hardware instructions", not "audio output". (For more details about MIDI, read the article <A HREF="whatmidi.htm">What's MIDI?</A>). So, you can't regard MIDI as an audio signal, and treat it as so.
+
+<P>If you were thinking about some sort of software that somehow intercepts the MIDI data that a sequencer program is sending out of your computer's MIDI interface to external MIDI gear, and "adds effects" such as "distortion" to that MIDI stream, then you definitely have a misunderstanding of what MIDI is and what it does, and/or how certain effects are implemented.
+
+<P>First of all, you definitely don't want to alter the MIDI signal itself because not only aren't those "hardware instructions" audio signals, altering them will achieve absolutely no purpose except to make it 
+impossible for your gear to communicate over MIDI. It would mutate that MIDI "language" into a "foreign language" that your external MIDI gear would no longer understand. So, for example, you can't plug a MIDI cable into a distortion box or delay device and expect to be "adding effects" as if you were doing so to a musical, audio signal. You wouldn't be.
+
+<P>You <u>can</u> add more instructions to the MIDI stream that may result in causing a  sound module to simulate the effects that an effects box may have. <u>But, the sound module itself must be capable of simulating those effects.</u> And that's the gist of it right there. You're not adding the actual effects to the MIDI stream. Rather, you're adding more MIDI instructions that tell your sound module to do something with its hardware which simulates some effect like distortion, delay, reverb, etc. Hopefully, the sound module's hardware can be manipulated to simulate the effect. Of course, by nature, this all
+<u>must</u> be done in real-time, because the effect can't be achieved until the sound module actually is "sounding", which of course it does in real-time.
+
+<HR><P><A NAME="delay">Let's</A> consider the easiest effect to simulate via MIDI messages; delay. A delay is simply a discrete repeat of a sound. A digital delay will usually just "buffer" the sound coming into it, and then "play it back" a few fractions of a second later. The human ear hears this as a
+delayed repeat. One way to make a sound module produce a delay effect is to have all of the MIDI messages that are sent to it resent after a few fractions of a second have passed. You can easily do that with a sequencer track as so:
+
+<OL>
+<LI>Record a musical track and copy it to a second track (ie, duplicate all of the same MIDI data onto two tracks).
+<LI>Move the second track's MIDI events forward in time (ie, add a small amount of time, usually measured in "clock pulses", to each MIDI event on the second track). Most sequencers have a feature whereby you can specify an amount of time to be added to all events in a track.
+<LI>Play both tracks on one MIDI module. (If your module automatically cuts off overlapping note-ons, you'll need to reassign the second track to a different MIDI channel than the first track. In this case, you'll need a multitimbral module to hear both tracks).
+</OL>
+
+<P>The effect will be a delay as the module plays both tracks in real-time; the original track as well as the "delayed" track. You can make the delay longer by adding more time to the second track's events (or make it shorter by subtracting time). You can adjust the volume of the delay by adjusting all of the note velocities in the second track. Most sequencers have a feature whereby you can specify an amount to be added or subtracted from all note events' velocities.
+
+<P>You can even stick MIDI Pan Controller messages, in various places in your second track, to come up with a "panning echo". But you'll probably need to add lots of Pan events, by hand, unless you use CakeWalk's CAL language to automate the procedure, or you've got some programmable slider on your 
+module which can generate Pan Controller messages which you record with the sequencer.
+
+<P>An important thing to consider is that your sound module is using some of its voices to play the second track too. So this effect cuts down on the polyphony you have left for your other musical parts.
+
+<P>Nevertheless, a delay effect is achievable on virtually any MIDI module via MIDI (ie, most all MIDI modules play polyphonically, and either allow overlapping note-ons or are multitimbral. So, the above technique will work with most modules).
+
+<P>There are even software programs that can wedge themselves inbetween a MIDI sequencer and a MIDI interface's driver, and duplicate the MIDI stream with a delay. So, you could get the effect without needing to duplicate a sequencer's track. There are also programs that read the MIDI IN of an interface and duplicate a delayed stream to the MIDI OUT, so you could use the computer to add a delay to a part that you're playing on the module. But ultimately, your module is using more of its voices to play those delayed notes.
+
+<HR><P>Let's consider reverb. Reverb is nothing more than many, many, many, many delays (ie, repeats) of a sound, one right after the other. The time inbetween each delay is so short that our ear hears this long, long, long series of delays as a continuous sound (rather than a whole bunch of delays) that we refer to as "reverb". I deliberately used the phrases "many, many, many" and "long, long, long" because I need to point out that we're typically talking about thousands of repeats in order to get a typical 
+reverb sound. You'd run out sequencer tracks to copy delayed MIDI events, as well as voices on your MIDI gear, before you'd ever get enough delays to achieve even a decent reverb effect. So, forget about it. You'll need dedicated hardware (ie, some sort of DSP setup for a reverb effect) for this effect.
+
+<HR><P>Let's consider distortion. Distortion involves clipping of audio signals. You have to feed a Distortion box (or algorithm) audio data. In the case of a Distortion box, it typically expects an analog audio signal (ie, such as what comes out of the AUDIO OUT jack on your MIDI gear). That's definitely
+not a MIDI stream. A software algorithm typically operates upon digital audio data (such as what is contained in a WAVE file, or what comes from a sound card's Analog to Digital Converter). That's definitely also not a MIDI stream. The only way to produce distortion via MIDI is maybe to boost the
+note velocities upon all note-on events, turn up the volume of the Patch, and hope that your module's audio output clips. Most MIDI gear is designed so that even if you "turn everything up to maximum", the output won't clip. There's enough "headroom" built in. So, it's doubtful that this technique
+will work. (Besides, if you use volume to overdrive the output stage, then you'll need an external volume control for the overall volume of the part). Again, distortion is something that you'll need dedicated hardware to achieve.
+
+<HR><P>To simulate a chorus effect, your MIDI module would have to allow lots of control over the module's Voltage Controlled Filter (ie, VCF) via MIDI messages. Very few modules offer that. Again, it'll probably be easier and more effective to use dedicated hardware for such.
+
+<HR><P>A leslie effect involves continuously panning a sound (which you can do on virtually every module via MIDI Pan Controller messages) as well as varying filter cutoff (which again, is probably not implemented via MIDI).
+
+<HR><P>In conclusion, about the only effect that is "do-able" via MIDI (without any dedicated effects hardware beyond what is in nearly every module manufactured today) is delay.
+
+<P>It should be pointed out that many hardware effects devices nowadays allow their parameters to be controlled via MIDI messages, even in real-time. So, you could use computer software to control the effects hardware, but you can't just replace the hardware with a software program.
+
+<P>The nice thing about computer sound cards that do have some effects hardware built-in (ie, maybe a generic DSP chip, or dedicated delay/chous/reverb/etc units) is that the cards are typically designed so
+that computer software can directly access, control, and maybe even somehow transform the card's hardware effects (ie, maybe by loading new algorithms into the DSP).
+
+<P>As a side note, it's possible to use computer software to modify digital audio data, and then send this modified data to a Digital to Analog Converter (ie, DAC) for playback. But of course, digital audio is something entirely different than MIDI. Software that deals with digital audio waveforms often offers the ability to perform effects algorithms such as delay, reverb, distortion, flanging, etc. After all, such software is directly manipulating the audio data, not MIDI control information, and so algorithms
+can be applied directly to that audio data. With MIDI, you're always controlling some sound source which is producing the audio data in real-time. If the sound source has no way of doing what you're asking it
+to do (via MIDI instructions), then you can't manipulate the audio data as desired.
+
+<P>So, it may be advantageous to wait to apply your effects until after you record the MIDI playback into some digital audio program such as Cool Edit. Play/record each MIDI track separately, as a distinct audio track in Cool Edit. And then apply the effect to that audio track.
+
+</BODY></HTML>

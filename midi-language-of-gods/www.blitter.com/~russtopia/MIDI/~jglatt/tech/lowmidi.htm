@@ -1,0 +1,541 @@
+<HTML><HEAD><TITLE>Low Level MIDI API</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Using the Low level MIDI API, you need to first call midiOutOpen() or midiInOpen() to open some MIDI device for
+output or input respectively.
+
+<P>In order to write out MIDI data to a particular device, you need to first call midiOutOpen() once, passing it the
+Device ID of that desired device. Then, you can subsequently call a function such as midiOutShortMsg() which
+(immediately) outputs MIDI data to that device.</P>
+
+<P>In order to read incoming MIDI data from a particular device, you need to first call midiInOpen() once, passing it
+the Device ID of that desired device. Then, Windows will subsequently pass your program each incoming MIDI message from
+that device.</P>
+
+<P>After you're done inputting or outputting to a device (and have no further use for it), you must close that device.</P>
+
+<P>Think of a MIDI device like a file. You open it, you read or write to it, and then you close it.</P>
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Opening the default MIDI device for output</FONT></H2>
+
+How does your program choose a MIDI device for output? There are several different approaches you can take,
+depending upon how fancy and flexible you want your program to be.
+
+<P>Recall that Windows maintains separate lists of the devices which are capable of inputting MIDI data, and the
+devices capable of outputting MIDI data. For output, there is also the MIDI Mapper. It's not really a device in the
+MIDI Output list. (Ie, If you enumerate the devices in that list, you won't come across the MIDI Mapper). But it is
+there nonetheless. So what MIDI Output is the MIDI Mapper attached to? Well, that depends upon the settings that the
+user has made in Control Panel's Multimedia MIDI page. This Control Panel utility lets him route default MCI MIDI Output
+to a single MIDI Output (ie, one of the real MIDI Outputs in Windows' list). Or, he can use the "Custom configuration"
+setup (not available in Windows 2000/NT/XP) to split
+up the 16 MIDI channels among several of the real MIDI Outputs, for example, he could set all MIDI events on channel 1 to
+go to the built-in wavetable module on his Creative Labs sound card, and all MIDI events on channel 2 to go to the built-in
+wavetable on his Turtle Beach sound card. So when using the MIDI Mapper, although your program outputs to only one "device",
+it actually supports having the various MIDI channels going to different devices (which the user may desire for more
+polyphony or because some cards are better suited for certain sounds, etc). Plus, the "Add new Instrument" feature
+(not available in Windows earlier than Windows 95) allows the user to apply Instrument Definition Files thus remapping your
+program's MIDI output even more, for example, to make non-General MIDI instruments conform to General MIDI.
+
+<P>When you use the MIDI Mapper for output, think of the Multimedia utility's "MIDI" page as becoming the "MIDI Setup"
+dialog for your own application. Whichever way the user set that page up is where your calls to midiOutShortMsg() and
+midiOutLongMsg() get routed. So, by opening the MIDI Mapper, you use the "default MIDI Out" setup.
+
+<P>The MIDI Mapper has a defined Device ID of -1, so to open MIDI Mapper for MIDI Output:</P>
+
+<PRE><FONT SIZE=3><B><FONT COLOR=GREEN>unsigned long</FONT> result;
+HMIDIOUT      outHandle;
+
+<FONT COLOR=BROWN>/* Open the MIDI Mapper */</FONT>
+result = midiOutOpen(&outHandle, (UINT)-1, 0, 0, CALLBACK_WINDOW);
+<FONT COLOR=GREEN>if</FONT> (result)
+{
+   printf("There was an error opening MIDI Mapper!\r\n");
+}
+</B></FONT></PRE>
+
+One drawback with MIDI Mapper is that it does impose an extra layer of software processing upon your MIDI output. If the
+user never enables the "Custom configuration", then all MIDI data ends up going to one device anyway, so you gain nothing
+here (and lose a little efficiency).
+
+<P><HR NOSHADE><H2><FONT COLOR="#FF8040">Opening the default MIDI device for input</FONT></H2>
+
+OK, that works for MIDI output, but what about MIDI input? There is no MIDI Mapper for input. You have to open one of the
+real devices. Remember that the first device in each list has a Device ID of 0. If he has at least one device capable of
+MIDI input, then you at least have a device with ID #0. So, you can simply use a Device ID of 0 with midiInOpen() as so:</P>
+
+<PRE><FONT SIZE=3><B><FONT COLOR=GREEN>unsigned long</FONT> result;
+HMIDIIN      inHandle;
+
+<FONT COLOR=BROWN>/* Open the MIDI In device #0. Note: myWindow is a handle to some open window */</FONT>
+result = midiInOpen(&inHandle, 0, (DWORD)myWindow, 0, CALLBACK_WINDOW);
+<FONT COLOR=GREEN>if</FONT> (result)
+{
+   printf("There was an error opening the default MIDI In device!\r\n");
+}
+</B></FONT></PRE>
+
+Of course, if the user has no device installed capable of inputting MIDI data, the above call returns an
+error, so always check that return value.
+
+<P>Note that the device(s) opened for output via MIDI Mapper, and the device opened for input above, may or may not be components of the same card. In other words, whichever MIDI IN jack is the default MIDI Input, and whichever MIDI OUT jack
+is the default MIDI Output, could be on two entirely different cards. But that is irrelevant to your purposes).</P>
+
+<P>The MIDI Input device with an ID of 0 is whichever MIDI device happened to first get into the list of
+MIDI Input devices upon bootup. The user really has no control over setting this.</P>
+
+<H2><FONT COLOR="#FF8040">The most flexible way to choose a MIDI device for input or output</FONT></H2>
+
+The most flexible way would be to present the user with all of the names in the list of MIDI Output devices and let him
+choose which one he wants (or if your program supports multiple MIDI output devices, you may wish to let him pick out
+several names from the list, and assign each sequencer "track" to one of those Device IDs. This is how professional
+sequencers implement support for multiple cards/outputs).
+
+<P>Whereas Windows maintains separate lists of MIDI Input and Output devices, so too, Windows has separate functions
+for querying the devices in each list.</P>
+
+<A NAME="3"></A>
+<P>Windows has a function that you can call to determine how many device names are in the list of devices that support
+outputting or playing MIDI data. This function is called midiOutGetNumDevs(). This returns the number of devices in the
+list. Remember that the Device IDs start with 0 and increment. So if Windows says that there are 3 devices in the list,
+then you know that their Device IDs are 0, 1, and 2 respectively. You then use these Device IDs with other Windows
+functions. For example, there is a function you can call to get information about one of the devices in the list, for
+example its name, and what sort of other features it has. You pass the Device ID of the device which you want to get
+information about (as well as a pointer to a special structure called a MIDIOUTCAPS into which Windows puts the info
+about the device), The name of the function to get information about a particular MIDI Output device is
+midiOutGetDevCaps().</P>
+
+<P>Here then is an example of going through the list of MIDI Output devices, and printing the name of each one:</P>
+
+<PRE><FONT SIZE=3><B>MIDIOUTCAPS     moc;
+<FONT COLOR=GREEN>unsigned long</FONT>   iNumDevs, i;
+
+<FONT COLOR=BROWN>/* Get the number of MIDI Out devices in this computer */</FONT>
+iNumDevs = midiOutGetNumDevs();
+
+<FONT COLOR=BROWN>/* Go through all of those devices, displaying their names */</FONT>
+<FONT COLOR=GREEN>for</FONT> (i = 0; i < iNumDevs; i++)
+{
+    <FONT COLOR=BROWN>/* Get info about the next device */</FONT>
+    <FONT COLOR=GREEN>if</FONT> (!midiOutGetDevCaps(i, &moc, <FONT COLOR=GREEN>sizeof</FONT>(MIDIOUTCAPS)))
+    {
+        <FONT COLOR=BROWN>/* Display its Device ID and name */</FONT>
+        printf("Device ID #%u: %s\r\n", i, moc.szPname);
+    }
+}
+</B></FONT></PRE>
+
+Likewise with MIDI Input devices, Windows has a function that you can call to determine how many device names are in
+the list of devices that support inputting or creating MIDI data. This function is called midiInGetNumDevs(). This
+returns the number of devices in the list. Again, the Device IDs start with 0 and increment. There is a function you can
+call to get information about one of the devices in the list, for example its name, and what sort of other features it
+has. You pass the Device ID of the device which you want to get information about (as well as a pointer to a special
+structure called a MIDIINCAPS into which Windows puts the info
+about the device), The name of the function to get information about a particular MIDI Input device is
+midiInGetDevCaps().
+
+<P>Here then is an example of going through the list of MIDI Input devices, and printing the name of each one:</P>
+
+<PRE><FONT SIZE=3><B>MIDIINCAPS     mic;
+<FONT COLOR=GREEN>unsigned long</FONT>    iNumDevs, i;
+
+<FONT COLOR=BROWN>/* Get the number of MIDI In devices in this computer */</FONT>
+iNumDevs = midiInGetNumDevs();
+
+<FONT COLOR=BROWN>/* Go through all of those devices, displaying their names */</FONT>
+<FONT COLOR=GREEN>for</FONT> (i = 0; i < iNumDevs; i++)
+{
+    <FONT COLOR=BROWN>/* Get info about the next device */</FONT>
+    <FONT COLOR=GREEN>if</FONT> (!midiInGetDevCaps(i, &mic, <FONT COLOR=GREEN>sizeof</FONT>(MIDIINCAPS)))
+    {
+        <FONT COLOR=BROWN>/* Display its Device ID and name */</FONT>
+        printf("Device ID #%u: %s\r\n", i, mic.szPname);
+    }
+}
+</B></FONT></PRE>
+
+You can download my <A HREF="../midi/software/dev/winapi/middevs.zip">ListMidiDevs</A> C
+example to show how to print the names of all the installed MIDI Input and Output devices, as well as other
+info about each device. Included are the Project Workspace files for Visual C++ 4.0, but since it is a console app,
+any Windows C compiler should be able to compile it. Remember that all apps should include MMSYSTEM.H and link with
+WINMM.LIB (or MMSYSTEM.LIB if Win3.1). This is a ZIP archive. Use an unzip utility that supports long filenames.
+
+<P><HR width="90%" color="#FF8040" size=10 NOSHADE>
+<H2><FONT COLOR="#FF8040">Outputting MIDI data (except System Exclusive)</FONT></H2>
+
+<P>How does an application tell Windows to output some MIDI bytes? That depends upon whether you're outputting
+System Exclusive Messages, or some other kind of MIDI message. All MIDI messages, except for System Exclusive, always
+have 3 or less bytes. So, Windows has a function through which you can pass such a MIDI message in its entirety for
+output. This function is called <B>midiOutShortMsg()</B>. What you do is pack up the 3 or less bytes of that
+MIDI message as an unsigned long value, and pass it to midiOutShortMsg(). The bytes of this MIDI message then get
+output as soon as possible (ie, hopefully immediately).</P>
+
+<A NAME="1"></A>
+<P>With midiOutShortMsg(), you need to pack up these 3 bytes into one unsigned long which is passed as one arg. The LSB of
+the low word is the MIDI status (for example, 0x90 for MIDI channel 1). The MSB of the low word is the first MIDI data
+byte, if any. (For Note events, this would be the MIDI note number). The LSB of the high word is the second MIDI data
+byte, if any. (For Note events, this would be the note velocity). The MSB of the high word is not used.</P>
+
+<P><B>Note:</B> Always include a status byte. The device driver for the card will implement running status when it
+outputs the MIDI message.</P>
+
+<P>Let's take an example of playing a 3 note chord -- a C chord (ie, C, E, and G notes).</P>
+
+<P>Each musical pitch of a chord is expressed as a MIDI note number (middle C is note number 60, so D# above middle
+C is #61, etc). We'll create a MIDI message for each one of those 3 note numbers. A MIDI message takes
+the form of 3 bytes; the Status byte, the note number, and velocity (usually implements note volume). The Status byte
+for turning a note on is 0x9<B>X</B> where X is the MIDI channel number desired (0 to F for MIDI channels 1 to 16 --
+we'll use a default of 0 but you may want to allow the user to change this). So for MIDI channel 1, the status is always
+0x90. For velocity, we'll use a default of 0x40.</P>
+
+<PRE><FONT SIZE=3><B>HMIDIOUT    handle;
+
+<FONT COLOR=BROWN>/* Open default MIDI Out device */</FONT>
+<FONT COLOR=GREEN>if</FONT> (!midiOutOpen(&handle, (UINT)-1, 0, 0, CALLBACK_NULL) )
+{
+    <FONT COLOR=BROWN>/* Output the C note (ie, sound the note) */</FONT>
+    midiOutShortMsg(handle, 0x00403C90);
+
+    <FONT COLOR=BROWN>/* Output the E note */</FONT>
+    midiOutShortMsg(handle, 0x00404090);
+
+    <FONT COLOR=BROWN>/* Output the G note */</FONT>
+    midiOutShortMsg(handle, 0x00404390);
+
+    <FONT COLOR=BROWN>/* Here you should insert a delay so that you can hear the notes sounding */</FONT>
+    Sleep(1000);
+
+    <FONT COLOR=BROWN>/* Now let's turn off those 3 notes */</FONT>
+    midiOutShortMsg(handle, 0x00003C90);
+    midiOutShortMsg(handle, 0x00004090);
+    midiOutShortMsg(handle, 0x00004390);
+
+     <FONT COLOR=BROWN>/* Close the MIDI device */</FONT>
+     midiOutClose(handle);
+}
+</B></FONT></PRE>
+
+<B>Note:</B> If your application is doing some sort of sequencing (ie, playback of a musical piece),
+you'll have to maintain a timer in order to figure out when it's time to output the next MIDI message via midiOutShortMsg().
+(Note that 32-bit Windows MultiMedia Timer callbacks under Win95 may suffer severe timing fluctuations. Since Win95's
+multimedia system is still 16-bit, you need to put your timer callback (and any functions it calls) into a 16-bit DLL in order
+for it to exhibit solid performance under Win95. WinNT doesn't exhibit this aberrant behavior with 32-bit code).
+
+<P><B>Warning:</B> There are some badly written drivers out there, especially for Windows NT/2000/XP. midiOutShortMsg()
+doesn't actually output the MIDI message. Instead, the driver puts the message in some internal queue for another thread
+(running inside of the driver) to output later, and then midiOutShortMsg() returns immediately. There's nothing wrong with
+that per se, but in these badly written drivers, when you call midiOutClose(), the driver discards any MIDI messages in its
+queue (as opposed to properly flushing them to MIDI Out). So if you call midiOutClose() too soon after calling
+midiOutShortMsg() (or perhaps even midiOutLongMsg()), then your MIDI output may end up being discarded before that other
+thread inside of the driver gets a chance to output the message. If the above example code results in stuck notes (or no sound at all) unless you put another Sleep() before the call to midiOutClose(), then you're dealing with such a badly
+designed driver. You could try to write some workaround that, whenever to call midiOutShort(), set a flag variable and start
+a one-shot timer. At the end of the timer, clear the flag. Before you ever call midiOutClose(), make sure that this
+flag is clear. If not, postpone the close. But a better solution is to contact the author of your card's driver, and tell
+him to fix his badly designed code.
+
+<P>You can download my <A HREF="../midi/software/dev/winapi/twinkle.zip">Twinkle</A> C
+example to show how to use midiOutShortMsg to play MIDI notes on the default MIDI Out device.
+Included are the Project Workspace files for Visual C++ 4.0, but since it is a console app,
+any Windows C compiler should be able to compile it.</P>
+
+<H2><FONT COLOR="#FF8040">Outputting System Exclusive MIDI messages</FONT></H2>
+
+Since System Exclusive messages can be any length, Windows has a different means for outputting them. You use the
+function midiOutLongMsg(), passing it a buffer filled with the MIDI message. (In fact, you can use midiOutLongMsg to
+pass a buffer filled with several non-System Exclusive messages. This is very handy if you need to output several
+MIDI messages that should occur simultaneously. Using midiOutShortMsg() for each individual MIDI message as we did
+in the example above may cause too much of a delay inbetween each MIDI message). You actually pass a special structure
+called a MIDIHDR which has a field where you store the pointer to your buffer containing the MIDI data.
+
+<P>But there are a few caveats:</P>
+
+<OL><LI>If running Win3.1, the data buffer (and perhaps the MIDIHDR structure, although MS examples show otherwise)
+must be allocated with GlobalAlloc() using the GMEM_MOVEABLE and GMEM_SHARE flags, and locked with GlobalLock.
+Under Win95 and WinNT, this no longer appears to be a requirement.
+
+<P><LI>Before you pass the buffer to midiOutLongMsg(), you must first "prepare" it by calling midiOutPrepareHeader().
+
+<P><LI>The MIDI Output device's driver determines whether the data is sent synchronously or asynchronously. So, with
+some devices, your app won't return from the call to midiOutLongMsg() until all of the data is output, whereas with
+other devices, you may return immediately and the driver will continue outputting the data in the background.
+
+<P><LI>After you're done with the buffer, you must "unprepare" it by calling midiOutUnprepareHeader().</OL>
+
+<P>Here's an example of outputting a System exclusive message under Win3.1:</P>
+
+<PRE><FONT SIZE=3><B>HMIDIOUT    handle;
+MIDIHDR     midiHdr;
+HANDLE      hBuffer;
+UINT        err;
+<FONT COLOR=GREEN>char</FONT>		sysEx[] = {0xF0, 0x7F, 0x7F, 0x04, 0x01, 0x7F, 0x7F, 0xF7};
+
+<FONT COLOR=BROWN>/* Open default MIDI Out device */</FONT>
+<FONT COLOR=GREEN>if</FONT> (!midiOutOpen(&handle, (UINT)-1, 0, 0, CALLBACK_NULL))
+{
+    <FONT COLOR=BROWN>/* Allocate a buffer for the System Exclusive data */</FONT>
+    hBuffer = GlobalAlloc(GHND, <FONT COLOR=GREEN>sizeof</FONT>(sysEx));
+    <FONT COLOR=GREEN>if</FONT> (hBuffer)
+    {
+        <FONT COLOR=BROWN>/* Lock that buffer and store pointer in MIDIHDR */</FONT>
+        midiHdr.lpData = (LPBYTE)GlobalLock(hBuffer);
+        <FONT COLOR=GREEN>if</FONT> (midiHdr.lpData)
+        {
+            <FONT COLOR=BROWN>/* Store its size in the MIDIHDR */</FONT>
+            midiHdr.dwBufferLength = <FONT COLOR=GREEN>sizeof</FONT>(sysEx);
+
+            <FONT COLOR=BROWN>/* Flags must be set to 0 */</FONT>
+            midiHdr.dwFlags = 0;
+
+            <FONT COLOR=BROWN>/* Prepare the buffer and MIDIHDR */</FONT>
+            err = midiOutPrepareHeader(handle,  &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR));
+            <FONT COLOR=GREEN>if</FONT> (!err)
+            {
+                <FONT COLOR=BROWN>/* Copy the SysEx message to the buffer */</FONT>
+                memcpy(midiHdr.lpData, &sysEx[0], <FONT COLOR=GREEN>sizeof</FONT>(sysEx));
+
+                <FONT COLOR=BROWN>/* Output the SysEx message */</FONT>
+                err = midiOutLongMsg(handle, &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR));
+                <FONT COLOR=GREEN>if</FONT> (err)
+                {
+                    <FONT COLOR=GREEN>char</FONT>   errMsg[120];
+
+                    midiOutGetErrorText(err, &errMsg[0], 120);
+                    printf("Error: %s\r\n", &errMsg[0]);
+                }
+
+                <FONT COLOR=BROWN>/* Unprepare the buffer and MIDIHDR */</FONT>
+                <FONT COLOR=GREEN>while</FONT> (MIDIERR_STILLPLAYING == midiOutUnprepareHeader(handle, &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR)))
+                {
+                    <FONT COLOR=BROWN>/* Should put a delay in here rather than a busy-wait */</FONT>
+                }
+            }
+
+            <FONT COLOR=BROWN>/* Unlock the buffer */</FONT>
+            GlobalUnlock(hBuffer);
+        }
+
+        <FONT COLOR=BROWN>/* Free the buffer */</FONT>
+        GlobalFree(hBuffer);
+    }
+
+    <FONT COLOR=BROWN>/* Close the MIDI device */</FONT>
+    midiOutClose(handle);
+}
+</B></FONT></PRE>
+
+Win95 and WinNT are easier. <A NAME="2"></A>Here's an example to output a System Exclusive message under Win95/NT:
+
+<PRE><FONT SIZE=3><B>HMIDIOUT    handle;
+MIDIHDR     midiHdr;
+UINT        err;
+<FONT COLOR=GREEN>char</FONT>		sysEx[] = {0xF0, 0x7F, 0x7F, 0x04, 0x01, 0x7F, 0x7F, 0xF7};
+
+<FONT COLOR=BROWN>/* Open default MIDI Out device */</FONT>
+<FONT COLOR=GREEN>if</FONT> (!midiOutOpen(&handle, (UINT)-1, 0, 0, CALLBACK_NULL))
+{
+    <FONT COLOR=BROWN>/* Store pointer in MIDIHDR */</FONT>
+    midiHdr.lpData = (LPBYTE)&sysEx[0];
+
+    <FONT COLOR=BROWN>/* Store its size in the MIDIHDR */</FONT>
+    midiHdr.dwBufferLength = <FONT COLOR=GREEN>sizeof</FONT>(sysEx);
+
+    <FONT COLOR=BROWN>/* Flags must be set to 0 */</FONT>
+    midiHdr.dwFlags = 0;
+
+    <FONT COLOR=BROWN>/* Prepare the buffer and MIDIHDR */</FONT>
+    err = midiOutPrepareHeader(handle,  &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR));
+    <FONT COLOR=GREEN>if</FONT> (!err)
+    {
+        <FONT COLOR=BROWN>/* Output the SysEx message */</FONT>
+        err = midiOutLongMsg(handle, &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR));
+        <FONT COLOR=GREEN>if</FONT> (err)
+        {
+            <FONT COLOR=GREEN>char</FONT>   errMsg[120];
+
+            midiOutGetErrorText(err, &errMsg[0], 120);
+            printf("Error: %s\r\n", &errMsg[0]);
+        }
+
+        <FONT COLOR=BROWN>/* Unprepare the buffer and MIDIHDR */</FONT>
+        <FONT COLOR=GREEN>while</FONT> (MIDIERR_STILLPLAYING == midiOutUnprepareHeader(handle, &midiHdr, <FONT COLOR=GREEN>sizeof</FONT>(MIDIHDR)))
+        {
+            <FONT COLOR=BROWN>/* Should put a delay in here rather than a busy-wait */</FONT>		    
+        }
+    }
+
+    <FONT COLOR=BROWN>/* Close the MIDI device */</FONT>
+    midiOutClose(handle);
+}
+</B></FONT></PRE>
+
+You can download my <A HREF="../midi/software/dev/winapi/midvol.zip">MidiVol</A> C
+example to show how to use midiOutLongMsg to output a MIDI System Exclusive message on the default MIDI Out device.
+Included are the Project Workspace files for Visual C++ 4.0, but since it is a console app,
+any Windows C compiler should be able to compile it.
+
+<P><HR width="90%" color="#FF8040" size=10 NOSHADE>
+<H2><FONT COLOR="#FF8040">Inputting MIDI data</FONT></H2>
+
+In the examples of outputting MIDI data, you'll notice that in the call to midiOutOpen(), I specified
+CALLBACK_NULL. What this flag means is that (other than the return codes from functions such as
+midiOutShortMsg or midiOutLongMsg), I require no feedback from Windows on the progress of the output of
+that MIDI data. (Remember that these output functions may return to the app before the data is finished
+being sent, if the driver has some means of doing that output in the background). I could have asked
+Windows to provide me with feedback (as we'll do in our MIDI input examples), but it wasn't necessary in
+those output examples, and it's simpler not to do it (although you should do it if you've called
+midiOutLongMsg -- in order to know when it's time to call midiOutUnprepareHeader. Otherwise, you'd have to
+do polling on the MHDR_DONE bit of the dwFlags field of the MIDIHDR structure. This bit will be set
+when the MIDI driver is finished with the MIDIHDR).
+
+<P>With MIDI input, you must provide a means of Windows giving you some sort of feedback. Why? Because
+you can't keep continuously polling the MIDI In port of a MIDI Input device waiting for incoming MIDI
+messages. That's an outdated MS-DOS programming technique. Rather, Windows programs are supposed to
+relinquish control back to Windows when the program has nothing to do except wait for something to happen,
+(Although it's possible, albeit not good programming practice, to do polling of the MHDR_DONE bit when
+inputting System Exclusive messages, for input of other types of MIDI messages, Windows requires that you
+provide a different means for Windows to pass you MIDI data).</P>
+
+<P>Instead, Windows will interact with your program whenever each MIDI message is input (ie, all of the
+bytes in it, for non-System Exclusive messages) or some input buffer you've supplied is filled (for
+System Exclusive messages). How does Windows interact with your program? You have
+several options as follows:</P>
+
+<OL><LI>CALLBACK_EVENT -- You allocate some Event with CreateEvent(), and Windows uses this to signal your
+app. (ie, Your app can wait on that Event signal, for example with WaitForSingleObject). You pass the handle of
+the Event as the 3rd arg to midiInOpen().
+
+<P><LI>CALLBACK_THREAD -- Windows causes some suspended thread within your app to run. (ie, Your app's thread can
+suspend itself via SuspendThread). You pass the Thread ID of the desired thread to be run as the 3rd arg to midiInOpen().</P>
+
+<P><LI>CALLBACK_WINDOW -- Windows sends a message to some open window in your app. The parameters for the message will
+contain additional information about what caused Windows to send that message. You pass the desired window's handle
+as the 3rd arg to midiInOpen().</P>
+
+<P><LI>CALLBACK_FUNCTION -- Windows directly calls some function in your app. It passes args that contain
+additional information about what caused Windows to call your function. You pass a pointer to the desired function as
+the 3rd arg to midiInOpen(). The 4th arg to midiInOpen() can be anything you desire, and this will be passed
+to your callback function each time that Windows calls your callback.</P></OL>
+
+<P>The latter two methods allow you to better determine what exactly caused Windows to notify you, because they
+supply additional information to you. In fact, for regular MIDI messages (ie, everything except System Exclusive
+messages -- I'll simply refer to these as "regular messages"), the latter two methods are the only methods you
+can use to actually get Windows to pass you the incoming MIDI data. (For System Exclusive, you could use the
+CALLBACK_EVENT or CALLBACK_THREAD, if you're not really interested in being notified of errors). For this
+reason, I'll only detail the latter two methods.</P>
+
+<P>So when does Windows notify you? Here are the times when Windows notifies you:</P>
+
+<OL><LI>When you open a MIDI In device via midiInOpen().
+
+<P><LI>When you close a MIDI In Device via midiInClose().</P>
+ 
+<P><LI>When Windows has finished inputting one regular MIDI message in its entirety.</P>
+
+<P><LI>When Windows has filled a MIDIHDR's buffer with a portion, or all, of a System Exclusive message.</P>
+
+<P><LI>When there has been an error inputting a regular or System Exclusive MIDI message.</P>
+
+<P><LI>When your handling of a particular MIDI message (that you've been passed) is so slow that the
+MIDI driver (and possibly the MIDI Interface) has had to throw away incoming MIDI data while it was
+waiting for you to finish processing a previous message.</P></OL>
+
+<P>In conclusion, you can have Windows call a function you have written, passing the MIDI data that
+has been input, or you can have Windows pass a message to one of your program's windows, with the MIDI
+data that has been input as part of that message.</P>
+
+<P>To have Windows call a function you have written, when you open the device, you specify the flag
+CALLBACK_FUNCTION. The third arg is a pointer to your function. (The fourth arg can be
+any value that you want Windows to pass to your function each time that function is called).</P>
+
+<PRE><FONT SIZE=3><B>result = midiInOpen(&inHandle, 0, (DWORD)myFunc, 0, CALLBACK_FUNCTION);</B></FONT>
+</PRE>
+
+To have Windows pass a message to one of your windows, when you open the device, you specify the flag
+CALLBACK_WINDOW. The third arg is a handle to your window. (The fourth arg is not used).
+
+<PRE><FONT SIZE=3><B>result = midiInOpen(&inHandle, 0, (DWORD)myWindow, 0, CALLBACK_WINDOW);</B></FONT>
+</PRE>
+
+One caveat with this second method is that Windows doesn't timestamp each MIDI message. So if you
+need timestamps, you would have to timestamp each MIDI message yourself using some software timer
+(ie, perhaps the one that you're using to time the output of MIDI messages, for example, a Windows
+MultiMedia timer implemented using functions such as timeGetTime). But such message passing is not
+very efficient. By the time that your window procedure finally got around to pulling that MIDI data
+out of a message and obtaining a time stamp for it, a long come could have transpired since it
+actually arrived at the computer's MIDI IN. Trying to get an accurate time stamp using this method
+is very difficult, especially if other things are happening in the system such as mouse and window
+movement. It is recommended that you use CALLBACK_WINDOW only when you don't need time stamps.
+Otherwise, use the CALLBACK_FUNCTION method.
+
+<HR>
+
+<P>If using the CALLBACK_FUNCTION method, then you need to write a function that has the following
+declaration (although you can name the function anything you like):</P>
+
+<PRE><FONT SIZE=3><B>
+<FONT COLOR=GREEN>void CALLBACK</FONT> midiCallback(HMIDIIN handle, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
+</B></FONT></PRE>
+
+As mentioned, you pass a pointer to this function as the 3rd arg to midiInOpen(). The 4th arg to
+midiInOpen() can be anything you desire, and this will be passed to your callback function (as the
+dwInstance arg) each time that Windows calls your callback. The handle arg is what was returned from
+midiInOpen().
+
+<P>The other args may be interpreted differently depending upon why Windows has called your callback. Here
+are those reasons:</P>
+
+<OL><LI>You open a MIDI In Device via midiInOpen(). In this case, the uMsg arg to your callback will
+be MIM_OPEN.
+
+<P><LI>You close a MIDI In Device via midiInClose(). In this case, the uMsg arg to your callback will be
+MIM_CLOSE.</P>
+
+<P><LI>One, regular (ie, everything except System Exclusive messages) MIDI message has been completely input.
+In this case, the uMsg arg to your callback will be MIM_DATA. The dwParam1 arg is the bytes of the MIDI
+Message packed into an unsigned long in the same format that is used by
+<HREF="lowmidi.htm#1">midiOutShort()</A>. The dwParam2 arg is a time stamp that the device driver created
+when it recorded the MIDI message.
+</P>
+
+<P><LI>Windows has either completely filled a MIDIHDR's memory buffer with part of a System Exclusive
+message (in which case you had better continue queuing the MIDIHDR again in order to grab the remainder
+of the System Exclusive), or the MIDIHDR's memory buffer contains the remainder of a System Exclusive
+message (or the whole message if it happened to fit into the memory buffer intact). In this case, the
+uMsg arg to your callback will be MIM_LONGDATA. The dwParam1 arg is a pointer to the MIDIHDR whose
+memory buffer contains the System Exclusive data. The dwParam2 arg is a time stamp that the device
+driver created when it recorded the MIDI message.</P>
+
+<P><LI>Your callback is not processing data fast enough such that the MIDI driver (and possibly the MIDI
+In port itself) has had to throw away some incoming, regular MIDI messages. In this case, the uMsg arg
+to your callback will be MIM_MOREDATA. The dwParam1 arg is the bytes of the MIDI Message that was
+not handled (by an MIM_DATA call) packed into an unsigned long in the same format that is used by
+midiOutShort(). The dwParam2 arg is a time stamp that the device driver created when it recorded the
+MIDI message. In handling a series of these events, you should store the MIDI data in a global buffer,
+until such time as you receive another MIM_DATA (which indicates that you can now do the more
+time-consuming processing that you obviously were doing in handling MIM_DATA). In other words, when
+Windows calls your callback with MIM_MOREDATA, this is it's way of saying "You're handling your
+previous MIM_DATA messages too slowly. (And in fact, I may have preemptively interrupted a previous
+MIM_DATA handling of your callback). This is your last chance to quickly do something with this
+one message that I'm passing you now. Otherwise, you're so far behind in handling the MIDI input that
+data is about to be permanently lost".</P>
+
+<P>NOTE: Windows sends an MIM_MOREDATA event only if you specify the MIDI_IO_STATUS flag to midiInOpen().</P>
+
+<P><LI>An invalid, regular MIDI message was received. In this case, the uMsg arg to your callback will
+be MIM_ERROR. The dwParam1 arg is the bytes of the MIDI Message that was not handled (by an MIM_DATA
+call) packed into an unsigned long in the same format that is used by midiOutShort(). The dwParam2 arg
+is a time stamp that the device driver created when it recorded the MIDI message.</P>
+
+<P><LI>An invalid, System Exclusive message was received. In this case, the uMsg arg to your callback
+will be MIM_LONGERROR. The dwParam1 arg is a pointer to the MIDIHDR whose memory buffer contains the
+System Exclusive data. The dwParam2 arg is a time stamp that the device driver created when it recorded
+the MIDI message.</P>
+</OL>
+
+<P>MIDI time stamps are defined as the time the first byte of the message was received
+and are specified in milliseconds. The midiInStart() function resets the time stamps for
+a device to 0.</P>
+
+<P>You can download my <A HREF="../midi/software/dev/winapi/midiin.zip">Midi In Callback</A> C
+example to show how to input MIDI messages. Included are the Project Workspace
+files for Visual C++ 4.0, but since it is a console app, any Windows C compiler should be able to compile it.</P>
+
+</BODY></HTML>

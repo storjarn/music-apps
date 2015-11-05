@@ -1,0 +1,43 @@
+<HTML><HEAD><TITLE>Adding General MIDI support to MS-DOS game software</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Most modern sound cards with built-in wavetable sound modules have their patch sets (and drum kit) configured to be
+General MIDI compliant. For example, a Roland RAP-10 offers a GM compliant sound module. So too do the SCD-10 and SCD-15
+daughterboards. Yamaha's cards offer GM (as well as a larger patch set known as XG).
+
+<P>Game cards typically offer two "modes"; a GM compliant mode (ie, a "Windows Sound System" mode which on really cheap
+cards may be only partially GM compliant) which incorporates the wavetable section of the card, and an SB compatible mode
+which incorporates FM synthesis. The Ensoniq and Tropez are examples.</P>
+
+<P>Not all of the above have the same quality sound, but they all are GM compliant sound modules (at least when in their
+"Windows Sound System" mode). So it's important to understand both the <A HREF="midispec.htm">MIDI Specification</A>
+and <A HREF="http://www.borg.com/~jglatt/tech/gm.htm">General MIDI</A> in order to know how to make music on the wavetable modules of these cards.</P>
+
+<P>You should have a "General MIDI" option for game music. This option means that your game music will take the form of
+simply writing MIDI messages to an MPU-401 compatible MIDI card (in Uart mode. For details and example code on programming the
+MPU-401 Uart mode, see the article <A HREF="mpu.htm">Programming the MPU-401</A>). It's assumed that a GM module is
+attached to the MPU's MIDI OUT. This is the case with most sound cards that offer MPU-401 compatibility plus a wavetable
+module. The built-in wavetable module is internally attached to the MIDI OUT of an MPU compatible port. The one notable
+exception to this is Creative Labs. (So what else is new?) In order to save a few pennies in parts, Creative Labs did not
+design the SB32 and AWE32 wavetable modules to be accessed through an MPU compatible MIDI port. The built-in wavetable
+sound module is accessed via proprietary ports, and not through an MPU-401 port which understands MIDI. So, you still have
+to incorporate support for the SB's proprietary way of accessing its wavetable module. But the good news is that a General
+MIDI option supports most everybody's wavetable sound except for Creative Labs. Oddly enough, if you add a daughterboard to
+an SB, the daughterboard is accessed through an MPU-401 MIDI port, so that does upgrade the SB32 and AWE32 to work just
+like everyone else's wavetable module (ie, it is accessed in the same way -- by writing MIDI messages to an MPU-401 MIDI
+OUT port).</P>
+
+<P>It's best to have your game music in MIDI file format. (Of course, for cards whose internal modules are not attached to
+an MPU compatible port, such as the SB, its "control bytes" may also not be MIDI. So, you may have to do some translation of
+the MIDI bytes when playing back a musical score on an SB, or for cards that offer only an SB FM synthesis section
+(ie, no wavetable attached to an MPU port). But, I'd still recommend using MIDI for the musical score's file format. It's
+easy to deal with when creating/editing game music). For details, see <A HREF="midifile.htm">MIDI File Format</A>.</P>
+
+<P>I think that the best test setup for a game programmer would be an AWE32 with either a GM daughterboard such as an
+SCD-10 or some external GM module attached to the AWE32's MIDI OUT. You can then test playback of sound effects upon the
+SB's digital audio section, as well as test playback of music upon the SB's FM synth and also the WaveTable Synth (which is
+GM compliant, but not accessed via the MPU compatible MIDI port). Then, you can test your game music's "GM" option via 
+the daughterboard (or external unit) connected to the AWE32's MPU Uart compatible MIDI OUT port. This covers testing the SB
+family, and all cards that offer either MPU-401 compatibility or SB compatibility (which is just about everything else,
+except maybe for a GUS -- I'm not sure if that one is completely proprietary).
+
+</BODY></HTML>

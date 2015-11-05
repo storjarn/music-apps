@@ -1,0 +1,43 @@
+<HTML><HEAD><TITLE>MIDI Specification: Program Change</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Program Change</CENTER></FONT></H2>
+
+<P>Category: Voice
+
+<P><FONT COLOR=GREEN>Purpose</FONT>
+<P>To cause the MIDI device to change to a particular <B>Program</B> (which some devices refer to as Patch, or
+Instrument, or Preset, or whatever). Most sound modules have a variety of instrumental sounds, such as Piano, and Guitar,
+and Trumpet, and Flute, etc. Each one of these instruments is contained in a Program. So, changing the Program changes
+the instrumental sound that the MIDI device uses when it plays Note On messages. Of course, other MIDI
+messages also may modify the current Program's (ie, instrument's) sound. But, the Program Change message actually
+selects which instrument currently plays. There are 128 possible program numbers, from 0 to 127. If the device is a
+MultiTimbral unit, then it usually can play 16 "Parts" at once, each receiving data upon its own MIDI channel. This
+message will then change the instrument sound for only that Part which is set to the message's MIDI channel.
+
+<P>For MIDI devices that don't have instrument sounds, such as a Reverb unit which may have several Preset "room
+algorithms" stored, the Program Change message is often used to select which Preset to use. As another example, a drum
+box may use Program Change to select a particular rhythm pattern (ie, drum beat).
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0xC0 to 0xCF where the low nibble is the MIDI channel.
+
+<P><STRONG>Data</STRONG>
+<P>One data byte follows the status. It is the program number to change to, a number from 0 to 127.
+
+<P><STRONG>Errata</STRONG>
+<P>On MIDI sound modules (ie, whose Programs are instrumental sounds), it became desirable to define a standard set of
+Programs in order to make sound modules more compatible. This specification is called
+<A HREF="http://www.borg.com/~jglatt/tech/midispec/..%5Cgm.htm">General MIDI Standard</A>.
+
+<P>Just like with MIDI channels 0 to 15 being displayed to a musician as channels 1 to 16, many MIDI devices display their
+Program numbers starting from 1 (even though a Program number of 0 in a Program Change message selects
+the first program in the device). On the other hand, this approach was never standardized, and some devices use vastly
+different schemes for the musician to select a Program. For example, some devices require the musician to specify a
+bank of Programs, and then select one within the bank (with each bank typically containing 8 to 10 Programs). So, the
+musician might specify the first Program as being bank 1, number 1. Nevertheless, a Program Change of
+number 0 would select that first Program.
+
+<P>Receipt of a Program Change should not cut off any notes that were previously triggered on the channel, and which
+are still sustaining.
+
+</FONT></BODY></HTML>

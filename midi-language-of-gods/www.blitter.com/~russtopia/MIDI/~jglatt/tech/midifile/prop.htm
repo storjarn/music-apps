@@ -1,0 +1,14 @@
+<HTML><HEAD><TITLE>MIDI File Format: Proprietary Event</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<FONT COLOR=BLUE><H3><CENTER>Proprietary Event</CENTER></H3></FONT></P>
+
+<P>FF 7F <I><FONT COLOR=GREEN><B>len</B></FONT></I> <I><FONT COLOR=RED><B>data</B></FONT></I>
+
+<P>This can be used by a program to store proprietary data. The first byte(s) should be a unique ID
+of some sort so that a program can identity whether the event belongs to it, or to some other
+program. A 4 character (ie, ascii) ID is recommended for such.
+
+<P>Note that <I><FONT COLOR=GREEN><B>len</B></FONT></I> could be a series of bytes since it
+is expressed as a variable length quantity.
+
+</FONT></BODY></HTML>

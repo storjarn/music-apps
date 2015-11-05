@@ -1,0 +1,46 @@
+<HTML><HEAD><TITLE>MIDI File Format: Introduction</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H1><FONT COLOR=RED><CENTER>Standard MIDI File (SMF) Format</CENTER></FONT></H1>
+
+The <B>Standard MIDI File</B> (SMF) is a file format used to store MIDI data (plus some
+other kinds of data typically needed by a <A HREF="../../tutr/whatsseq.htm">sequencer</A>).
+
+<P>This format stores the standard MIDI messages (ie, status bytes with appropriate data bytes)
+plus a time-stamp for each message (ie, a series of bytes that represent how many clock pulses
+to wait before "playing" the event). The format also allows saving information about tempo,
+time and key signatures, the names of tracks and patterns, and other information typically
+needed by a sequencer. One SMF can store information for numerous patterns and tracks so that any
+sequencer can preserve these structures when loading the file.
+
+<P><B><FONT COLOR=RED>NOTE:</FONT></B> A <B>track</B> usually is analogous to one musical part,
+such as a Trumpet part. A <B>pattern</B> would be analogous to all of the musical parts (ie,
+Trumpet, Drums, Piano, etc) for one song.
+
+<P>The format was designed to be generic so that the most important data can be read by all
+sequencers. Think of a MIDI file as a musical version of an ASCII text file (except
+that the MIDI file contains binary data), and the various sequencer programs as text editors
+all capable of reading that file. But, unlike ASCII, MIDI file format saves data in <B>chunks</B>
+(ie, groups of bytes preceded by an ID and size) which can be parsed, loaded, skipped, etc.
+Therefore, SMF format is flexible enough for a particular sequencer to store
+its own proprietary, "extra" data in such a way that another sequencer won't be confused when
+loading the file and can safely ignore this extra stuff that it doesn't need.
+For example, maybe a sequencer wants to save a "flag byte"
+that indicates whether the user has turned on an audible metronome click. The sequencer can save
+this flag byte in such a way that another sequencer can skip this byte without
+having to understand what that byte is for. In the future, the SMF format can also be
+extended to include new "official" chunks that all sequencer programs may elect to load and use.
+This can be done without making old data files obsolete, nor making old sequencers no longer
+able to load the new files. So, the format is designed to be
+extensible in a backwardly compatible way.
+
+<P>Of course, SMF files may be used by other MIDI software than just sequencers.
+Since SMF files can store any and all types of MIDI messages, including System Exclusive
+messages, they may be used to store/load data by all kinds of MIDI software, such as a Patch
+Editor that wants to save some System Exclusive messages it received from a MIDI module. (The
+"timestamp" for each message may be irrelevant to such a Patch Editor. But it's easily
+ignored for programs that don't really need it).
+
+<P>In conclusion, any software that saves or loads MIDI data should use SMF format for its data
+files.
+
+</FONT></BODY></HTML>

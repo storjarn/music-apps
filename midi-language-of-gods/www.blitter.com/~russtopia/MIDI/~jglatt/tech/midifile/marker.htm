@@ -1,0 +1,13 @@
+<HTML><HEAD><TITLE>MIDI File Format: Marker</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<FONT COLOR=BLUE><H3><CENTER>Marker</CENTER></H3></FONT></P>
+
+<P>FF 06 <I><FONT COLOR=GREEN><B>len</B></FONT></I> <I><FONT COLOR=RED><B>text</B></FONT></I>
+
+<P>The text for a marker which occurs on a given beat. Marker events might be used to denote a loop
+start and loop end (ie, where the sequence loops back to a previous event).
+
+<P>Note that <I><FONT COLOR=GREEN><B>len</B></FONT></I> could be a series of bytes since it is
+expressed as a variable length quantity.
+
+</FONT></BODY></HTML>

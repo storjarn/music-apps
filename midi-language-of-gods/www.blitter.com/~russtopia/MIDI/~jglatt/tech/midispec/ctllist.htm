@@ -1,0 +1,151 @@
+<HTML><HEAD><TITLE>MIDI Specification: Controller Numbers</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>Controller Numbers</CENTER></FONT></H2></P>
+
+<P>A <B>Controller</B> message has a Status byte of 0xB0 to 0xBF depending upon the MIDI channel. There are two
+more data bytes.</P>
+
+<P>The first data byte is the <B>Controller Number</B>. There are 128 possible controller numbers (ie, 0 to 127). Some
+numbers are defined for specific purposes. Others are undefined, and reserved for future use.
+
+<P>The second byte is the "value" that the controller is to be set to.
+
+<P>Most controllers implement an effect even while the MIDI device is generating sound, and the effect will be immediately
+noticeable. In other words, MIDI controller messages are meant to implement various effects by a musician <U>while he's
+operating the device</U>.
+
+<P>If the device is a MultiTimbral module, then each one of its Parts may respond differently (or not at all) to a particular
+controller number. <U>Each Part usually has its own setting for every controller number</U>, and the Part responds only
+to controller messages on the same channel as that to which the Part is assigned. So, controller messages for one Part do
+not affect the sound of another Part even while that other Part is playing.
+
+<P>Some controllers are <B>continuous</B> controllers, which simply means that their value can be set to any value
+within the range from 0 to 16,384 (for 14-bit coarse/fine resolution) or 0 to 127 (for 7-bit, coarse resolution). Other
+controllers are <B>switches</B> whose state may be either <B><I>on</I></B> or <B><I>off</I></B>. Such controllers will usually
+generate only one of two values; 0 for off, and 127 for on. But, a device should be able to respond to any received
+switch value from 0 to 127. If the device implements only an "on" and "off" state, then it should
+regard values of 0 to 63 as off, and any value of 64 to 127 as on.
+
+<P>Many (continuous) controller numbers are <B>coarse</B> adjustments, and have a respective <B>fine</B>
+adjustment controller number. For example, controller #1 is the coarse adjustment for Modulation Wheel. Using this
+controller number in a message, a device's Modulation Wheel can be adjusted in large (coarse) increments (ie, 128
+steps). If finer adjustment (from a coarse setting) needs to be made, then controller #33 is the fine adjust for Modulation
+Wheel. For controllers that have coarse/fine pairs of numbers, there is thus a 14-bit resolution to the range. In other words,
+the Modulation Wheel can be set from 0x0000 to 0x3FFF (ie, one of 16,384 values).  For this 14-bit value, bits 7 to 13 are
+the coarse adjust, and bits 0 to 6 are the fine adjust. For example, to set the Modulation Wheel to 0x2005, first you have to
+break it up into 2 bytes (as is done with <A HREF="wheel.htm#Combine">Pitch Wheel</A> messages). Take bits 0 to 6 and put them in a byte that is
+the fine adjust. Take bits 7 to 13 and put them right-justified in a byte that is the coarse adjust. Assuming a MIDI channel
+of 0, here's the coarse and fine Mod Wheel controller messages that a device would receive (coarse adjust first):
+
+<PRE><B><FONT SIZE=3>0xB0 0x01 0x40
+<FONT COLOR=BLUE>Controller on chan 0, Mod Wheel coarse, bits 7 to 13 of 14-bit
+value right-justified (with high bit clear).</FONT>
+
+0xB0 0x33 0x05
+<FONT COLOR=BLUE>Controller on chan 0, Mod Wheel fine, bits 0 to 6 of 14-bit
+value (with high bit clear).</FONT>
+</B></FONT></PRE>
+
+Some devices do not implement fine adjust counterparts to coarse controllers. For example, some devices do not
+implement controller #33 for Mod Wheel fine adjust. Instead the device only recognizes and responds to the Mod Wheel
+coarse controller number (#1). It is perfectly acceptable for devices to <U>only</U> respond to the coarse adjustment for
+a controller if the device desires 7-bit (rather than 14-bit) resolution. The device should ignore that controller's respective
+fine adjust message. By the same token, if it's only desirable to make fine adjustments to the Mod Wheel without changing
+its current coarse setting (or vice versa), a device can be sent only a controller #33 message without a preceding controller
+#1 message (or vice versa). Thus, if a device can respond to both coarse and fine adjustments for a particular controller
+(ie, implements the full 14-bit resolution), it should be able to deal with either the coarse or fine controller message being
+sent without its counterpart following. The same holds true for other continuous (ie, coarse/fine pairs of) controllers.
+
+<P><B><FONT COLOR=RED>Note:</FONT></B> In most MIDI literature, the coarse adjust is referred to with the
+designation "MSB" and the fine adjust is referred to with the designation "LSB". I prefer the terms
+"coarse" and "fine".
+
+<P>Here's a list of the defined controllers. To the left is the controller number (ie, how the MIDI Controller message refers to
+a particular controller), and on the right is its name (ie, how a human might refer to the controller). To get more information
+about what a particular controller does, click on its controller name to bring up a description. Each description shows the
+controller name and number, what the range is for the third byte of the message (ie, the "value" data byte), and what the
+controller does. For controllers that have separate coarse and fine settings, both controller numbers are shown.
+
+<P>MIDI devices should use these controller numbers for their defined purposes, as much as possible. For example, if the
+device is able to respond to <B>Volume controller</B> (coarse adjustment), then it should expect that to be controller
+number 7. It should not use <B>Portamento Time controller</B> messages to adjust volume. That wouldn't make any
+sense. Other controllers, such as <B>Foot Pedal</B>, are more general purpose. That pedal could be controlling the
+tempo on a drum box, for example. But generally, the Foot Pedal shouldn't be used for purposes that other controllers
+already are dedicated to, such as adjusting <B>Pan position</B>. If there is not a defined controller number for
+a particular, needed purpose, a device can use the General Purpose Sliders and Buttons, or NRPN for device specific
+purposes. The device should use controller numbers 0 to 31 for coarse adjustments, and controller numbers 32 to
+63 for the respective fine adjustments.
+
+<P><B><CENTER><FONT COLOR=GREEN>Defined Controllers</FONT></CENTER></B>
+
+<PRE><B><FONT SIZE=3>
+0   <A HREF="bank.htm">Bank Select (coarse)</A>
+1   <A HREF="mod.htm">Modulation Wheel (coarse)</A>
+2   <A HREF="wind.htm">Breath controller (coarse)</A>
+4   <A HREF="foot.htm">Foot Pedal (coarse)</A>
+5   <A HREF="ptime.htm">Portamento Time (coarse)</A>
+6   <A HREF="dslider.htm">Data Entry (coarse)</A>
+7   <A HREF="vol.htm">Volume (coarse)</A>
+8   <A HREF="balance.htm">Balance (coarse)</A>
+10  <A HREF="pan.htm">Pan position (coarse)</A>
+11  <A HREF="exp.htm">Expression (coarse)</A>
+12  <A HREF="eff1.htm">Effect Control 1 (coarse)</A>
+13  <A HREF="eff2.htm">Effect Control 2 (coarse)</A>
+16  <A HREF="gens.htm">General Purpose Slider 1</A>
+17  <A HREF="gens.htm">General Purpose Slider 2</A>
+18  <A HREF="gens.htm">General Purpose Slider 3</A>
+19  <A HREF="gens.htm">General Purpose Slider 4</A>
+32  <A HREF="bank.htm">Bank Select (fine)</A>
+33  <A HREF="mod.htm">Modulation Wheel (fine)</A>
+34  <A HREF="wind.htm">Breath controller (fine)</A>
+36  <A HREF="foot.htm">Foot Pedal (fine)</A>
+37  <A HREF="ptime.htm">Portamento Time (fine)</A>
+38  <A HREF="dslider.htm">Data Entry (fine)</A>
+39  <A HREF="vol.htm">Volume (fine)</A>
+40  <A HREF="balance.htm">Balance (fine)</A>
+42  <A HREF="pan.htm">Pan position (fine)</A>
+43  <A HREF="exp.htm">Expression (fine)</A>
+44  <A HREF="eff1.htm">Effect Control 1 (fine)</A>
+45  <A HREF="eff2.htm">Effect Control 2 (fine)</A>
+64  <A HREF="hold.htm">Hold Pedal (on/off)</A>
+65  <A HREF="port.htm">Portamento (on/off)</A>
+66  <A HREF="sus.htm">Sustenuto Pedal (on/off)</A>
+67  <A HREF="soft.htm">Soft Pedal (on/off)</A>
+68  <A HREF="leg.htm">Legato Pedal (on/off)</A>
+69  <A HREF="hold2.htm">Hold 2 Pedal (on/off)</A>
+70  <A HREF="sndvar.htm">Sound Variation</A>
+71  <A HREF="sndtim.htm">Sound Timbre</A>
+72  <A HREF="sndrel.htm">Sound Release Time</A>
+73  <A HREF="sndatt.htm">Sound Attack Time</A>
+74  <A HREF="sndbri.htm">Sound Brightness</A>
+75  <A HREF="sndctl.htm">Sound Control 6</A>
+76  <A HREF="sndctl.htm">Sound Control 7</A>
+77  <A HREF="sndctl.htm">Sound Control 8</A>
+78  <A HREF="sndctl.htm">Sound Control 9</A>
+79  <A HREF="sndctl.htm">Sound Control 10</A>
+80  <A HREF="genb.htm">General Purpose Button 1 (on/off)</A>
+81  <A HREF="genb.htm">General Purpose Button 2 (on/off)</A>
+82  <A HREF="genb.htm">General Purpose Button 3 (on/off)</A>
+83  <A HREF="genb.htm">General Purpose Button 4 (on/off)</A>
+91  <A HREF="eff.htm">Effects Level</A>
+92  <A HREF="trem.htm">Tremulo Level</A>
+93  <A HREF="cho.htm">Chorus Level</A>
+94  <A HREF="cel.htm">Celeste Level</A>
+95  <A HREF="pha.htm">Phaser Level</A>
+96  <A HREF="dinc.htm">Data Button increment</A>
+97  <A HREF="ddec.htm">Data Button decrement</A>
+98  <A HREF="nrpn.htm">Non-registered Parameter (fine)</A>
+99  <A HREF="nrpn.htm">Non-registered Parameter (coarse)</A>
+100 <A HREF="rpn.htm">Registered Parameter (fine)</A>
+101 <A HREF="rpn.htm">Registered Parameter (coarse)</A>
+120 <A HREF="sndoff.htm">All Sound Off</A>
+121 <A HREF="ctloff.htm">All Controllers Off</A>
+122 <A HREF="local.htm">Local Keyboard (on/off)</A>
+123 <A HREF="ntnoff.htm">All Notes Off</A>
+124 <A HREF="omoff.htm">Omni Mode Off</A>
+125 <A HREF="omon.htm">Omni Mode On</A>
+126 <A HREF="mono.htm">Mono Operation</A>
+127 <A HREF="poly.htm">Poly Operation</A>
+</B></FONT></PRE>
+
+</FONT></BODY></HTML>

@@ -14,16 +14,26 @@
             var ddMidiInputs = document.getElementById("midiInputs");
             for ( var i = 0; i < MIDI.inputs.length; ++i) {
                 // input.value.onmidimessage = MIDIMessageEventHandler;
-                haveAtLeastOneDevice = true;
                 var option = document.createElement("option");
                 option.value = MIDI.inputs[i].id;
                 option.text = MIDI.inputs[i].name;
                 ddMidiInputs.appendChild(option);
             }
+
+            var ddMidiOutputs = document.getElementById("midiOutputs");
+            for ( var i = 0; i < MIDI.outputs.length; ++i) {
+                // input.value.onmidimessage = MIDIMessageEventHandler;
+                var option = document.createElement("option");
+                option.value = MIDI.outputs[i].id;
+                option.text = MIDI.outputs[i].name;
+                ddMidiOutputs.appendChild(option);
+            }
+
             go();
         });
 
         var useMockInput = true;
+        var useMockOutput = false;
 
         function go() {
             var mockInput = {
@@ -61,17 +71,23 @@
                 document.getElementById('pulseIndicator').setAttribute('class', 'on');
             });
 
-            clock.linkOutput(mockOutput);
+
 
             if (useMockInput) {
                 clock.linkInput(mockInput);
             } else {
-                clock.linkInput(MIDI.inputs[0]);
-                MIDI.inputs[0].onmidimessage = function(event) {
+                clock.linkInput(MIDI.inputs[1]);
+                MIDI.inputs[1].onmidimessage = function(event) {
                     var now = new Date().getTime();
                     console.log(event);
                     console.log('Timestamps match?:', now == event.timeStamp, now, event.timeStamp);
                 };
+            }
+
+            if (useMockOutput) {
+                clock.linkOutput(mockOutput);
+            } else {
+                clock.linkOutput(MIDI.outputs[1]);
             }
 
             var tempo = 30;
@@ -82,7 +98,7 @@
                     function generate() {
                         return Math.round(Math.random() * 256);
                     }
-                    var msg = {data: [MIDI.Constants.TimingClock, 0, 0]};
+                    var msg = {data: [MIDI.Constants.TimingClock]};
                     mockInput.onmidimessage(msg);
                     // msg = {data: [generate(), generate(), generate()]};
                     // mockInput.onmidimessage(msg);
@@ -95,8 +111,14 @@
 </script>
 
 <div id="app">
-    <div>MIDI Inputs</div>
-    <select id="midiInputs"></select>
+    <div>
+        <div>MIDI Inputs</div>
+        <select id="midiInputs"></select>
+    </div>
+    <div>
+        <div>MIDI Outputs</div>
+        <select id="midiOutputs"></select>
+    </div>
     <div>
         Desired Tempo: <input id="tempoSelect" value="60" style="width: 60px" onkeyup="tempoRun()" /> BPM
     </div>

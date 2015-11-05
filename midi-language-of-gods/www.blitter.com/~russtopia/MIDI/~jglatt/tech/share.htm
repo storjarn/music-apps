@@ -1,0 +1,589 @@
+<HTML><HEAD><TITLE>Managing MIDI Ports</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+Windows does not yet have a MIDI Manager. What this means is that it doesn't really arbitrate access to MIDI Input and
+Output intelligently between applications. Essentially, it leaves it up to each device driver to arbitrate access to its
+MIDI Input and Output (and without any standardized means for the driver to provide information about its status to the
+application). Needless to say, there are some caveats to this method (and general guidelines you should follow) as
+described below.
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Single client drivers -- Device is busy errors</FONT></H2>
+
+<P>Many drivers are single client. Such a driver allows only one call to open its MIDI In to succeed (regardless of whether
+that Input is opened via midiInOpen(), or a high level MCI call). The driver also allows only one call
+to open its MIDI Out to succeed (regardless of whether that Output is opened via midiOutOpen(), a high level MCI call, or
+even midiStreamOpen()).
+
+<P>For example, if your application has successfully opened that driver for output (via a midiOutOpen call perhaps), then
+it owns that driver's MIDI Out. (ie, Your application has exclusive access to that MIDI Output). If some other application
+tries to subsequently open that Output (perhaps via midiOutOpen), then that application's call to midiOutOpen() will fail
+(and usually return an error number that is translated to a message of "Device is busy" by midiOutGetErrorText).
+
+<P>Only when your application finally closes that MIDI Output (via midiOutClose perhaps) will the "lock" upon that
+particular Output be released, and then another application can successfully open that Output.
+
+<P>Of course, the above example also pertains to MIDI Inputs (ie, midiInOpen, etc).
+
+<P>What is the result of this? Well, it means that, despite your application running under a multitasking system (ie,
+Win32), if your application opens a MIDI Input or Output and "hogs" it by keeping it open the entire time that
+your application is running, then the enduser will not be able to simultaneously run other MIDI software that wants to use
+that MIDI Input/Output. He'll just get "Device is busy" error messages from that other application every time he tries
+to do something with that application's MIDI Input/Output. You'll effectively be preventing him from multitasking
+another MIDI application in conjunction with that particular MIDI Input/Output. He'll have to close down your application
+every time he wants to use that other application with that MIDI Input/Output. And if the other application hogs that
+Input/Output too, then the reverse is also true. (ie, Every time he wants to run your application, he'll have to close
+down that other application).
+
+<P>This is very annoying to an enduser. It turns his multitasking operating system into something that looks like a
+singletasking operating system -- and one that doesn't manage resources.
+
+<P>So what is one way of getting around this? Well, a simple solution is not to hog the Input/Output. Don't
+open the MIDI Input/Output until you're actually ready to do some MIDI input/output (ie, midiOutShortMsg,
+midiOutLongMsg, doing some input/output via MCI, etc). Do that MIDI input/output as quickly as possible, and then
+immediately close that MIDI Input/Output. The net result is that you'll only be preventing multitasking for a short
+time while you're actually doing some input/output. If the other applications are doing the same, then everyone will be
+happy, as the enduser can switch between those applications running concurrently, and as long as he doesn't try to
+make both applications do MIDI input/output simultaneously (which can be a bad thing as you'll learn below), his
+applications will be sharing the MIDI Input/Output.
+
+<P><A NAME="1">For</A> example, let's say that you're writing a patch editor for a sound module. You need to send it a
+System Exclusive message to request it perform a data dump. Then you need to input a bunch of System Exclusive messages
+until you receive the entire data dump. Here's the approach you could take:
+
+<P><OL><LI>Give the enduser a means to start the operation of receiving a dump. For example, maybe have a button
+labeled "Receive Dump" upon which he clicks to begin the operation. Do <B>not</B> open MIDI Input or Output until he
+clicks upon that button.
+<LI>When he clicks upon the button (to start the data dump), open MIDI Out with a call to midiOutOpen(). Also open MIDI In
+with a call to midiInOpen() (and setup some means of collecting the incoming bytes that Windows will pass to your
+application).
+<LI>Send your "dump request" System Exclusive message to MIDI Out.
+<LI>Collect the incoming MIDI data that Windows passes to you.
+<LI>When you see that you have a complete dump from the sound module, call midiOutClose() and midiInClose().
+</OL>
+
+<P>The above solution is all well and good for some applications, but it's an impractical solution for some other
+types of applications. Let's take the example of a "MIDI Input Viewer" program. It "displays" each incoming MIDI
+message in realtime (ie, immediately when the message comes into the MIDI In and is passed to the application by
+Windows).
+
+<P>Obviously, that application can't know ahead of time when MIDI messages will be forthcoming and how much data
+will be coming in (unlike the patch editor, which knows that a dump will be following shortly after that
+"dump request", and knows how many bytes to expect).
+
+<P>A slightly different approach could be to give the enduser a button to start recording (at which time you
+call midiInOpen) and a button to stop recording (at which time you call midiInClose). In this way, he could
+stop recording before he switched to another application, and therefore still have his applications share that
+MIDI Input. But there is an even better solution which makes sharing the Input/Outputs transparent to the
+enduser, as you'll learn later.
+
+<P>But as (bad) luck would have it, many programmers wrote MIDI software that doesn't even allow this minimal level
+of sharing. They wrote software that hogs the MIDI In or Out for the entire time that the program is running. Why?
+Well, sometimes it could be because the software allows access to numerous MIDI Inputs and Outputs simultaneously,
+and it takes too much time and trouble to open/close them all before/after each operation. If the software is a MIDI
+sequencer, such timing delays prior to recording/playing may be crucial. Therefore, the software simply leaves all
+inputs/outputs constantly open so that the software will be "ready to go" whenever the user starts it recording/playing.
+But this is still a poor excuse for why the software doesn't close those inputs/outputs when the enduser switches to some
+other application. This is easy to implement under Win32, as you'll learn later. After all, if the enduser is
+switching to another application, he probably doesn't really care whether the first application is ready to do
+input/output at that moment (and if he does, there's a simple solution to handle that case too, which I'll outline later).
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Multiclient drivers -- The perils of multitasking without management</FONT></H2>
+
+<P>Because too many programmers wrote MIDI applications that hog the inputs/outputs, some manufacturers of sound cards
+and MIDI interfaces started shipping multiclient drivers with their products.
+
+<P>A multiclient (sometimes called multi-instance) driver is one which allows more than one application to open a
+MIDI input or output. (ie, More than one call to midiOutOpen or midiInOpen will succeed). In essense, the driver lets two or
+more applications simultaneously open a MIDI input/output, unbeknowst to each other, and the driver itself tries to
+manage (ie, mix) their MIDI output, and also provides the applications separate copies of each incoming MIDI message.
+
+<P>Lots of endusers scramble for multiclient drivers so that they don't have to shut down MIDI programs in order to run
+other MIDI programs.
+
+<P>But there is one problem here. The two applications don't know that they're both outputting to the same MIDI
+port perhaps simultaneously. And the driver may not be intelligent enough to know when that's a good or bad thing. Let's
+take the example of that patch editor above.
+
+<P>Let's say that when the patch editor sends a data dump back to the sound module, instead of sending one large,
+complete system exclusive message in a single call to midiOutLongMsg(), it breaks one System Exclusive message into
+numerous "blocks of data bytes" sent via several
+calls to midiOutLongMsg(). Well, hopefully the driver is smart enough to not allow another application to do some
+MIDI Output inbetween the other application's midiOutLongMsg() calls until the driver detects the end of a System
+Exclusive message. Otherwise, the other application will screw up the patch editor's dump.
+
+<P>And Windows provides no standardized way for an application to tell a driver to give it exclusive access to a port, so
+an application is at the mercy of a multiclient driver's behavior in handling multiple output requests.
+
+<P>So too, if both programs are simultaneously outputting MIDI note messages, they may be turning off each other's
+Note On messages (with Note Off messages) or stacking Note Ons for the same note number and resulting in "stuck notes".
+Or they could be doing other conflicting things which the driver doesn't resolve.
+
+<P>And all of this multiclient stuff, particularly in regards to System Exclusive message input and output, imposes
+unnecessay overhead upon the driver. A single client driver can be <B>much</B> more stream-lined and efficient.
+
+<P>In fact, multiclient drivers decrease efficiency and yield poorer performance where a single client driver would
+suffice. (And those "loopback drivers" are even worse. These really play havoc with the efficiency of MIDI input/output).
+A MIDI Manager that arbitrated access to multiple ports, in conjunction with application support, would not only be more
+efficient (because all of its drivers could then be single client, instead of every driver duplicating the functionality
+and overhead of a poor "MIDI Manager" inside of it), it could also be more flexible (for example, allowing applications
+to choose when they want to share an Input/Output and when they don't -- control which they do not have over a multi-client
+driver).
+
+<P>Needless to say, a multiclient driver is no substitute for a MIDI Manager that is capable of allowing applications
+some control over sharing an Input/Output. Mostly, musicians use multiclient drivers for the sole purpose of avoiding
+having to shut down programs that hog the MIDI Input/Output. Clearly, what is needed is a better way for an application
+to access a MIDI Input/Output without hogging it, but also having to avoid the speed overhead of opening an
+Input/Output before every operation and then immediately closing it afterward (which as I pointed out above, is not
+suitable for some types of MIDI applications). If the enduser had software that could do that, instead of hogging an
+Input/Output, then he wouldn't need multiclient drivers at all. In fact, his software could share Inputs/Outputs with the
+multitude of single client drivers that are out there now.
+
+<P>Such a method is what we'll investigate now.
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">A more elegant, transparent way of sharing a MIDI input/output</FONT></H2>
+
+<P>If your application has a window of your own creation (and virtually all non-console Windows applications do), then a
+simple way of sharing a MIDI port with other applications, transparently to the enduser, is to process the WM_ACTIVATEAPP
+message. This message tells you whether your application is becoming active (ie, the user has selected any window that
+you created, and thereby given your program the focus) or inactive (ie, the user has selected a window created by another
+application, and therefore, if your application isn't already doing something in the background, it becomes inactive). In
+processing this message, you should close any MIDI ports you have open if the wParam argument is 0 (ie,
+you're going inactive) or reopen them if wParam is 1 (ie, you're active).
+
+<P>In this way, your application transparently releases the MIDI devices when the user switches away from it to another
+program. And your application also transparently reopens the MIDI devices when the user switches back to it. Because this
+processing is done in the WM_ACTIVATEAPP, it happens as soon as your application becomes active. This includes when your
+application initially starts, and so, the WM_ACTIVATEAPP code also serves to initially open your MIDI devices. Quick and
+easy.
+
+<P>What's so great about this? Well, you <B>can</B> hog the MIDI Input/Output to your hearts content... while your
+program is active (and the other MIDI programs are inactive). And when your program is inactive, you don't care about
+hogging the MIDI Input/Output. Now, you don't have to open/close the MIDI devices before/after each operation, and yet,
+you'll be sharing the MIDI ports with other applications -- even doing so transparently to the enduser, in a way that
+works with single client drivers too. That's what is so great about it.
+
+<P>Below is some example code to illustrate this. It contains a minimal WinMain() function (ie, program entry point for a
+Windows C program) which opens a window of my own creation. (For simplicity, I use a dialog template in a resource file,
+and call CreateDialog, but you could use CreateWindowEx). Its message handler is mainWndProc(). That's where I open and
+close MIDI devices by processing the WM_ACTIVATEAPP message. mainWndProc() references two globals, MidiInHandle
+and MidiOutHandle, which are initially set to 0 at program startup. Whenever these two handles are 0, I know that I
+don't have my MIDI In and Out devices open. By checking these globals for 0, this makes the code bulletproof. I sort of
+made "wrapper functions" for midiOutOpen(), midiInOpen(), midiOutClose(), and midiInClose() that operate upon those
+global handles, just to make it easier.
+
+<PRE><FONT SIZE=4><B>DWORD MidiInHandle = 0;
+DWORD MidiOutHandle = 0;
+
+<FONT COLOR=BROWN>/* ****************************** WinMain() ********************************
+ * Program Entry point
+ ************************************************************************* */</FONT>
+
+<FONT COLOR=GREEN>int</FONT> WINAPI WinMain(HINSTANCE hinstExe, HINSTANCE hinstPrev, LPSTR lpszCmdLine, <FONT COLOR=GREEN>int</FONT> nCmdShow)
+{
+   MSG   msg;
+   HWND  mainWindow;
+
+   <FONT COLOR=BROWN>/* Create Main window */</FONT>
+   <FONT COLOR=GREEN>if</FONT> (!(mainWindow = CreateDialog(hinstExe, MAKEINTRESOURCE(IDD_MAINWINDOW), 0, mainWndProc)))
+   {
+      <FONT COLOR=GREEN>return</FONT>(-1);
+   }
+
+   <FONT COLOR=BROWN>/* Show the window with default size */</FONT>
+   ShowWindow(mainWindow, SW_SHOWDEFAULT);
+   UpdateWindow(mainWindow);
+
+   <FONT COLOR=BROWN>/* Get the next msg (until WM_QUIT) */</FONT>
+   <FONT COLOR=GREEN>while</FONT> (GetMessage(&msg, 0, 0, 0))
+   {
+      <FONT COLOR=BROWN>/* Send msg to window procedure */</FONT>
+      DispatchMessage((CONST MSG *)&msg);
+   }
+
+   <FONT COLOR=BROWN>/* Close any Midi Input device */</FONT>
+   closeMidiIn();
+
+   <FONT COLOR=BROWN>/* Close any Midi Output device */</FONT>
+   closeMidiOut();
+
+   <FONT COLOR=BROWN>/* Exit */</FONT>
+   <FONT COLOR=GREEN>return</FONT>(0);
+}
+
+<FONT COLOR=BROWN>/* ****************************** mainWndProc() *********************************
+ * Main Window message handler called by Windows
+ ******************************************************************************* */</FONT>
+
+<FONT COLOR=GREEN>long</FONT> APIENTRY mainWndProc(HWND hwnd, UINT uMsg, UINT wParam, LONG lParam)
+{
+   <FONT COLOR=GREEN>switch</FONT>(uMsg)
+   {
+      <FONT COLOR=BROWN>/* ============== App is gaining or losing activation ============= */</FONT>
+      <FONT COLOR=GREEN>case</FONT> WM_ACTIVATEAPP:
+      {
+         <FONT COLOR=BROWN>/* Is app losing activation? */</FONT>
+         <FONT COLOR=GREEN>if</FONT> (!wParam)
+         {
+            <FONT COLOR=BROWN>/* Close the MIDI devices (so other apps can use them) */</FONT>
+            closeMidiIn();
+            closeMidiOut();
+         }
+
+         <FONT COLOR=BROWN>/* App gaining activation so reopen
+         MIDI devices if not already open */</FONT>
+         <FONT COLOR=GREEN>else</FONT>
+         {
+            <FONT COLOR=BROWN>/* Open MIDI In */</FONT>
+            openMidiIn();
+
+            <FONT COLOR=BROWN>/* Open MIDI Out */</FONT>
+            openMidiOut();
+         }
+	
+         <FONT COLOR=BROWN>/* Allow windows to continue handling WM_ACTIVATEAPP */</FONT>
+         <FONT COLOR=GREEN>break</FONT>;
+      }
+   }
+
+   // Let windows handle it
+   <FONT COLOR=GREEN>return</FONT>(0);
+}
+
+<FONT COLOR=BROWN>/* ****************************** closeMidiIn() *****************************
+ * Close MIDI In Device if it's open.
+ ************************************************************************** */</FONT>
+
+<FONT COLOR=GREEN>DWORD</FONT> closeMidiIn(<FONT COLOR=GREEN>void</FONT>)
+{
+   DWORD   err;
+
+   <FONT COLOR=BROWN>/* Is the device open? */</FONT>
+   <FONT COLOR=GREEN>if</FONT> ((err = (DWORD)MidiInHandle))
+   {
+      <FONT COLOR=BROWN>/* Unqueue any buffers we added. If you don't
+      input System Exclusive, you won't need this */</FONT>
+      midiInReset(MidiInHandle);
+
+      <FONT COLOR=BROWN>/* Close device */</FONT>
+      <FONT COLOR=GREEN>if</FONT> (!(err = midiInClose(MidiInHandle)))
+      {
+         <FONT COLOR=BROWN>/* Clear handle so that it's safe to call closeMidiIn() anytime */</FONT>
+         MidiInHandle = 0;
+      }
+   }
+
+   <FONT COLOR=BROWN>/* Return the error */</FONT>
+   <FONT COLOR=GREEN>return</FONT>(err);
+}
+
+<FONT COLOR=BROWN>/* *************************** openMidiIn() *****************************
+ * Opens MIDI In Device #0. Stores handle in MidiInHandle. Starts
+ * recording. (midiInputEvt is my callback to process input).
+ * Returns 0 if success. Otherwise, an error number.
+ * Use midiInGetErrorText to retrieve an error message.
+ ************************************************************************ */</FONT>
+
+<FONT COLOR=GREEN>DWORD</FONT> openMidiIn(<FONT COLOR=GREEN>void</FONT>)
+{
+   DWORD   err;
+
+   <FONT COLOR=BROWN>/* Is it not yet open? */</FONT>
+   if (!MidiInHandle)
+   {
+      <FONT COLOR=BROWN>/* Open MIDI Input and set Windows to call my
+      midiInputEvt() callback function. You may prefer
+      to have something other than CALLBACK_FUNCTION. Also,
+      I open device 0. You may want to give the user a choice */</FONT>
+      <FONT COLOR=GREEN>if</FONT> (!(err = midiInOpen(&MidiInHandle, 0, (DWORD)midiInputEvt, 0, CALLBACK_FUNCTION)))
+      {
+         <FONT COLOR=BROWN>/* Start recording Midi and return if SUCCESS */</FONT>
+         <FONT COLOR=GREEN>if</FONT> (!(err = midiInStart(MidiInHandle)))
+         {
+            <FONT COLOR=GREEN>return</FONT>(0);
+         }
+
+      <FONT COLOR=BROWN>/* ============== ERROR ============== */</FONT>
+
+      <FONT COLOR=BROWN>/* Close MIDI In and zero handle */</FONT>
+      closeMidiIn();
+
+      <FONT COLOR=BROWN>/* Return the error */</FONT>
+      <FONT COLOR=GREEN>return</FONT>(err);
+   }
+
+   <FONT COLOR=GREEN>return</FONT>(0);
+}
+
+<FONT COLOR=BROWN>/* ***************************** closeMidiOut() *****************************
+ * Close MIDI Out Device if it's open.
+ ************************************************************************** */</FONT>
+
+<FONT COLOR=GREEN>DWORD</FONT> closeMidiOut(<FONT COLOR=GREEN>void</FONT>)
+{
+   DWORD   err;
+
+   <FONT COLOR=BROWN>/* Is the device open? */</FONT>
+   <FONT COLOR=GREEN>if</FONT> ((err = (DWORD)MidiOutHandle))
+   {
+      <FONT COLOR=BROWN>/* If you have any system exclusive buffers that
+      you sent via midiOutLongMsg(), and which are still being output,
+      you may need to wait for their MIDIERR_STILLPLAYING flags to be
+      cleared before you close the device. Some drivers won't close with
+      pending output, and will give an error. */</FONT>
+
+      <FONT COLOR=BROWN>/* Close device */</FONT>
+      <FONT COLOR=GREEN>if</FONT> (!(err = midiOutClose(MidiOutHandle)))
+      {
+         <FONT COLOR=BROWN>/* Clear handle so that it's safe to call closeMidiOut() anytime */</FONT>
+         MidiOutHandle = 0;
+      }
+   }
+
+   <FONT COLOR=BROWN>/* Return the error */</FONT>
+   <FONT COLOR=GREEN>return</FONT>(err);
+}
+
+<FONT COLOR=BROWN>/* ************************** openMidiOut() *****************************
+ * Opens MIDI Out Device #0. Stores handle in MidiOutHandle.
+ * Returns 0 if success. Otherwise, an error number.
+ * Use midiOutGetErrorText to retrieve an error message.
+ ************************************************************************ */</FONT>
+
+<FONT COLOR=GREEN>DWORD</FONT> openMidiOut(<FONT COLOR=GREEN>void</FONT>)
+{
+   DWORD   err;
+
+   <FONT COLOR=BROWN>/* Is it not yet open? */</FONT>
+   if (!MidiOutHandle)
+   {
+      <FONT COLOR=BROWN>/* Open MIDI Output. I open device 0. You
+      may want to give the user a choice */</FONT>
+      <FONT COLOR=GREEN>if</FONT> (!(err = midiOutOpen(&MidiOutHandle, 0, 0, 0, CALLBACK_NULL)))
+      {
+         <FONT COLOR=GREEN>return</FONT>(0);
+      }
+
+      <FONT COLOR=BROWN>/* ============== ERROR ============== */</FONT>
+
+      <FONT COLOR=BROWN>/* Return the error */</FONT>
+      <FONT COLOR=GREEN>return</FONT>(err);
+   }
+
+   <FONT COLOR=GREEN>return</FONT>(0);
+}
+
+</B></FONT></PRE>
+
+<P>Note: For the sake of simplicity, I omit code above to notify the user if an error occurred in opening a MIDI device.
+That's usually something that he would want to know.
+
+<P>Of course, you would likely add menus and controls to your window, to allow the user to perform some MIDI operations.
+And you would add WM_COMMAND message processing to your window procedure to do that user interaction. One caveat is
+that, before you make any call to do MIDI output, you should first check that MidiOutHandle is not 0. After all, it may be
+that some other application has not been as nice as you, and didn't relinquish its death grip on the MIDI Output you're
+trying to use. In that case, the MIDI Output may not reopen. (Same thing with MIDI Input, but since Windows calls <B>you</B>
+for MIDI input, rather than you calling a Windows function, all that happens when MIDI Input doesn't reopen is that your
+MIDI input routines never get called).
+
+<P>There is one thing that I've noticed about some drivers. They allow an application to quickly return from a call
+to midiOutClose() or midiInClose(), but the driver then goes on to do some "cleanup" in the background. The driver may
+not yet be ready to allow someone else to do a midiInOpen() or midiInClose() during that time, and may return a
+"Device is busy" error. The net result is that, if another application is doing the same thing as above (ie, opening and
+closing devices in its WM_ACTIVATEAPP processing), there may not be enough time between when that application closes the
+device and when you try to open it. After all, you both are processing your WM_ACTIVATEAPP messages around the same time
+(on each of your timeslices).
+
+<P>I have found that a good work around is not to do the device opens while processing the WM_ACTIVATEAPP message. Rather,
+have that message post another, user-defined message to your window handler (ie, a message with an ID of WM_USER or greater).
+And then when your window procedure processes the WM_USER message is where you do the opens. This works because, when your
+application is getting the focus, there are usually a slew of messages sent and processed by your window procedure, and
+these get done well before you get around to that WM_USER message. Typically, a driver's background tasks get higher
+priority, so the driver will likely get done well before you get around to reopening the device.
+
+<P>Another concern I have observed under Windows 2000 (but not other versions of Win32) is when you go to close down your
+application. (ie, Close down all windows). You should close any MIDI handles you have before you call DestroyWindow() upon
+your last window. Otherwise, if you wait to close those handles after the call to DestroyWindow(), then the WM_ACTIVATEAPP
+message may be sent to another app which will try to open those same MIDI handles. (ie, During your call to DestroyWindow()
+upon your last open window, Windows 2000 will fire off the WM_ACTIVATEAPP message to some other app).
+
+<P>Here then is a slightly modified window procedure with these fixes:
+
+<PRE><FONT SIZE=4><B><FONT COLOR=BROWN>/* ****************************** mainWndProc() *********************************
+ * Main Window message handler called by Windows
+ ******************************************************************************* */</FONT>
+
+LONG APIENTRY mainWndProc(HWND hwnd, UINT uMsg, UINT wParam, LONG lParam)
+{
+   <FONT COLOR=GREEN>switch</FONT>(uMsg)
+   {
+      <FONT COLOR=BROWN>/* ============== App is gaining or losing activation ============= */</FONT>
+      <FONT COLOR=GREEN>case</FONT> WM_ACTIVATEAPP:
+      {
+         <FONT COLOR=BROWN>/* Is app losing activation? */</FONT>
+         <FONT COLOR=GREEN>if</FONT> (!wParam)
+         {
+             <FONT COLOR=BROWN>/* Close the MIDI devices (so other apps can use them) */</FONT>
+             closeMidiIn();
+             closeMidiOut();
+         }
+
+         <FONT COLOR=BROWN>/* App gaining activation */</FONT>
+         <FONT COLOR=GREEN>else</FONT>
+         {
+             <FONT COLOR=BROWN>/* Post a message to myself to reopen MIDI devices
+             later, if they're not already open */</FONT>
+             PostMessage(hwnd, WM_USER, (WPARAM)0, (LPARAM)0);
+         }
+	
+         <FONT COLOR=BROWN>/* Allow windows to continue handling WM_ACTIVATEAPP */</FONT>
+         <FONT COLOR=GREEN>break</FONT>;
+      }
+
+      <FONT COLOR=BROWN>/* ================== MIDI Port allocation =================== */
+      /* I send a WM_USER message to myself during WM_ACTIVATEAPP
+         to open the MIDI In and Out devices. */</FONT>
+      <FONT COLOR=GREEN>case</FONT> WM_USER:
+      {
+         <FONT COLOR=BROWN>/* Open MIDI In */</FONT>
+         openMidiIn();
+
+         <FONT COLOR=BROWN>/* Open MIDI Out */</FONT>
+         openMidiOut();
+
+         <FONT COLOR=BROWN>/* Handled this message */</FONT>
+         return(1);
+      }
+
+      <FONT COLOR=BROWN>/* ============== App is about to close its last window ============= */</FONT>
+      <FONT COLOR=GREEN>case</FONT> WM_CLOSE:
+      {
+         <FONT COLOR=BROWN>/* Close the MIDI devices (so other apps can use them) */</FONT>
+         closeMidiIn();
+         closeMidiOut();
+
+         <FONT COLOR=BROWN>/* NOW close your last window */</FONT>
+         DestroyWindow(hwnd);
+
+         <FONT COLOR=BROWN>/* Handled this message */</FONT>
+         return(1);
+      }
+   }
+
+   // Let windows handle it
+   <FONT COLOR=GREEN>return</FONT>(0);
+}</B></FONT></PRE>
+
+Ok, you say, "But what about those times when I want to continue doing something with MIDI in the background while
+another program gets the focus?" For example, maybe you want to continue playing a MIDI file in the background, and don't
+want to stop just because the user switches to a paint program.
+
+<P>In that case, you should give the user the option of whether he wants your program to continue doing MIDI in the
+background. One good approach is to have some menu item he can check or uncheck which signals whether he wants you to
+"relinquish" the MIDI devices when your application is deactivated. Here I have a global, NoRelinquishFlag. When the
+user tells me to "hold onto the device", I set this to one. If the user wants me to relinquish the MIDI devices when
+he moves to another app, then I clear it. (I won't bother showing you how to set and clear variables). Below, I show
+you the simple modification you need to make to implement intelligent MIDI sharing that should encompass your
+software's requirements.
+
+<PRE><FONT SIZE=4><B><FONT COLOR=GREEN>unsigned char</FONT> NoRelinquishFlag = 0;
+
+<FONT COLOR=BROWN>/* ****************************** mainWndProc() *********************************
+ * Main Window message handler called by Windows
+ ******************************************************************************* */</FONT>
+
+LONG APIENTRY mainWndProc(HWND hwnd, UINT uMsg, UINT wParam, LONG lParam)
+{
+   <FONT COLOR=GREEN>switch</FONT>(uMsg)
+   {
+      <FONT COLOR=BROWN>/* ============== App is gaining or losing activation ============= */</FONT>
+      <FONT COLOR=GREEN>case</FONT> WM_ACTIVATEAPP:
+      {
+         <FONT COLOR=BROWN>/* Is app losing activation? */</FONT>
+         <FONT COLOR=GREEN>if</FONT> (!wParam)
+         {
+             <FONT COLOR=BROWN>/* Does user want the feature where this app relinquishes its
+             access to MIDI In and Out when user switches to another app? */</FONT>
+             <FONT COLOR=GREEN>if</FONT> (!NoRelinquishFlag)
+             {
+                <FONT COLOR=BROWN>/* Close the MIDI devices (so other apps can use them) */</FONT>
+                closeMidiIn();
+                closeMidiOut();
+             }
+         }
+
+         <FONT COLOR=BROWN>/* App gaining activation */</FONT>
+         <FONT COLOR=GREEN>else</FONT>
+         {
+             <FONT COLOR=BROWN>/* Post a message to myself to reopen MIDI devices
+             later, if they're not already open */</FONT>
+             PostMessage(hwnd, WM_USER, (WPARAM)0, (LPARAM)0);
+         }
+	
+         <FONT COLOR=BROWN>/* Allow windows to continue handling WM_ACTIVATEAPP */</FONT>
+         <FONT COLOR=GREEN>break</FONT>;
+      }
+
+      <FONT COLOR=BROWN>/* ================== MIDI Port allocation =================== */
+      /* I send a WM_USER message to myself during WM_ACTIVATEAPP
+         to open the MIDI In and Out devices. */</FONT>
+      <FONT COLOR=GREEN>case</FONT> WM_USER:
+      {
+         <FONT COLOR=BROWN>/* Open MIDI In */</FONT>
+         openMidiIn();
+
+         <FONT COLOR=BROWN>/* Open MIDI Out */</FONT>
+         openMidiOut();
+
+         <FONT COLOR=BROWN>/* Handled this message */</FONT>
+         return(1);
+      }
+   }
+
+   // Let windows handle it
+   <FONT COLOR=GREEN>return</FONT>(0);
+}
+</B></FONT></PRE>
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Crashes under Windows 2000/NT/XP, and lost handles</FONT></H2>
+
+<P>When a program crashes, and it has no exception handling of its own, the Win32 default exception handling is invoked.
+This default handling attempts to free up resources for the program. For example, if you have some file open, the handle to
+it is closed. Under Windows 2000/NT/XP, the default exception handling unfortunately does not close any MIDI handles you
+have open. The net result is that, after a program crashes, no program will be able to open that MIDI port until you reboot
+the system.
+
+<P>But there is a way to solve this problem. What the default exception handling does do is to unload any Dynamic Link
+Libraries (DLL) that you have open. The operating system calls a special function (usually named DllMain()) in the DLL,
+passing a value of DLL_PROCESS_DETACH. The DLL is expected to do any cleanup then. So, if you place your MIDI handle
+variables inside of a DLL that you write, and then put code in your DllMain() function to close these handles if they are
+not zero, then your program will effectively close it MIDI handles, even when it crashes under Windows 2000/NT/XP.
+
+<P>So, how do you get access to those MIDI handles if they're inside of a DLL? Well, if you statically link with the DLL, and
+you've put the names of those variables in your Module Definition (.DEF) file, then Win32 automatically resolves those
+links when your program is loaded. You simply access those variables just like any other global variable in your
+program. But an even better idea is to put those above "wrapper functions" I wrote into a DLL, export their names in your
+DEF file, and call them just like any other functions in your program. Then, your DllMain()'s DLL_PROCESS_DETACH can
+simply call closeMidiOut() and closeMidiIn() to do the needed cleanup.
+
+You can download my <A HREF="../midi/software/dev/winapi/midskele.zip">MIDI Skeleton</A> C
+example which implements this sharing. Run multiple copies of this program with a single client driver and you'll note that
+they all share a MIDI port. In fact, this example shows skeleton code for writing a MIDI C application, and may be of
+some use as a starting point for your own projects. Included are the Project Workspace files for Visual C++ 4.0. Remember
+that all apps should include MMSYSTEM.H and link with WINMM.LIB (or MMSYSTEM.LIB if Win3.1). This is a ZIP archive. Use an
+unzip utility that supports long filenames. It also includes the source code to a DLL with the wrapper functions in it.
+The C app uses this DLL to deal with the situation of freeing handles when crashing under Windows 2000/NT/XP.
+
+<HR NOSHADE><H2><FONT COLOR="#FF8040">Conclusion</FONT></H2>
+
+<P>By implementing the above, you'll be able to write a program that shares the MIDI ports with other such well-behaved
+MIDI programs (including multiple instances of your own program). It will work with single client drivers, and it will be
+transparent to the enduser. It will free MIDI handles under Windows 2000/NT/XP if your program crashes.
+
+<P>In conclusion, if you don't care about the overhead of opening and closing a device before and after every operation,
+and you do quick, MIDI operations, then you can just do the technique described in <A HREF="share.htm#1">my first
+example</A>. You won't hog a port that way.
+
+<P>But if you must hog a port, then do it the intelligent, user-friendly way as shown above.
+
+<P>Do Windows-using musicians a favor -- If you run across a MIDI program that doesn't share the MIDI port when you go to
+activate other MIDI programs, send the author of that first program a copy of this web page.
+</BODY></HTML>

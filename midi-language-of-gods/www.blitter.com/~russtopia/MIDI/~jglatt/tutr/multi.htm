@@ -1,0 +1,266 @@
+<HTML><HEAD><TITLE>MIDI Channels and Multitimbral Sound Modules</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+<CENTER><FONT COLOR=RED><B>Introduction</B></FONT></CENTER>
+
+<P>Most MIDI <A HREF="define.htm#module">sound modules</A> today are "multi-timbral". This means that the module can listen
+to all 16 MIDI channels at once, and play any 16 of its "patches" simultaneously, with each of the 16 patches set to a
+different MIDI channel.
+
+<P>It's as if the module had 16 smaller "sub-modules" inside of it. Each sub-module plays its own patch (ie, instrument) upon its own MIDI channel.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>MIDI Channels and the Multi-Timbral Module</B></FONT></CENTER>
+
+<P>It may help if I draw some analogies here to explain the above.
+
+<P>Think of these sub-modules as robotic musicians. I'll call them "robomusicians". You have 16 of them inside one
+multi-timbral module.
+
+<P>Now think of MIDI channels as channels (ie, inputs) upon a mixing console. You have 16 of them in any one MIDI setup.
+(I assume one discrete MIDI bus in this "MIDI setup". Some setups have <A HREF="midibus.htm">multiple MIDI
+Ins/Outs with more than 16 MIDI channels</A>. But here, let's talk about a typical MIDI setup which is limited to 16 channels).
+
+<P>Each robomusician (ie, sub-module) has his own microphone plugged into one channel of that 16 channel mixer, so you
+have individual control over his volume, panning, reverb and chorus levels, and perhaps other settings.
+
+<P>The diagram below illustrates the concept of a multi-timbral module in my MIDI setup. There are 16 "robomusicians"
+representing the 16 sub-modules. And there are 16 channels on the mixer, representing the 16 MIDI channels. Each robomusician
+has his own channel on the mixer, which means he has his own volume, pan, reverb level, and other such settings.
+
+<P><CENTER><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 NOWRAP>
+<TR>
+<TD WIDTH=36 ALIGN=CENTER>1</TD>
+<TD WIDTH=36 ALIGN=CENTER>2</TD>
+<TD WIDTH=36 ALIGN=CENTER>3</TD>
+<TD WIDTH=36 ALIGN=CENTER>4</TD>
+<TD WIDTH=36 ALIGN=CENTER>5</TD>
+<TD WIDTH=36 ALIGN=CENTER>6</TD>
+<TD WIDTH=36 ALIGN=CENTER>7</TD>
+<TD WIDTH=36 ALIGN=CENTER>8</TD>
+<TD WIDTH=36 ALIGN=CENTER>9</TD>
+<TD WIDTH=36 ALIGN=CENTER>10</TD>
+<TD WIDTH=36 ALIGN=CENTER>11</TD>
+<TD WIDTH=36 ALIGN=CENTER>12</TD>
+<TD WIDTH=36 ALIGN=CENTER>13</TD>
+<TD WIDTH=36 ALIGN=CENTER>14</TD>
+<TD WIDTH=36 ALIGN=CENTER>15</TD>
+<TD WIDTH=36 ALIGN=CENTER>16</TD>
+</TR>
+<TR>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+</TR>
+<TR>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+</TR>
+<TR>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+</TR>
+</TABLE></CENTER>
+
+<P>But MIDI Channels aren't exactly like inputs on a mixer, because not only are they inputs from those robomusicians,
+they are also outputs to those robomusicians. In other words, let's say that there is a button on each of those mixer channels. When you push that button and speak into a microphone, your voice is heard through the headphones worn by only the one robomusician plugged into that channel. For example, if you push the button on channel 10, only robomusician 10 hears what you say to him. In this way, you can give individual instructions to each robomusician.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Assigning a patch to a "robomusician"</B></FONT></CENTER>
+
+<P>Think of a patch as a "musical instrument". For example, you typically have Piano, Flute, Saxophone, Bass Guitar, etc,
+patches in a sound module (even the ones built into a computer sound card -- often referred to as a "wavetable synth").
+Typically, most modules have hundreds of patches (ie, musical instruments) to chose from. The patches are numbered.
+For example, a trumpet patch may be the fifty-seventh patch available among all of the choices.
+
+<P>Since you have 16 robomusicians, you can pick out any 16 instruments (ie, patches) among those hundreds, to be played
+simultaneously by your 16 robomusicians. Each robomusician can of course play only one instrument at a time. (On the
+other hand, each robomusician can play chords upon any instrument he plays, even if it's traditionally an instrument that
+can't play chords. For example, if the robomusician plays a trumpet patch, he can play chords on it, even though a real
+trumpet is incapable of sounding more than one pitch at a time).
+
+<P>As an example, maybe your arrangement needs a drum kit, a bass guitar, a piano, and a saxophone. Let's say that the
+drums are played by robomusician #10. (He's on MIDI channel 10 of the mixer). (In fact, with some MIDI modules, channel
+#10 is reserved for only drums. In other words, robomusician #10 can play <U>only</U> drums, and maybe he's the only
+robomusician who can play the drums). The other robomusicians are super musicians. Each robomusician can play <U>any</U> of
+the hundreds of instruments (ie, patches) in your module, but of course, he still is restricted to playing only one
+instrument at a time. So let's say that you tell robomusician 1 to sit at a piano, and robomusician 2 to pick up a bass
+guitar, and robomusician 3 to pick up a saxophone. Let's say that you tell the remaining 12 robomusicians to pick up an
+accordian, violin, acoustic guitar, flute, harp, cello, harmonica, trumpet, clarinet, etc, so that each robomusician has a
+different instrument to play.
+
+<P>Here's what we want the instrument assignment to look like:
+
+<P><CENTER><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 NOWRAP>
+<TR>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 1 plays piano" SRC="keys2.gif" WIDTH=32 HEIGHT=24 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 2 plays bass" SRC="gtr.gif" WIDTH=32 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 3 plays sax" SRC="sax.gif" WIDTH=25 HEIGHT=46 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 4 plays accordian" SRC="accord.gif" WIDTH=30 HEIGHT=20 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 5 plays violin" SRC="violin.gif" WIDTH=15 HEIGHT=37 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 6 plays acoustic guitar" SRC="folkgtr.gif" WIDTH=26 HEIGHT=26 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=CENTER ALIGN=CENTER><IMG ALT="Musician 7 plays flute" SRC="http://www.borg.com/~jglatt/tutr/Flute.gif" WIDTH=35 HEIGHT=5 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 8 plays harp" SRC="harp.gif" WIDTH=25 HEIGHT=33 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 9 plays viola" SRC="cello.gif" WIDTH=32 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 10 plays drums" SRC="snare.gif" WIDTH=29 HEIGHT=29 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 11 plays harmonica" SRC="harmonic.gif" WIDTH=16 HEIGHT=42 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 12 plays trumpet" SRC="trumpet.gif" WIDTH=28 HEIGHT=28 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 13 plays clarinet" SRC="clari.gif" WIDTH=28 HEIGHT=28 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 14 plays cello" SRC="cello.gif" WIDTH=32 HEIGHT=32 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=TOP ALIGN=CENTER><IMG ALT="Musician 15 plays synth" SRC="keys.gif" WIDTH=32 HEIGHT=24 BORDER=0></TD>
+<TD WIDTH=36 VALIGN=CENTER ALIGN=CENTER><IMG ALT="Musician 16 plays timbales" SRC="snare2.gif" WIDTH=29 HEIGHT=27 BORDER=0></TD>
+</TR>
+<TR>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="man.gif" WIDTH=32 HEIGHT=44 BORDER=0></TD>
+</TR>
+<TR>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mic.gif" WIDTH=10 HEIGHT=62 BORDER=0></TD>
+</TR>
+<TR>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+<TD WIDTH=36 ALIGN=CENTER><IMG SRC="mixer.gif" WIDTH=32 HEIGHT=100 BORDER=0></TD>
+</TR>
+</TABLE></CENTER>
+
+<P>How do you tell the robomusician to pick up a certain instrument? Hit that button upon his channel and give him a
+message telling him the number of the patch/instrument you want him to play. How do you do that over MIDI? Well, that's
+what MIDI messages are for. The MIDI Program Change message is the one that instructs a robomusician to pick up a certain
+instrument. Contained in the MIDI Program Change message is the number of the desired patch/instrument. (For example, above
+that would be #57 for the Trumpet patch). So, you send (to the multi-timbral module's MIDI In) a MIDI Program Change message
+upon the MIDI channel for that robomusician. For example, to tell robomusician 3 to pick up a sax, you send a MIDI Program Change (with a value that selects the Saxophone patch) on MIDI channel 3.
+
+<P><FONT COLOR=RED>Note:</FONT> To discover what value (ie, number) you need for the Program Change message, in order to select a particular patch, consult the manual for your sound module. If your module follows the <A HREF="gm.htm#Patch">General MIDI Patch set</A>, then consult that standard for what numbers select which patches.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Individual control via each MIDI Channel</B></FONT></CENTER>
+
+<P>After you've told the 16 robomusicians what instruments to pick up, you can now have them play a MIDI arrangement with
+these 16 instruments -- each robomusician playing simultaneously with individual control over his volume, panning, etc.
+
+<P>How do you tell a robomusician what notes to play? You send him MIDI Note messages on his channel. Remember that only that
+one robomusician "hears" these messages. The other robomusicians see only those messages on their respective channels. (ie,
+Each robomusician ignores messages that aren't on his channel, and takes notice of only those messages that are on his
+channel). For example, the sax player is robomusician 3, so you send him note messages on MIDI channel 3.
+
+<P>How do you tell a robomusician to change his volume? You send him Volume Controller messages on his MIDI channel. How do you tell a robomusician to bend his pitch? You send him Pitch Wheel messages on his MIDI channel. In fact, there are many different things that a robomusician can do independently of the other 15 robomusicians, because there are many different <A HREF="ctl.htm">MIDI controller messages</A> that can be sent on any given MIDI channel.
+
+<P>And that's why I say that it's as if there are are 16 "sub-modules" inside of one multi-timbral module -- because these 16 robomusicians really do have independent control over their musical performances, thanks to there being 16 MIDI channels in that one MIDI cable that runs to the multi-timbral module's MIDI In.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Changing instrumentation</B></FONT></CENTER>
+
+<P>OK, let's say that at one point in your arrangement, a 17th instrument needs to be played -- maybe a Banjo. Well, at that
+point you've got to have one of your 16 robomusicians put down his current instrument and pick up a Banjo instead. Let's say
+that the sax player isn't supposed to be playing anything at this point in the arrangement. So, you send a MIDI Program
+Change to robomusician 3 (ie, on MIDI channel 3 -- remember that he's the guy who was playing the sax), telling him to pick
+up a Banjo. Now when you send him note messages, he'll be playing that banjo. Later on, you can send him another MIDI
+Program Change to tell him to put down the Banjo and pick up the saxophone again (or some other instrument). So, although
+you're limited to 16 robomusicians playing 16 instruments simultaneously, any of your robomusicians can change their
+instruments during the arrangement. (Well, maybe robomusician 10 is limited to playing only drums. Even then, he may be
+able to choose from among several different drum kits).
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Parts</B></FONT></CENTER>
+
+<P>So is there a name for these 16 "robomusicians" or "sub-modules" inside of your MIDI module? Well, different
+manufacturers refer to them in different ways, and I'm going to use the Roland preference, a <B>Part</B>. A Roland
+multi-timbral module has 16 Parts inside of it, and each usually has its own settings for such things as Volume, Panning,
+Reverb and Chorus levels, etc, and its MIDI channel (ie, which MIDI data the Part "plays"). Furthermore, each Part has its
+own way of reacting to MIDI data such as <EM>Channel Pressure</EM> (often used to adjust volume or brightness), <EM>MOD
+Wheel controller</EM> (often used for a vibrato effect), and <EM>Pitch Wheel</EM> (used to slide the pitch up and down). For
+example, one Part can cause its patch to sound brighter when it receives Channel Pressure messages that increase in value.
+On the other hand, another Part could make its volume increase when it receives increasing Channel Pressure messages. These
+Parts are completely independent of each other. Just because one Part is receiving a Pitch Wheel message and bending its
+pitch doesn't mean that another Part has to do the same.
+
+<HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Stereo output</B></FONT></CENTER>
+
+<P>You'll note that sound of all 16 robomusicians typically comes out of a stereo output of your sound module (or
+computer card). That's because most multi-timbral modules have an internal mixer (which can be adjusted by MIDI controller
+messages to set volume, panning, brightness, reverb level, etc) that mixes the output of all 16 Parts to a pair of stereo
+output jacks. (ie, The 16 microphones and 16 channel mixing console I alluded to earlier are built into the MIDI module
+itself. The stereo outputs of the module are like the stereo outputs of that mixing console).
+
+<P><H3>Recommended reading:</H3>
+<P><A HREF="whatmidi.htm">What's MIDI?</A>
+
+</BODY></HTML>

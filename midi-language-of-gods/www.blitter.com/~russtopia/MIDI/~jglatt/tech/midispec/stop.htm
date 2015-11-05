@@ -1,0 +1,24 @@
+<HTML><HEAD><TITLE>MIDI Specification: MIDI Stop</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>MIDI Stop</CENTER></FONT></H2></P>
+
+<P>Category: System Realtime
+
+<P><FONT COLOR=GREEN>Purpose</FONT>
+<P>Some master device that controls sequence playback sends this message to make a slave device stop playback of a
+song/sequence.
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0xFC
+
+<P><FONT COLOR=GREEN>Data</FONT>
+<P>None
+
+<P><FONT COLOR=GREEN>Errata</FONT>
+<P>When a device receives a MIDI Stop, it should keep track of the point at which it stopped playback (ie, its stopped
+"Song Position"), in the anticipation that a MIDI Continue might be received next.
+
+<P>Often, the slave device has its playback tempo synced to the master via MIDI Clock. See
+<A HREF="seq.htm">Syncing Sequence Playback</A>.
+
+</FONT></BODY></HTML>

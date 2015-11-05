@@ -1,0 +1,14 @@
+<HTML><HEAD><TITLE>MIDI File Format: Cue</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<FONT COLOR=BLUE><H3><CENTER>Cue Point</CENTER></H3></FONT></P>
+
+<P>FF 07 <I><FONT COLOR=GREEN><B>len</B></FONT></I> <I><FONT COLOR=RED><B>text</B></FONT></I>
+
+<P>The text for a cue point which occurs on a given beat. A Cue Point might be used to denote
+where a WAVE (ie, sampled sound) file starts playing, for example, where the
+<I><FONT COLOR=RED><B>text</B></FONT></I> would be the WAVE's filename.
+
+<P>Note that <I><FONT COLOR=GREEN><B>len</B></FONT></I> could be a series of bytes since it
+is expressed as a variable length quantity.
+
+</FONT></BODY></HTML>

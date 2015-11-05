@@ -1,0 +1,24 @@
+<HTML><HEAD><TITLE>MIDI File Format: Program (Patch) Name</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<FONT COLOR=BLUE><H3><CENTER>Program Name</CENTER></H3></FONT></P>
+
+<P>FF 08 <I><FONT COLOR=GREEN><B>len</B></FONT></I> <I><FONT COLOR=RED><B>text</B></FONT></I>
+
+<P>The name of the program (ie, patch) used to play the MTrk. This may be
+different than the Sequence/Track Name. For example, maybe the name of your sequence (ie, Mtrk)
+is "Butterfly", but since the track is played upon an electric piano patch, you may also include a
+Program Name of "ELECTRIC PIANO".
+
+<P>Usually, the instruments (ie, patches, tones, banks, etc) are setup on the audio devices via
+<B>MIDI Program Change</B> and <B>MIDI Bank Select Controller</B> events within the MTrk. So,
+this event exists merely to provide the user with visual feedback of what particular patch is
+used for a track. But it can also give a hint to intelligent software if patch remapping needs
+to be done. For example, if the MIDI file was created on a non-General MIDI instrument, then
+the <B>MIDI Program Change</B> event will likely contain the
+wrong value when played on a General MIDI instrument. Intelligent software can use the
+Program Name event to look up the correct value for the <B>MIDI Program Change</B> event.
+
+<P>Note that <I><FONT COLOR=GREEN><B>len</B></FONT></I> could be a series of bytes since it
+is expressed as a variable length quantity.
+
+</FONT></BODY></HTML>

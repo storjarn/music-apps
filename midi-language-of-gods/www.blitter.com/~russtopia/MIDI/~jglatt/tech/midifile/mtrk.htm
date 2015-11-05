@@ -1,0 +1,29 @@
+<HTML><HEAD><TITLE>MIDI File Format: MTrk Chunk</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+After the MThd chunk, you should find an <B>MTrk chunk</B>, as this is the only other
+currently defined chunk. (If you find some other chunk ID, it must be proprietary to some other
+program, so skip it by ignoring the following data bytes indicated by the chunk's
+Length).
+
+<P>An MTrk chunk contains all of the midi data (with timing bytes), plus optional non-midi data
+for <U>one track</U>. Obviously, you should encounter as many MTrk chunks in the file as the
+MThd chunk's NumTracks field indicated.
+
+<P>The MTrk header begins with the ID of <b>MTrk</B>, followed by the Length
+(ie, number of data bytes for this track). The Length will likely be different for
+each track. (After all, a track containing the violin part for a Bach concerto will likely contain
+more data than a track containing a simple 2 bar drum beat).
+
+<P>Here's what an MTrk chunk looks like if you defined it in C:
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BLUE>struct</FONT> MTRK_CHUNK
+{
+   <FONT COLOR=BROWN>/* Here's the 8 byte header that all chunks must have */</FONT>
+   <FONT COLOR=BLUE>char</FONT>           ID[4];   <FONT COLOR=BROWN>/* This will be 'M','T','r','k' */</FONT>
+   <FONT COLOR=BLUE>unsigned long</FONT>  Length;  <FONT COLOR=BROWN>/* This will be the actual size of Data[] */</FONT>
+
+   <FONT COLOR=BROWN>/* Here are the data bytes */</FONT>
+   <FONT COLOR=BLUE>unsigned char</FONT>  Data[];  <FONT COLOR=BROWN>/* Its actual size is Data[Length] */</FONT>
+};</B></FONT></PRE>
+
+</FONT></BODY></HTML>

@@ -1,0 +1,78 @@
+<HTML><HEAD><TITLE>MIDI Specification: Manufacturer IDs</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+Here are the assigned Manufacturer ID numbers (ie, the second byte in a System Exclusive message):
+
+<PRE><B><FONT SIZE=3 COLOR=BLUE>Sequential Circuits  1
+Big Briar            2
+Octave / Plateau     3
+Moog                 4
+Passport Designs     5
+Lexicon              6
+Kurzweil             7
+Fender               8
+Gulbransen           9
+Delta Labs         0x0A
+Sound Comp.        0x0B
+General Electro    0x0C
+Techmar            0x0D
+Matthews Research  0x0E
+Oberheim           0x10
+PAIA               0x11
+Simmons            0x12
+DigiDesign         0x13
+Fairlight          0x14
+Peavey             0x1B
+JL Cooper          0x15
+Lowery             0x16
+Lin                0x17
+Emu                0x18
+Bon Tempi          0x20
+S.I.E.L.           0x21
+SyntheAxe          0x23
+Hohner             0x24
+Crumar             0x25
+Solton             0x26
+Jellinghaus Ms     0x27
+CTS                0x28
+PPG                0x29
+Elka               0x2F
+Cheetah            0x36
+Waldorf            0x3E
+Kawai              0x40
+Roland             0x41
+Korg               0x42
+Yamaha             0x43
+Casio              0x44
+Akai               0x45
+</B></FONT></PRE>
+
+<P>You'll note that we use only one byte for the Manufacturer ID. And since a midi data byte can't
+be greater than 0x7F, that means we have only 127 IDs to dole out to manufacturers. Well, there
+are more than 127 manufacturers of MIDI products.
+
+<P>To accomodate a greater range of manufacturer IDs, the MMA decided to reserve a manufacturer
+ID of 0 for a special purpose. When you see a manufacturer ID of 0, then there will be two
+more data bytes after this. These two data bytes combine to make the real manufacturer ID. So,
+some manufacturers have IDs that are 3 bytes, where the first byte is always 0. Using this
+"trick", the range of unique manufacturer IDs is extended to accomodate over 16,000 MIDI
+manufacturers.
+
+<P>For example, Microsoft's manufacturer ID consists of the 3 bytes 0x00 0x00 0x41.
+Note that the first byte is 0 to indicate that the real ID is 0x0041, but is still different
+than Roland's ID which is only the single byte of 0x41.
+
+<P>A manufacturer must get a registered ID from the MMA if he wants to define his own SysEx
+messages, or use the following:
+
+<PRE><B><FONT SIZE=3 COLOR=BLUE>Educational Use  0x7D
+</B></FONT></PRE>
+
+This ID is for educational or development use only, and should never appear in a commercial design.
+
+<P>On the other hand, it is permissible to use another manufacturer's defined SysEx message(s) in
+your own products. For example, if the Roland S-770 has a particular SysEx message that you could
+use verbatim in your own design, you're free to use that message (and therefore the Roland ID in
+it). But, you're not allowed to transmit a mutated version of any Roland message with a Roland ID.
+Only Roland can develop new messages that contain a Roland ID.
+
+</FONT></BODY></HTML>

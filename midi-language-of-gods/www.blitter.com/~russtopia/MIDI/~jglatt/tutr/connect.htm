@@ -1,0 +1,535 @@
+<HTML><HEAD><TITLE>MIDI connections and computer setup</TITLE></HEAD><BODY BGCOLOR=FFFFFF TEXT=000000 LINK=BLUE VLINK=PURPLE ALINK=PURPLE>
+
+This article answers questions about connecting MIDI gear (particularly with regard to a MIDI setup that includes a computer), and setting up computer MIDI hardware/software.
+
+<P>When it comes to solving problems with an entire setup (ie, more than one, self-contained piece of equipment), you need
+to learn how to do something called "trouble-shooting". What this involves is simply going through your entire setup, one
+item at time, <u>isolating</u> that individual piece of equipment and checking that it is operating as you expect.
+
+<P>If you suspect that a particular item is the source of your problems, try to remove just that one item from your setup.
+Replace it with a suitable, substitute item (or nothing at all if your system can operate without that one item). If your
+problems disappear, then you've found the "bad" item, and can concentrate upon trying to "fix" this one item. Every single
+detachable item should be regarded as a separate item to be checked, including <u>all</u> cords and cables, power strips,
+and even each program you're using on your computer.
+
+<P>Don't go running around the room, checking items at random. Start with one item at the end of your MIDI daisy-chain and
+follow the MIDI connections through to the last item. As you move from item to item, remember to check the MIDI cable
+connecting the 2 items. Replace it with another MIDI cable and see if that makes any difference. Look for obvious mistakes
+on each item such as forgetting to turn the power on, forgetting to turn the volume up, connecting a MIDI OUT jack to
+another MIDI OUT jack or MIDI IN jack to another MIDI IN jack (MIDI OUT or THRU jacks always connect to MIDI IN jacks, and
+vice versa), forgetting to make an essential connection (such as the power cord or audio cable), etc. Check for loose
+connections. Plug a pair of headphones directly into the output of a sound module if you suspect a problem with your mixer.
+Play the sound module from its own local keyboard if you suspect a problem with the MIDI output of your sequencer.
+
+<P>When it comes to problems involving computer sound cards or MIDI interfaces, or getting computer software working with
+sound cards or MIDI interfaces, problems can even be more convoluted. If you're having a problem with an internal IBM PC
+card not working, then you should first check for any hardware conflicts in your system. Read the article
+<A HREF="conflict.htm">"Resolving hardware conflicts"</A> for more information.
+
+<P>Another, even more common problem concerns software drivers. The fact of the matter is that programmers <u>do</u> write
+buggy software, and there's a chance that any problem which looks hardware-related may actually be due to some bug in the
+card's driver. Check with the card's manufacturer that you have the latest drivers. Ask if there have been any problems
+reported that may be applicable to your own setup.
+
+<P>And definitely don't rule out the possibility that you may have configured the driver's setup (ie, "Properties" in
+Microsoft-speak) incorrectly. If you use Windows 95, read the FAQ <A HREF="win95.htm">"MIDI/Audio under Win95"</A>.
+
+<HR>
+<P>Questions in this FAQ are:
+
+<P><A HREF="connect.htm#q1">"Why do MIDI IN jacks connect to MIDI OUT jacks?"</A>
+<BR><A HREF="connect.htm#q2">"Why won't my MIDI controller play the sounds on my card (or sound module attached to MIDI OUT)?"</A>
+<BR><A HREF="connect.htm#q3">"Why does my fancy daughterboard sound the same as my card's crummy built-in FM/wavetable sounds?"</A>
+<BR><A HREF="connect.htm#q4">"How do I setup my software so that its 'software mixer' patch names will
+match the sounds (ie, patches) on my sound module?</A>
+<BR><A HREF="connect.htm#q5">"Why can't 2 Windows programs use my card simultaneously?"</A>
+<BR><A HREF="connect.htm#q6">"Can I put 2 sound cards or MIDI interfaces in my computer?"</A>
+<BR><A HREF="connect.htm#q7">"How do I setup my multi-port interface under Windows?"</A>
+<BR><A HREF="connect.htm#q8">"Why is my computer randomly losing (or garbling) MIDI input?"</A>
+<BR><A HREF="connect.htm#q9">"How can I direct one program's MIDI output to another program's MIDI input?"</A>
+<BR><A HREF="connect.htm#q10">"Why is my sound module playing only some of the MIDI channels?"</A>
+<BR><A HREF="connect.htm#q11">"Does daisy-chaining MIDI modules (via THRU jacks) cause note delays?"</A>
+<BR><A HREF="connect.htm#q12">"Can my external MIDI sampler do direct-to-disk recording to my computer hard drive?"</A>
+<BR><A HREF="connect.htm#q13">"Why does my sound card show 3 separate output devices for MIDI playback?"</A>
+<BR><A HREF="connect.htm#q14">"How should I setup MIDI channels for my sequencer tracks?"</A>
+<BR><A HREF="connect.htm#q15">"Why won't my parallel port MIDI interface work?"</A>
+<BR><A HREF="connect.htm#q16">"Why won't my serial port MIDI interface work?"</A>
+<BR><A HREF="connect.htm#q17">"To what extent are piano pedals supported in MIDI?"</A>
+<BR><A HREF="connect.htm#q18">"Why isn't my sustain pedal working properly?"</A>
+<BR><A HREF="connect.htm#q19">"How can I set my MIDI modules to respond to only certain MIDI channels?"</A>
+<BR><A HREF="connect.htm#q20">"In Windows 3.1 MIDI Mapper, what is the difference between the patch and key maps?"</A>
+
+<P><H2><A NAME="q1">Why</A> do MIDI IN jacks connect to MIDI OUT jacks? It makes more sense to connect a MIDI IN jack to a
+MIDI IN jack. After all, they're both labeled <B>IN</B>. Same goes for MIDI OUT to MIDI OUT.</H2>
+
+<P>The accepted way actually makes a lot of sense. Think about it. You want MIDI data to go <u>out</u> of your controller
+and <u>in</u> to your sound module. After all, you wouldn't connect the audio out jack of your sound module to the outputs
+of your mixer, would you? No, you connect the audio output to an audio (mixer) input. And then you connect the mixer outputs
+to the inputs of your amplifier. And then you connect the amp's speaker outputs to the speaker inputs. Same thing with MIDI.
+Think of MIDI data as "flowing" in the same way that audio signals "flow" through your audio system.
+
+
+
+<P><H2><A NAME="q2">I</A> connected the MIDI OUT of my keyboard controller to the MIDI IN of my computer sound card. The
+card has a built-in sound module. So why am I not hearing any sound from the card when I play the controller?</H2>
+
+<P>The built-in sound module on a typical computer card is not internally connected to the card's MIDI IN. Neither is the
+MIDI OUT jack of your sound card internally connected to its own MIDI IN. Therefore, the MIDI data (from your
+keyboard controller) which goes into your card's MIDI IN jack does not automatically get sent to the card's built-in module
+nor external modules attached to the card's MIDI OUT. (ie, The MIDI data goes into the computer OK. It just isn't
+simultaneously sent to MIDI OUT nor the card's built-in sound module). You need to specifically route the MIDI IN jack
+to the card's built-in sound module or its MIDI OUT.
+
+<P>The internal module is considered an entirely separate "device" from the MIDI IN or OUT jacks on the card. (The exception is with early Roland cards, or with cards that can host a "daughterboard" card such as a Roland SCD-10/SCD-15. In this case, the module is internally attached to the MIDI OUT, and is not a separate device). So, if you plug an external controller into the MIDI IN of your card, you won't automatically be able to play the built-in sound module on your card. You need to run some software program that provides a "software THRU switch" (usually referred as "MIDI Echo" in programs). In other words, the program reads the MIDI data coming into the card's MIDI IN, and immediately resends that data to the card's internal sound module or MIDI OUT. At that point, the built-in sound module "sees" the MIDI data from the controller. Yeah, it's a roundabout way of getting the sound module to see data from the card's MIDI IN, but if the sound module was connected to both the MIDI IN <u>and</u> MIDI OUT jacks, then it would get very confused if both a sequencer (sending data to to the module) and a controller (sending data to MIDI IN) were both sending MIDI data simultaneously.
+
+<P>Some fancier MIDI interfaces have hardware support for MIDI Thru. Usually, this is disabled by default. Typically this is
+turned on and off by software supplied with the card. This is a lot more efficient (ie, you hear less of a delay between
+pressing a controller key and hearing the sound) than a software MIDI Thru.
+
+
+
+
+<P><H2><A NAME="q3">I</A> put a fancy daughterboard in my Creative Labs' card, but I still hear the same old cheesy sounds
+as I did with the card's built-in module. Did I get ripped off?"</H2>
+
+<P>Yes, but prior to the daughterboard purchase.
+
+<P>The problem here is that you haven't reconfigured your operating system (or your MIDI software) to use the daughterboard
+instead of the Sound Blaster's built-in module. Hence, you're still hearing that old built-in module. The built-in module is considered to be a separate "device" apart from the daughterboard. The daughterboard is actually attached to the MIDI OUT of the card, so you need to go into your operating system's (or your MIDI software's) MIDI settings and select the Sound Blaster's "MIDI Output" as opposed to "WaveTable Synth" or "FM Synth" (or something to that effect, which refers to the card's built-in module). Different operating systems have different ways to do this. In Win95, you use the Control Panel's MultiMedia notebook, open to the MIDI page, and select the SB's MIDI Out as the "Single Instrument". (Or, you could go to Custom Configuration, and divide up the MIDI channels between "MIDI output", ie, the daughterboard, and "WaveTable Synth", ie the built-in sound module, if you wish to use both sound sources together). Under another OS, you may have to modify some configuration file to indicate that the MIDI Out should be used as the destination for MIDI playback. If your sequencer uses Windows MCI drivers directly, make sure that you've assigned tracks to the card's "MIDI Out" rather than its "WaveTable Synth" (ie, the sequencer will no doubt have its own built-in MIDI setup screen).
+
+
+
+<P><H2><A NAME="q4">How</A> do I setup my software so that its "software mixer" patch names will match the sounds (ie, patches) on my sound module? If I select the "Fretless Bass" patch (#35) on my Yamaha PSR500 via the Yamaha's own control panel, I get the proper sound. But if I use my MIDI software's "mixer" panel to select a "Fretless Bass" patch, it switches to an accordian patch.</H2>
+
+<P>The problem here is that your Yamaha doesn't have a General MIDI patch set, but that's what your software "mixer panel" assumes your module has. So, when you select some "Fretless Bass" patch using your software, the software sends a MIDI Program Change to where the General MIDI "Fretless Bass" patch is located (ie, patch #36). But, your Yamaha has an accordian patch in that location instead (ie, #36). You need to have your computer remap the GM patch set to where those respective patches are really located on your Yamaha. (For example, if your Yamaha's "Fretless Bass" patch is #12, you need to tell your computer that when you select "Fretless Bass" on your software mixer, it should send a Program Change to patch 12 instead of
+36. You'll need to go through all 128 GM patches, and select the correct patch number on your Yamaha for each, or the closest patches that you can find). Or, if your MIDI software supports it, you need to tell your software what are the real names of all of the patches on your sound module (in the correct order from patch #1 to the last patch), so that the software mixer will display those patch names (instead of the GM Patch set).
+
+<P>Let's consider the second option since that is more flexible. (ie, You aren't stuck with using only the GM patch names). Some MIDI software has its own "patch naming" features. CakeWalk has a feature whereby you can enter the name of each patch on your sound module. You list these names in the correct order (ie, from patch #1 to the last patch). For example, you can create a listing of all patches on your EMU Proteus sound module, specifying that patch #1 is called "Tuba Surprise" (or whatever), patch #2 is called "Deep Bass", etc. Then you can apply this patch set to a particular track. Now when you use the software's mixer panel, it uses the patch names you specified (rather than the GM patch set names), and will select the proper patches. Usually, the software allows you to create an individual set of patch names for <u>each</u> one of your sound modules, and then select any set for any given sequencer track. So track 1 can display the patch names of your Proteus (when you use the software mixer), and yet track 2 may display the patch names of your JV-90, and track 3 may display a standard GM patch set for your SCC-1 card. (ie, Your tracks can have different patch sets applied to them, which is very useful if you're using MIDI sound modules that have different patch sets, as above).
+
+<P>If your software doesn't support various sets of patch names (ie, you're stuck using the GM patch set names, and therefore when you select a particular patch name, it may be sending the wrong Program Change to your non-GM modules), you can have Windows do a remapping of those MIDI Program Changes at the driver stage. You'll still be stuck using the GM patch names, but at least you can reroute the program changes to respective patches on your non-GM module. (ie, If you've got a "Fretless Bass" patch on your module for example, at least you can setup your software so that when you select the GM "Fretless Bass"
+patch name on the software mixer, it actually switches to such a patch on your module).
+
+<P>Windows does this patch remapping right before the MIDI data is sent out of your computer. In this way, your software doesn't even need to know that Windows is remapping all of the Program Change events. And this remapping is effective for all of your software (that doesn't bypass Windows high level MCI API), including the Windows Media Player and any Windows multimedia titles.
+
+<P>For Windows 3.X, you use the MIDI Mapper. For Windows 95/98, you instead use an Instrument Definition File (IDF) made with the IDFedit utility and applied within the MultiMedia notebook's MIDI page. (Win95 IDF's also allow you to apply other translations such as transposing notes, and remapping the GM drum sounds to different keys. See my tutorial about <A HREF="win95.htm#w3">using IDFEdit</A>).
+
+<P>The drawback to letting Windows do the remapping is that you'll have to apply remapping by MIDI channel. (Win95's IDF allows remapping for the 16 channels of each MIDI card, which is more flexible than Win3.1's MIDI Mapper's limit of 16 MIDI channels total). This is less flexible than being able to apply an instrument definition to each sequencer track. With the sequencer, you can have a track outputting data on MIDI channel 1 use one patch set for a given song, and then in a different song, use another patch set for that same track outputting on channel 1. With Windows, you can apply one remapping to channel 1, and if you want to change it, you've got to hassle with MIDI Mapper or Win95's MultiMedia notebook instead of easily reconfiguring right within your sequencer software). Another drawback is that Windows remapping is limited to one bank (ie, one set of 128 patches) whereas the renaming features of many software programs allow you to specify several banks of patches and easily select them from the software mixer.
+
+<P><B>NOTE:</B> Don't use Win3.1's MIDI Mapper's patch remapping (or Win95 IDF's) in conjunction with the built-in patch naming features of your sequencer. You don't want to remap your custom patch sets. The exception to this is if your sequencer completely bypasses MIDI Mapper (or Win95's MultiMedia MIDI setup). Such a sequencer would use the "low level" MIDI API of Windows. In this case, you can still setup the MIDI Mapper (or IDF) for the benefit of sequencers and multimedia software that uses the "high level" MCI API of Windows. But then, don't select the MIDI Mapper as the output driver for your software that has its own patch naming features.
+
+
+
+<P><H2><A NAME="q5">I</A> ran a MIDI program. It was using my sound card (or MIDI interface) just fine. Then, I wanted to
+run another program that used the same sound card, but I didn't want to end the first program. (ie, I wanted both programs
+running simultaneously). The second program said that my device was "already in use", and wouldn't work with the sound card.
+What's up?</H2>
+
+<P>This is a limitation of your card's driver. The driver simply doesn't allow more than one program at a time to use it.
+You're just going to have to run only one MIDI program at a time. (Yes, it's a hassle).
+
+<P>Some drivers are written such that they do allow more than one program to use the driver simultaneously. (ie, The driver
+doesn't use "global data". It's fully re-entrant). Such a driver is referred to as "multi-client" (or "multi-instance"). If
+you have one for your sound card or interface, you won't see the above problem. But until Windows gets a real "MIDI
+Manager", you still have to be careful not to cause two programs to be simultaneously doing MIDI output (or simultaneous
+MIDI input). In that case, one program may mess up the output (or input) of the other. You can have both programs loaded
+simultaneously, but only operate one at a time, as you're switching between them. (ie, Don't hit the play button on a
+sequencer, leave it running, and then flip to another program and do something which causes that second program to do MIDI
+output simultaneously).
+
+
+
+
+
+<P><H2><A NAME="q6">Can</A> I have two sound cards (or MIDI interfaces) in my computer? If so, how can I get a software program to use them both simultaneously?</H2>
+
+<P>Maybe. Of course, both cards must be set to use a different IRQ #, and port address. (If they are Plug-and-Play cards, hopefully they are intelligent enough to cooperatively use different resources).
+
+<P>If both cards are of the same model/type, and therefore use the exact same driver file, you had better hope that the
+driver is written to support more than one of the cards installed. It may need to be "multi-client", as explained above.
+
+<P>If the cards are different, then they'll likely have different drivers. Install both drivers and then use Win95's
+Control Panel's MultiMedia notebook (ie, the MIDI page), to do a Custom Configuration as described in
+<A HREF="win95.htm#wref1">How do I install/setup an audio/MIDI driver?</A>. (For Win3.1, you'll use the MIDI Mapper).
+You're still stuck with a 16 MIDI channel limitation in software (even though you really have 32 MIDI channels support in
+hardware). But at least you can divide up those 16 channels between the 2 cards (and that helps reduce bandwidth problems).
+
+<P>On the other hand, if you have software that can query and directly use all installed MIDI drivers (as opposed to
+software that only uses the default MultiMedia settings), then it likely will support all available MIDI inputs and outputs
+fully. For example, with two installed drivers, CakeWalk will recognize two MIDI ports (each with 16 channels IN and OUT).
+
+
+
+<P><H2><A NAME="q7">I</A> have a MasterTrax MIDI interface card. It has 16 MIDI OUT jacks (ie, multiple busses). Each jack
+supports 16 MIDI channels (256 channels total). How do I use more than one output? My external Sound Canvas is connected to
+one MIDI OUT of the midi interface. If I want to use a separate drum machine, or my Korg M1 as extra sound modules, how do
+I get my software to route MIDI to those specific modules (ie, the various MIDI OUTs)?</H2>
+
+<P>The external Sound Canvas is connected to one of the 16 available MIDI OUT jacks on your interface, and since the Sound
+Canvas is multitimbral, it's going to hog all 16 MIDI channels (of one jack) for itself. So obviously, since you've got 15
+other ports available, you'll want to attach your other gear to those ports. Attach one MIDI device per port as long as
+you've got enough ports. (ie, Each MIDI module attaches to a different MIDI OUT jack on your interface).
+
+<P>(As a side note, it <u>is</u> possible to tell the Sound Canvas to ignore certain MIDI channels. You do this by sending it MIDI System Exclusive messages. See the article <A HREF="rap10use.htm#q6">Roland Audio Card FAQ</A> for details. So, you could daisy-chain all your equipment to one MIDI OUT jack on the interface, and then divide up the 16 MIDI channels between all your gear by telling each module to only recognize a smaller, unique set of MIDI channels. But this is a waste of your other MIDI OUT ports).
+
+<P>Your real question is "how do I get my MIDI software to recognize, and direct its MIDI data to various ports on my MIDI Interface"? This is <u>entirely</u> a software issue. (Yeah, you can start shivering in fright now. You know that software issues pertaining to particular pieces of hardware means that we're talking about DRIVER SUPPORT, CONFIGURING YOUR DRIVER, and CONFIGURING YOUR APPLICATION SOFTWARE. Yep, this is going to be painful, especially if you're dealing with companies that make poor drivers and/or inflexible applications. Grab your ankles and grimace).
+
+<P>Hopefully, the Windows driver with your Interface is designed such that it tells Windows that there is more than one MIDI output. (If it doesn't, toss away the hardware. Without decent driver support, it's useless). <A NAME="ref1">Assuming</A> Win95, open the Control Panel's <EM>MultiMedia</EM> notebook. Turn to the <B>MIDI</B> page. Look at the list of driver names under "Single Instrument". What do you see there? Is there more than one item there (ie, indicating that there is more than one MIDI output available)? For example, for your MasterTrax brand interface, maybe you'll see several items called something like "MasterTrax Output 1", "MasterTrax Output 2", etc. (I'm making up these names. The names are determined by what strings were in the .INF file that shipped with your driver, which you used when you installed the driver. This INF file is just a regular text file that you can read in a text editor. Think of it as a CONFIG.SYS for the sound card alone). If you see multiple items, you're cooking with gas. Your driver has successfully "installed" several "MIDI outputs (ie, devices)" with Windows. For more information on installing and setting up Win95 drivers, see <A HREF="win95.htm#w1">"How do I install/setup an audio/MIDI driver?"</A>.
+
+<P>Now, you need to use Windows software that queries and can access all of the MIDI devices installed on your system. Typically, the software will allow you to choose which MIDI data goes to which MIDI output, and which input supplies incoming MIDI. For example, CakeWalk (ie, its <I>Options -> MIDI Devices</I> menu item) will present a list of all installed MIDI devices, and you can choose which ones you want the software to access. Then, you can route each CakeWalk track to whichever output (of the ones you enabled) you want that track to be sent.
+
+<P>So what if your software doesn't query and use all installed MIDI devices, nor allow you to somehow route the MIDI data between those outputs? Well, that means that the software is written to only use one MIDI output at a time. Which MIDI output is that? Well, go back to the Control Panel <B>MultiMedia</B> "MIDI" page. Did you select "Single Instrument" or "Custom Configuration"? If you selected "Single Instrument", then the output which is used is the one whose name appears in the box immediately below  "Single Instrument". For example, maybe you've selected the output "MasterTrax Output 1" which is the first MIDI OUT jack on the interface. Maybe you've connected your Sound Canvas to that jack. The result is that all MIDI data (output by your software) will be sent to the Sound Canvas. If you'd like your software to use another output, scroll through the list of outputs below, and select the desired one. You have to do this every time that you want the software to use a different output, and the software can only use 1 output at any given time.
+
+<P>If you selected "Custom Configuration", this allows you to divide up 16 MIDI channels among several outputs. Never mind that your MIDI interface is capable of handling 256 channels among its 16 outputs. You're going to have to stick to a channel limitation of 16, and divide those up between available outputs. For example, maybe for MIDI channels 1 to 5, you'll select the output "MasterTrax Output 1" which presumably is the first MIDI OUT jack on the interface. Maybe you've connected your Sound Canvas to that jack. The result is that all MIDI data (output by your software) on channels 1 to 5 will be sent to the Sound Canvas. Maybe for MIDI channels 6 to 9 and 11 to 16, you'll select the output "MasterTrax Output 2" which is the second
+MIDI OUT jack on the interface. Maybe you've connected your Korg M1 to that jack. The result is that all MIDI data (output by your software) on channels 6 to 9 and 11 to 16 will be sent to the M1. Maybe for MIDI channel 10, you'll select the output "MasterTrax Output 3" which is the third MIDI OUT jack on the interface. Maybe you've connected your drum box to that jack. The result is that all MIDI data (output by your software) on channel 10 will be sent to the drum box. Win95's MIDI "Custom Configuration" setup is basically Win3.1's MIDI Manager (without the "Patch remapping" feature -- this feature is now assumed by Win95's Instrument Definition Files, or IDF's). With Custom Configuration, you're still limited to 16 channels (as you would be by daisy-chaining all of your gear to only one MIDI OUT jack on your interface), but at least you're using more than one MIDI OUT jack on your interface (which helps to relieve some problems with MIDI bandwidth).
+
+<P>But of course, the best solution is using software that recognizes and uses the multiple MIDI devices (outputs) on your interface.
+
+
+
+<P><H2><A NAME="q8">I</A> have a PC with Win3.1, Windows sequencing software, a controller keyboard, and a MIDI interface for my computer.
+
+<P>Whenever I try to record MIDI (from my controller), some (but not all) data gets lost randomly. I've tried various
+controllers, and various sequencer programs to no avail. I did <u>not</u> use MIDI mapper.
+
+<P>MIDI playback works perfectly.</P>
+
+<P>Is this a hardware problem with my MIDI interface?</P></H2>
+
+<P>I suspect that you're right as to hardware deficiencies being part of your problem, but I also think that your real problem may be due to something called "interrupt latency" (which is sort of dependent upon both software and hardware). In a nutshell, all that means is that your computer isn't running the sound card driver's interrupt handler often enough that the
+driver is grabbing all of the MIDI data from the card's MIDI IN port. That data is only available for a limited time on the card's MIDI IN port, and if the driver code ISN'T run (by your computer's CPU) in time to grab that byte and pass it off to your software, then the data byte is lost forever when the next incoming MIDI data byte arrives.
+
+<P>Solutions (to be tried in the following order):
+
+<OL>
+<LI>Make sure that you have the latest drivers for your MIDI interface. OK, this isn't directly related to the problem of "interrupt latency", but it's worth checking out first because it's a lot easier to replace a driver than to screw around with hardware.
+
+<LI>Make sure that you use a MIDI interface that has a sufficiently large hardware buffer on its MIDI input. It should be able to store upto at least 64 incoming MIDI bytes that are waiting to be read by the driver. In this way, the driver can take its time reading the next MIDI data byte without worrying that another incoming MIDI data byte will "overwrite" the preceding data byte. All Roland cards have buffered MIDI inputs, some with over 1000 bytes in order to better handle large System Exclusive messages. Many other "high-end" cards likely have good hardware-buffering too, but I'm mostly familiar with Roland stuff.
+
+<P>It sounds like your MIDI interface has no, or anemic, hardware buffering on its MIDI input.
+
+<LI>If the above doesn't cure the problem, then try to reduce the load on your CPU so that it can devote more time to running the sound card driver's interrupt handler. In particular, remove anything extra that is interrupt-driven. Turn off any "software blinkie lights" (if possible) and other "animated" graphics that your sequencer may be doing while it's recording. (ie, You don't want the sequencer to be using CPU cycles drawing some scrolling display during MIDI recording). Don't move the mouse during recording. If you're trying to do digital audio playback while recording MIDI data, be aware that digital
+audio playback/recording is extremely I/O intensive (and perhaps CPU intensive if your card doesn't use DMA to stream audio data to/from the card's Digital To Analog Converter or Analog To Digital Converter, as some cheap cards may not). Don't play/record digital audio tracks during MIDI recording if your MIDI recording is getting screwed up. Reduce your video display (ie, less colors and/or less resolution) to make sure that the CPU is not spending too much time drawing graphics.
+
+<LI>If the above doesn't work, then get a faster computer system (ie, faster CPU with a chipset that more efficiently handles I/O). Kill the problem with brute force speed, because after all, the real problem is that, somehow, your system isn't working fast enough to handle incoming MIDI data at MIDI baud rate, as far-fetched as that may seem. (ie, Most computer systems run at <u>much</u> faster rates than MIDI baud rate).</OL>
+
+<P>There is one footnote to be added here. If you're using a Creative Labs' AWE64 or AWE32, and having problems with
+garbled MIDI Thru (ie, the MIDI data from your controller keyboard is recorded into the computer OK but when simultaneously
+sent to MIDI OUT or the AWE built-in sound module, you get weird MIDI response), this is due to a bug in the chipset used in
+some CL cards. This is particularly noticeable with Roland keyboard controllers used with an Awe32/64. (In fact, Roland
+discovered the bug in CL's chipset). You need to send the card back to CL for servicing. Contact CL tech support.
+
+
+
+<P><H2><A NAME="q9">I</A> have this program which displays a graphical piano keyboard. When I click the mouse on a "key", the program outputs a MIDI message to my sound card. I have another program which is a sequencer program. It can record MIDI messages coming into the computer. How can I get the first program to send its MIDI data to the sequencer so that I can record my "playing" (ie, I can use the computer as a controller at the same time that I'm recording my performance).</H2>
+
+<P>If the two programs aren't designed to use some sort of scheme to internally pass MIDI data between themselves, then you need to rig up some connection between MIDI input and MIDI output. That could be as simple as just connecting the computer interface's MIDI OUT to its MIDI IN with a MIDI cable.
+
+<P>Alternately, if both programs are Windows software, you can use software called "MIDI Router" by Zoltan Janosy, or Hubi's "Loopback", or MidiOx. These programs feature a special MIDI device driver that you install (just as you would any other Windows audio/MIDI driver) which makes a software "MIDI connection" between any Windows program outputting MIDI data and any Windows program inputting MIDI data. (It connects the first program's MIDI OUT to the second program's MIDI IN). Note that this isn't a perfect solution. For one thing, you may now have trouble using a MIDI program that does simultaneous MIDI input
+and output (ie, because now it's connected to itself, and feeding back upon itself). In that case, you'll have to disable MIDI Router's function whenever you don't need it. Secondly, this extra software layer does slow down MIDI input and output.
+
+
+
+<P><H2><A NAME="q10">Why</A> is my MIDI sound module playing only some of the MIDI channels? I played a MIDI file that has tracks on MIDI channels 1 to 16, but I only heard the tracks on channels 1 to 8.</H2>
+
+<P>There are two possibilities here. First, does your sound module support all 16 MIDI channels simultaneously? Some older models do not. For example, a Roland D-70 only has 5 "Parts", which means that it can play only 5 MIDI channels simultaneously. (See my article on <BR><A HREF="rolarc.htm#rol3">Roland sound module architecture</A> for more details concerning Roland modules). Some sound cards, particularly early 8-bit Sound Blasters and their ilk, also didn't recognize all 16 MIDI channels. There is only one official MIDI specification, and it specifies 16 MIDI channels. But, Creative Labs generally makes sound cards for game players, not musicians, so the cards typically aren't as "full-featured" as cards for musicians. Game players buy cheap sound cards, and that means CL had to "cut corners" on that "esoteric MIDI stuff". One way that CL cut corners was by not supporting all 16 MIDI channels. Early CL cards had very limited polyphony, so it wasn't as if
+anyone was going to do complex MIDI arrangements on them anyway. So, two "sub-standards" were devised known as "base level" and "extended level" MIDI. "Base level" supports only something like 8 MIDI channels and really limited polyphony, and discards any MIDI events on the remaining MIDI channels. "Extended level" supports slightly more channels and polyphony. Both are for cheesy sound cards. "Base level" is for really shitty, now-obsolete sound cards. "Extended level" is for the slightly
+less shitty, but equally obsolete cards (ie, you know, essentially the same basic shit design repackaged in a box with the word "Pro" appended to the name of the sound card).
+
+<P>If your sound card or module <u>does</u> recognize all 16 MIDI channels (and you've checked that it is in fact setup to do so -- try connecting a controller directly to it and sending messages on one of the troublesome MIDI channels), the problem could be software related. If you're using "Custom Configuration" in Win95's MultiMedia MIDI setup, make sure that you've got the MIDI channels set to the intended device. Also, check your sequencer software's MIDI configuration. Maybe it's your sequencer program that is setup for "base level" or "extended level" MIDI (and therefore the program itself is discarding MIDI data on those extra MIDI channels). Check your sequencer's "MIDI setup" options, and look for something that says "base level" or "extended level". Turn that off. Instead select full MIDI support, sometimes indicated by the label "General MIDI". Incidentally, if your software <u>does</u> screw around with this "base level" and "extended level" crap, this is a good indication that you've got "toy" music software there, which was designed to be used with "toy" audio cards. Professional music software does <u>not</u> bother with "base level" and "extended level".
+
+
+
+
+<P><H2><A NAME="q11">I've</A> heard that MIDI (note) delays are due to daisy-chaining MIDI sound modules. Each module's THRU jack delays the MIDI signal before it gets passed to the next module, and you can hear the delay after about 3 modules are daisy-chained together. Is this true?</H2>
+
+<P>No, but this is such a popular myth that it has been elevated to the status of "urban MIDI legend". The amount of time that it takes the MIDI signal to pass from a module's MIDI IN jack to a <u>properly configured</u> MIDI THRU jack is a matter of a few microseconds. You would need to daisy-chain <U>many</u> (ie, certainly more than 30) modules before you could even
+begin to ascertain any kind of delay.
+
+<P>How did this myth get started? Well, in the early days, MIDI modules were very limited in polyphony. They weren't even multi-timbral, so you usually needed many, many modules in order to play a MIDI arrangement with lots of musical parts and heavy "note density" (ie, lots of notes playing upon the same beat). This was a really expensive proposition, so in the early days, musicians tended to do simpler arrangements with typically small, limited MIDI setups. They didn't tax the MIDI bus with lots of notes and therefore, didn't notice the limitations of "MIDI bandwidth". (For a more indepth discussion of MIDI bandwidth, read the article <A HREF="midibus.htm"> Multiple MIDI outputs</A> now). Later on, as MIDI sound modules got cheaper, with more polyphony, musicians started daisy-chaining more modules together. They also started making more complex MIDI music to use all of this additional polyphony. And that's when MIDI bandwidth reared its ugly head. The musicians failed to recognize that they were taxing the MIDI bus with denser arrangements now. Instead, they mistakenly assumed that the delays that they were hearing must be due to daisy-chaining MIDI modules. Hence, the "MIDI THRU Delay Theory" was born. It's incorrect.
+
+<P>Now, note above that I've emphasized <u>properly configured</u>. Some manufacturers foolishly do not follow the MIDI specification properly. The MIDI THRU jack is supposed to be "directly coupled" to the MIDI IN jack. Instead, some manufacturers process the MIDI IN, and THEN send it out the MIDI THRU jack. (A telltale sign that this is likely being done is a module that has no dedicated MIDI THRU jack. Rather, it has a "software switchable" MIDI OUT/THRU jack). This "processed output" likely will introduce more delay than a direct coupled MIDI THRU -- a LOT more delay. But we're talking about an
+aberration of the MIDI spec. My advice is to avoid using that THRU jack, or only buy gear that follows the MIDI spec precisely. I tend to buy Roland stuff because the company is religious about not screwing around with the MIDI specification. (Roland is one of the few companies that even go so far as to implement Active Sense).
+
+<P>A processed MIDI THRU is a very, very, very, very bad thing. It shouldn't be necessary, and if you got it and don't need it, you can't get rid of it. (If you're daisy-chaining so much gear that you need to worry about "cleaning up" the MIDI signal along the path, then you should <u>definitely</u. be considering a multi-bus MIDI configuration to solve the problem. <u>Do not solve the problem with processed MIDI THRU signals.</U> That introduces more problems than it ever solves). Avoid it. Avoid products that do this. Stick with products that follow the MIDI spec. We've been using it for a long time. It works. There are much better solutions to connecting gear than a processed MIDI THRU.
+
+
+
+
+<P><H2><A NAME="q12">I'd</A> like to use my AKAI S-1000 MIDI sampler to record digital audio to my computer HD. Can I do that?</H2>
+
+<P>You can't do "direct-to-disk" recording to your computer's HD with an external MIDI sampler. The wave data transfers that such MIDI samplers do is not a real-time transfer. MIDI Sample Dump Standard sends data far too slowly over the MIDI cable
+to be able to store it as fast as it's being recorded. It's a much, much slower transfer than playing back the data. Even SMDI (ie, the SCSI version of SDS) isn't real-time (although much faster than SDS). Besides, few samplers are designed to 
+do recording at the same time that they're doing a dump of a waveform to another device (the Peavey SX being an exception).
+Usually samplers require a direct link to storage medium in order to record in real-time to that medium (ie, the HD has to be directly connected to the sampler).
+
+<P>You'd need a direct hardware connection to your computer's HD. This may be possible using a SCSI controller in your computer and SCSI HD, plus a sampler that can record directly to a SCSI drive, but probably your sampler's file format will be different than what your computer requires (ie, FAT or NTFS format for most PCs). And, you couldn't control the recording with PC software. You'd have to do so from your sampler's front panel. So, it won't be practical anyway.
+
+<P>Of course, you can record digital audio on your MIDI sampler, as much as its RAM will allow, and then later transfer that data to the PC via SDS or SMDI protocol. You need a PC program such as "sdxsend" (http://alfred.uib.no/People/midi/midi_prog.html), which works with SDS capable samplers. If you've got an akai sampler, you can use floppies to transfer your samples using "Akaidisk v2.0" (http://www.cs.ruu.nl/~jules/Akai/) which reads/writes AKAI format floppies on a PC floppy drive. Then, you can edit the waveforms on the PC with PC wave-editing software such as SoundForge (assuming that it will read the data format of "sdxsend" or "Akaidisk") and later send the waveform back to
+the sampler. Obviously, this isn't real-time control.
+
+<P>You'll need a computer card with an ADC in order to do direct-to-disk recording to your PC's HD. For example, a DAL CardD, Roland RAP-10, TB Monterrey or Tahiti or Tropez, etc, are cards with an ADC.
+
+<P>Another alternative is to use a DAT recorder to record your digital audio tracks. Then, you can transfer the waveforms to the PC (saving as WAVE files) using a card with digital audio I/O such as the CardD+ (or the digital audio I/O only version of it, http://www.digitalaudio.com) or the Zefiro Acoustics ZA1 or ZA2 (http://archive.uwp.edu/zefiro) or Turtle Beach
+Fiji or Pinnacle or other cards with digital I/O. (Even the Awe64 Gold now has digital I/O). You can edit the waveforms with PC software as above, and then digitally transfer it back to the DAT or burn a CD using software such as Adaptec's Easy CD Creator with a capable CD writer drive.
+
+
+
+
+<P><H2><A NAME="q13">I</A> have an AWE32 (ie, built-in wavetable and built-in FM synth) to which I've added a Yamaha DB50XG
+daughterboard. I have 3 separate output devices for MIDI playback listed although I only have one sound card. Why? Also,
+how should I setup MIDI channels between these MIDI output devices? Do I use one channel per output?</H2>
+
+<P>You actually have 3 separate output devices (all on one card). You have the <I>SB FM Synth</I>. That supports 16 MIDI
+channels. (But since its sound quality and polyphony is extremely poor, you likely won't be using it much except for music
+on really old game software). You have the <I>SB WaveTable Synth</I>. That supports 16 more MIDI channels. And you have the
+<I>SB MIDI Out</I> (to which the DB50 is internally attached). That supports another 16 MIDI channels. So, each one of the
+components is its own output device, not internally daisy-chained to the other 2 components, and therefore has its full 16
+MIDI channels which it does not need to share with the other devices. (You have a total of 16+16+16 MIDI channels). That's
+why you have 3 outputs listed -- because even though they're on the same card, they each have their own set of 16 MIDI
+channels.
+
+<P>MIDI channel #1 on your AWE32's WaveTable Synth is <u>not</u> the same as MIDI channel #1 on your DB50. Why? Because
+these two devices are not daisy-chained together. (If they were, <u>then</u> they'd be using the same MIDI channel 1). They
+each have their own set of 16 MIDI channels to work with. So, if you set one CakeWalk track to output to the AWE32
+WaveTable Synth on MIDI channel 1, and you set another track to output to the SB MIDI Out (ie, the DB50) on MIDI channel 1,
+then these are going to two different places (ie, outputs). They're not the same MIDI channel 1. One is on the AWE32
+WaveTable output, and one is on the MIDI OUT output.
+
+<P>So there's no reason whatsoever for you to divide up MIDI channels between devices, <u>assuming that you're using a
+sequencer program which supports outputting to all 3 devices simultaneously</u>, such as CakeWalk. If you have a sequencer
+that supports only 1 output device at a time, and therefore only 16 MIDI channels total, <u>then</u> you'll need to use
+Win95's Advanced MIDI setup or Windows 3.1's MIDI Mapper, and divide up the 16 channels among your output devices. (I'd
+recommend using 6 channels for the AWE32 WaveTable, and 6 for the DB50, and forget the FM synth).
+
+<P>Of course, if you attach external MIDI modules to the AWE32's MIDI Out, then you're effectively daisy-chaining these to
+the DB50, since the daughterboard is internally attached to the AWE32's MIDI Out. Now, you've got to share the MIDI Out's
+16 channels between the DB50 and other external modules. (Setup each module to ignore certain channels. The DB50 can be set
+to ignore channels via System Exclusive messages). No, you can't reroute some of WaveTable Synth's or the FM Synth's 16
+channels to the MIDI Out (and therefore have more than 16 channels going to MIDI Out). The MIDI Out has only its own 16
+channels with which to work, and these must be divided among all modules attached to MIDI Out, including the DB50.
+
+
+
+
+<P><H2><A NAME="q14">I</A> have a General MIDI sound card to play my musical sequences. I always use a different MIDI
+channel for each track in my sequencer. Is this unnecessary?</H2>
+
+<P>That depends upon what is on each track.</P>
+
+<P>You'll likely need to have each "instrument" in your arrangement upon a separate MIDI channel. For example, don't put
+the piano <u>and</u> the sax parts upon the same MIDI channel (unless the parts don't occur during the same musical bars.
+I'll explain that later). Why? Because a single MIDI channel can't <u>simultaneously</u> play 2 different patches. A patch
+is usually analogous to one instrument sound. (On some modules, a patch can be setup to divide the MIDI note range between
+2 or more instrument sounds, ie, a "split". But on General MIDI devices, such as what you have, most patches feature only a
+single instrument sound across the entire MIDI note range. The GM patch named "Bass + Lead" is an exception. Notes lower
+than middle C play a bass guitar sound, whereas notes above C play a synth lead sound. So you can play two instrument sounds
+with that one patch. But that's an exception, and the other GM patches feature only 1 instrument sound across the entire
+MIDI note range).
+
+<P>But that's not necessarily to say that every sequencer track will be on a different channel. Maybe you'll have 2
+tracks that are both using the same piano sound (ie, same patch) on the same module, and have the same settings (ie, the
+same panning, volume, etc). Maybe one track is some background piano part, and you decided to put the piano solo upon a
+separate track (so that it is easier to edit separately from the background piano notes). In that case, you'll likely have
+the tracks set to the same MIDI channel. After all, even though you're using 2 sequencer tracks, they are both playing the
+same part -- the piano part.
+
+<P>Of course, if you have 2 instrumental parts that don't occur during the same musical bars, then you can put both parts
+upon the same MIDI channel. For example, let's say that you have a trumpet solo during bars 1 to 16. Then you have a sax
+solo during bars 16 to 32. At no time do any trumpet solo notes sound while the sax solo notes are sounding (and vice
+versa). Although you may choose to record the solos to separate sequencer tracks, you can have both solos set to play upon
+the same MIDI channel and the same sound module. You would have a MIDI Program Change at the start of the trumpet solo. It
+would change to the trumpet patch. Then at the beginning of bar 16, after all of the trumpet notes have stopped but before
+any sax notes have started, you would have a MIDI Program Change to switch to the sax patch. Using the same MIDI channel
+for instruments whose parts do not occur upon the same musical bars (ie, the parts don't overlap) is a good way to
+conserve your MIDI channels for musical parts that <u>do</u> overlap.
+
+<P>Sometimes you do have to use more than 1 MIDI channel for a certain instrument if you're doing some stereo effect. For
+example, let's say that you want to have all of the piano notes played with the left hand panned to the left, and all of
+notes played with the right hand panned to the right. You'll need to record the notes for each hand upon a separate MIDI
+channel. Why? Because not only is a single MIDI channel limited to playing only one patch, it is also limited to only
+one pan position. That means that you can pan notes on MIDI channel 1 to the left, or to the right, but not both. You can't
+have some notes panned to the right and other notes simultaneously panned to the left. You'll need to separate the left and
+right hand parts to 2 separate MIDI channels, and pan one channel to the right and the other channel to the left. (Alternately, if your sound module offers "stereo patches", you may wish to do this sort of stereo imaging in the patch settings of your sound module, as opposed to "faking it" via MIDI panning).
+
+<P>But, mostly, you'll have each instrument's part on just one track (with its own, unique MIDI channel). Especially if
+your arrangement doesn't use more than 16 patches, you've got it covered with only 16 MIDI channels, and you can safely
+dedicate a unique MIDI channel to each instrument (ie, patch).
+
+
+
+<P><H2><A NAME="q15">I</A> have a MIDI interface that attaches to my parallel port. It isn't working and the driver says
+that there's a hardware problem. The interface works upon another computer I tried.</H2>
+
+<P>First, get into your BIOS setup, and check whether you have the parallel port set to "Enhanced" or "Bi-directional"
+modes. Some parallel port MIDI interfaces do not support these two modes, and will only work when the parallel port is in a
+basic, uni-directional mode. (Of course, changing this may then affect your printer operation if it shares the port).
+
+<P>Secondly, if you have a printer already using the first parallel port (ie, LPT1), it may be that the printer's driver is
+not allowing the MIDI interface's driver to use the IRQ (ie, #7). If you have a second parallel port (ie, LPT2), then use
+that (and make sure that you let the MIDI driver know that it should use IRQ 5 -- but make sure that you don't have another
+sound card set to that, since many SB cards use this IRQ by default). If you don't have another parallel port, you may have
+to try removing your printer driver to see if that resolves some conflict.
+
+
+
+<P><H2><A NAME="q16">I</A> have a MIDI interface that attaches to my serial port. It isn't working and the driver says
+that there's a hardware problem. The interface works upon another computer I tried.</H2>
+
+<P>Do you actually have free resources associated with the COM ports? Note that COM1 and COM3 both share IRQ 4, and COM2
+and COM4 share IRQ 3. So, if you have two devices that require use of the IRQ, you can't set them to COM1 and COM3
+respectively as that would force them to both try to simultaneously use IRQ 4. Ditto with COM2 and COM4. If you have a
+serial mouse plugged into serial port 1, and you have a modem plugged into serial port 2 (an internal ISA card will also
+typically be set to use the second COM port and its IRQ), then you've already used those IRQ's associated with the COM
+ports. You won't be able to also use your serial port MIDI interface with a serial mouse and modem already in your
+computer.
+
+<P>Of course, you'll want to make sure that your serial port isn't disabled in your BIOS. Also, make sure that your serial
+port uses a chip (such as the 16550) that supports the 38KHz baud rate that serial MIDI interfaces require.
+
+
+
+<P><H2><A NAME="q17">To</A> what extent are piano (ie, sustain) pedals supported in MIDI? Does General MIDI cover this issue?
+If I have a controller that includes at least a sustain pedal, does it output some kind of "pedal down" and "pedal up"
+message? If so, how consistently will sound modules respond? I'd guess that when long arpeggios are performed, either
+the oldest or newest notes will get cut off after the limitation on voices is surpassed, but which is it, and how much of
+a problem is this?</H2>
+
+<P>MIDI has many "controller functions" to adjust such things as a patch's volume, pan, portamento time, modulation
+(which could be setup to implement a vibrato effect, or tremulo effect, or other effects), reverb amount, chorus amount,
+and many other functions. (For a list of defined controllers, see <A HREF="ctl.htm">Defined MIDI Controllers</A>).
+There is even a controller that specifically functions as a sustain pedal. (ie, When "on", it causes the module to "hold"
+the sustain portion of its volume envelope even after receiving a note-off. When "off", the envelope proceeds to its
+release portion as usual when a note-off is received. So yes, it does implement a "pedal up" and "pedal down" simulation
+of a piano sustain pedal). There are two other specific controllers to simulate the "soft pedal" and the "sustenuto pedal".
+These controllers are all part of the MIDI spec itself.
+
+<P>The GM spec simply states that a module <u>must</u> support particular controllers, in a particular way. Think of GM
+as a <u>minimum</u> standard for what portion of the MIDI spec a module must support, and how it must support that portion
+of the spec. GM is just a minimum level of support -- a minimal "setup" such as 128 specific patches and 47 specific drum
+sounds that a module must have in order to be at least GM compliant. The reason for GM is to ensure that all modules have
+a minimal, standard setup so that MIDI files that adhere to this minimum standard can playback easily and properly upon all
+GM equipment.
+
+<P>One of the controllers that GM mandates support for is the sustain pedal, so virtually every module supports that
+function. (The soft and sustenuto pedals are not part of the GM spec, and are rarely supported, so you'd have to
+specifically shop for a module that supports such, ie. goes beyond GM support, if you want those other 2 pedals).
+
+<P>Most modern sound modules support many of the above functions (ie, adjustment of volume, pan, reverb level, sustain
+on/off, etc), although how extensive the module's support is usually varies according to price and model. Many modules offer an assignable pedal input. That is to say that you can assign the pedal to control any of the above functions (or maybe just
+a limited set of functions). This pedal will also typically generate a MIDI controller message. Typically, it will use a
+"generic" controller number, since you can assign the pedal to control any one of a variety of functions. Most modules also
+have a pedal jack that is hard-wired to that sustain pedal function. This will generate that defined controller number for
+the sustain pedal (ie, controller #64). Virtually all modules support this particular controller, and will respond in a
+similiar (if not identical) manner.
+
+<P>Most modules implement dynamic voice allocation, which means that as voices are all used up (because you're sustaining
+notes) and you play more notes, previously played notes are "stolen" (ie, a previously played note is muted so that a new
+note may sound). This is no standard algorithm for dynamic voice allocation. Some modules have a more intelligent scheme
+than others, and will try to drop the "least important" notes first. (For example, one module may discern that you're
+sustaining the 4 notes C-E-G plus another C an octave above the first. Even though the E may have been the last played
+note, maybe the module will steal a C note because it's a doubling of another playing C. Some modules try to avoid stealing
+the highest and lowest sounding notes, as your ear tends to be most sensitive to these dropping out). So, it may be possible
+that you'll prefer one module's dynamic voice allocation to another. To be sure, the more voices that a module has, the
+less likely you'll run into a "problem" with voice allocation.
+
+<P>Personally, I think that 32 voices is more than enough to simulate a piano well (but of course, with a multitimbral
+module, you may be playing other patches simultaneously, and spreading out voices among numerous patches).
+
+
+
+<P><H2><A NAME="q18">Whenever</A> I depress the sustain pedal, all sounds on my module no longer sustain when I release the
+key. When I release the pedal, the sound sustains. In other words, my pedal works exactly the opposite to the way that a
+real pedal works. What have I done wrong?</H2>
+
+<P>You bought a pedal that was made for a keyboard that had a reverse polarity to yours. Some modules want "open circuit"
+switches and some want "closed circuit" switches. You can tear open the pedal and rewire it, assuming that your module
+doesn't have some feature to reverse the polarity (ie, many new units have that function selectable by the user, or if you
+press down your pedal while turning on the unit, it may automatically adjust to using reverse polarity). But a better idea
+is to buy a pedal that has a polarity switch on it.
+
+
+
+
+<P><H2><A NAME="q19">I</A> want to connect several external MIDI modules to my sound card's one MIDI Out. I must setup each
+module so that it responds to MIDI channels that the other modules do not also respond to. How can I do this setup using
+MIDI messages (so that it can be done automatically at the start of a MIDI file's playback for example)?</H2>
+
+<P>There is no standard MIDI message to explicitly tell a sound module to ignore certain MIDI channels. Many sound modules
+do support their own System Exclusive message to do that. But that message will vary from manufacturer to manufacturer, as
+Sysex messages tend to do, and some modules may not offer any way to setup MIDI reception other than by manually using the
+module's control knobs. You'll have to check the manual for each module, and see if it offers such a Sysex message.
+
+<P>Now, I said that there's no MIDI message to <u>explicitly</u> tell a sound module to ignore MIDI channels, but in later
+revisions of the MIDI specification, the MIDI controller message, "Monophonic Operation" (ie, controller 126) is redefined
+to work in conjunction with the "Omni Off" Controller (ie, 124) message to allow you to set a MIDI module to respond to
+only a limited set of MIDI channels. One caveat with using this method is that the MIDI channels must be adjacent numbers.
+For example, you can get a module to respond to channels 6 through 10. But you can't tell it to respond to 6, 7, 8, and 10
+(ie, skipping channel 9). Well, not via the Monophonic Controller message anyway.
+
+<P>There's another caveat. You must manually set the "Base Channel" of every module to be different. (Again, some modules
+let you select the Base Channel with a System Exclusive message). The "Base Channel" is the channel upon which messages
+such as Omni Off and Monophonic Operation must be sent in order for the module to recognize the message.
+
+<P>Here's how Monophonic Controller works in conjunction with Omni Off. (NOTE: The following discussion assumes a
+multi-timbral module. Monophonic Operation does not work the following way for modules that aren't multi-timbral).
+
+<P>Like all controllers, a Monophonic Operation Controller message has a data value associated with it. If Omni is off (ie,
+you have sent the Omni Off Controller message already -- most multi-timbral modules automatically powerup in this state
+anyway), this value tells how many MIDI channels the module is expected to respond to. In other words, if Omni is off,
+this value is used to select a limited set of the 16 MIDI channels (ie, 1 to 16) to respond to.
+
+<P>If Value is 0, what this means is that the module should play as many MIDI channels as it has multi-timbral "Parts". So,
+if the module can play 16 of its patches simultaneously, then it can respond to MIDI messages on all 16 channels.
+
+<P>If Value is not 0 (ie, 1 to 16), then that's how many MIDI channels the module is allowed to respond to. For example, a
+value of 1 would mean that the module would be able to respond to only 1 MIDI channel (and therefore play only 1 Part). If
+a module is asked to respond to more MIDI channels than it has Parts to accomodate, then it will handle only as many MIDI
+channels as it has Parts. For example, if a module can play only 5 Patches simultaneously, and receives the value 8 in the
+Mono message, then the module will play 5 patches on MIDI channels 0 to 4 and ignore messages on channels 5 to 7. (Here we
+assume a base channel of 0).
+
+<P>Most multi-timbral modules allow you to specify a Base Channel. This will be the lowest MIDI channel that the module
+responds to. For example, if a Mono message specifies that the module is to respond to only 2 channels, and its Base
+Channel is 4, then the module responds to channels 4 and 5.
+
+<P>Of course, in order to be able to send an individual Mono message to each of your modules, each one has to be set to a
+different Base Channel. Otherwise, 2 modules with the same Base Channel would both respond to the same Mono message. And
+of course, you need each module set to a different Base Channel in order to also have each use its own, unique range of
+MIDI channels. After all, the Base Channel is the first channel that the module always responds to.
+
+<P>Getting a headache yet? As you can see, because of this Base Channel hassle, the above method of setting up a
+multi-timbral module's MIDI reception means that you likely have to setup each module manually anyway (unless the module
+also allows setting Base Channel via System Exclusive). It would have been nice to have a dedicated MIDI message to set
+channel reception which, like System Exclusive, didn't need to be sent upon a particular MIDI channel, and had two data
+values to set the desired lower and upper ranges for MIDI channels. But the MIDI designers didn't think of this at first,
+and this method of hacking the Monophonic Controller was the best, backward-compatible trick they could devise later on.
+Because of its convoluted and inflexible hassles, many multi-timbral modules don't even support the Monophonic Operation
+controller at all. So it's not even very much of a "standard" approach today. Why didn't the MIDI designers think to have
+a dedicated message to set MIDI channel reception right from the start? Well, it never occurred to them that it was
+important. They didn't have multi-timbral modules back then. And it's a weird concept to setup MIDI channel reception using
+MIDI messages. Think about it.
+
+<P>Most modules instead use a simple System Exclusive message to set MIDI channel reception, and usually this allows for
+picking MIDI channels in any order. For example, the Yamaha DB50XG daughterboard uses the SyxEx message (values in
+hexadecimal):
+
+<P>F0 43 10 4C 08 <B>Channel</B> 04 7F F7</P>
+
+<P>where <i>Channel</i> is the desired MIDI channel that you want the DB50XG to <u>ignore</u>. (0 is the first MIDI
+channel). You would repeat this message for each channel that you wish ignored, substituting that channel number in the
+message. For examples with the Roland RAP-10, see <A HREF="rap10use.htm#q6">Roland Audio Card FAQ</A>.</P>
+
+<P>But the drawback with SysEx messages is that everyone does it differently. There's really no easy, "works for all MIDI modules" way to setup a module's MIDI channel reception over MIDI.
+
+
+
+<P><H2><A NAME="q20">In</A> Windows 3.1 MIDI Mapper, what is the difference between the patch and key maps?</H2>
+
+<P>Patch maps are used to remap MIDI Program Change messages. For example, maybe a MIDI file assumes that the Grand Piano patch is #1 on your module. But maybe your module has an Oboe patch for #1 instead. Maybe the Grand Piano patch is #40 on your module. So when the MIDI file tells your module to change to Grand Piano, it will accidentally misinterpret this as a command to play the Oboe. You can use MIDI Mapper to fix this. Set MIDI Mapper's patch #1 to
+send a Program Change value of 40 instead. Now when the MIDI file sends a Program Change for patch #1, MIDI Mapper instead sends a Program Change for patch #40, and your module does in fact play that Grand Piano.
+
+<P>Most MIDI files nowadays expect a General MIDI patch set (ie, certain instruments in a certain order). If your module is not General MIDI, then you should use MIDI Mapper to remap a GM patch set to your module's patch numbers.
+
+<P>Key maps are used to remap MIDI Note messages. Usually, every different note number of a Drum Kit plays a different drum sound. For example, a middle C Note message sent to a General MIDI drum kit, will play a "High Bongo" drum. Now, maybe the drum kit in your module has a snare drum sound mapped to that middle C key. Maybe the High Bongo is assigned to note number 61. So, when a GM MIDI file tells your module's drum kit to play a High Bongo, it will accidentally misinterpret this as a command to play a snare. You can use MIDI Mapper to fix this. Set MIDI Mapper's key #60 (ie, middle C) to send a note number of 61 instead. Now when the MIDI file sends a Note message to play note 60, MIDI Mapper instead sends a message for note #61, and your module does in fact play that High Bongo.
+
+</BODY></HTML>

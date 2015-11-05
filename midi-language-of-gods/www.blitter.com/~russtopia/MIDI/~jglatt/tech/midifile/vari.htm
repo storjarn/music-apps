@@ -1,0 +1,140 @@
+<HTML><HEAD><TITLE>MIDI File Format: Variable Quantities</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+Think of a track in the MIDI file in the same way that you normally think of a track in a
+sequencer. A sequencer track contains a series of <B>events</B>. For example, the first
+event in the track may be to sound a middle C note. The second event may be to sound the
+E above middle C. These two events may both happen at the same time. The third event may
+be to release the middle C note. This event may happen a few musical beats after the first
+two events (ie, the middle C note is held down for a few musical beats). Each event has a
+"time" when it must occur, and the events are arranged within a "chunk" of memory in the order
+that they occur.
+
+<P>In a MIDI file, an event's "time" precedes the data bytes that make up that event itself. In
+other words, the bytes that make up the event's time-stamp come first. A given event's
+time-stamp is referenced from the previous event. For example, if the first event occurs 4 clocks
+after the start of play, then its "delta-time" is 04. If the next event occurs simultaneously with
+that first event, its time is 00.  So, a delta-time is the duration (in clocks) between an event
+and the preceding event.
+
+<P><B><FONT COLOR=RED>NOTE:</FONT></B> Since all tracks start with an assumed time of 0, the first
+event's delta-time is referenced from 0.
+
+<P>A delta-time is stored as a series of bytes which is called a <B>variable length
+quantity</B>. Only the first 7 bits of each byte is significant (right-justified; sort of like an
+ASCII byte). So, if you have a 32-bit delta-time, you have to unpack it into a series of 7-bit
+bytes (ie, as if you were going to transmit it over midi in a SYSEX message). Of course, you
+will have a variable number of bytes depending upon your delta-time. To indicate which is the
+last byte of the series, you leave bit #7 clear. In all of the preceding bytes, you set bit #7. So,
+if a delta-time is between 0-127, it can be represented as one byte. The largest delta-time
+allowed is 0FFFFFFF, which translates to 4 bytes variable length. Here are examples of
+delta-times as 32-bit values, and the variable length quantities that they translate to:
+
+<PRE><B>
+ <FONT COLOR=GREEN>NUMBER        VARIABLE QUANTITY</FONT>
+00000000              <FONT COLOR=BLUE>00</FONT>
+00000040              <FONT COLOR=BLUE>40</FONT>
+0000007F              <FONT COLOR=BLUE>7F</FONT>
+00000080             <FONT COLOR=BLUE>81 00</FONT>
+00002000             <FONT COLOR=BLUE>C0 00</FONT>
+00003FFF             <FONT COLOR=BLUE>FF 7F</FONT>
+00004000           <FONT COLOR=BLUE>81 80 00</FONT>
+00100000           <FONT COLOR=BLUE>C0 80 00</FONT>
+001FFFFF           <FONT COLOR=BLUE>FF FF 7F</FONT>
+00200000          <FONT COLOR=BLUE>81 80 80 00</FONT>
+08000000          <FONT COLOR=BLUE>C0 80 80 00</FONT>
+0FFFFFFF          <FONT COLOR=BLUE>FF FF FF 7F</FONT>
+</B></PRE>
+
+Here are some C routines to read and write variable length quantities such as delta-times. With
+<B>WriteVarLen()</B>, you pass a 32-bit value (ie, unsigned long) and it spits out the correct
+series of bytes to a file. <B>ReadVarLen()</B> reads a series of bytes from a file until it
+reaches the last byte of a variable length quantity, and returns a 32-bit value.
+
+<PRE><FONT SIZE=3><B><FONT COLOR=BLUE>void</FONT> WriteVarLen(<FONT COLOR=BLUE>register unsigned long</FONT> value)
+{
+   <FONT COLOR=BLUE>register unsigned long</FONT> buffer;
+   buffer = value & 0x7F;
+
+   <FONT COLOR=BLUE>while</FONT> ( (value &gt&gt= 7) )
+   {
+     buffer &lt&lt= 8;
+     buffer |= ((value & 0x7F) | 0x80);
+   }
+
+   <FONT COLOR=BLUE>while</FONT> (TRUE)
+   {
+      putc(buffer,outfile);
+      <FONT COLOR=BLUE>if</FONT> (buffer & 0x80)
+          buffer &gt&gt= 8;
+      <FONT COLOR=BLUE>else</FONT>
+          <FONT COLOR=BLUE>break</FONT>;
+   }
+}
+
+<FONT COLOR=BLUE>unsigned long</FONT> ReadVarLen()
+{
+    <FONT COLOR=BLUE>register unsigned long</FONT> value;
+    <FONT COLOR=BLUE>register unsigned char</FONT> c;
+
+    <FONT COLOR=BLUE>if</FONT> ( (value = getc(infile)) & 0x80 )
+    {
+       value &= 0x7F;
+       <FONT COLOR=BLUE>do</FONT>
+       {
+         value = (value &lt&lt 7) + ((c = getc(infile)) & 0x7F);
+       } <FONT COLOR=BLUE>while</FONT> (c & 0x80);
+    }
+
+    <FONT COLOR=BLUE>return</FONT>(value);
+}
+</B></FONT></PRE>
+
+<B><FONT COLOR=RED>NOTE:</FONT></B> The concept of variable length quantities (ie, breaking up a
+large value into a series of bytes) is used with other fields in a MIDI file besides delta-times,
+as you'll see later.
+
+<P>For those not writing in C, you may benefit from a psuedo-code explanation of
+the above routines. In pseudo-code, ReadVarLen() is:
+
+<P><OL>
+<LI>Initialize the variable which will hold the value. Set it to 0. We'll
+call this variable 'result'.</LI>
+<LI>Read the next byte of the Variable Length quantity from the MIDI file.</LI>
+<LI>Shift all of the bits in 'result' 7 places to the left. (ie, Multiply 'result' by 128).</LI>
+<LI>Logically OR 'result' with the byte that was read in, but first mask off bit #7
+of the byte. (ie, AND the byte with hexadecimal 7F before you OR with
+'result'. But make sure you save the original value of the byte for the test
+in the next step).</LI>
+<LI>Test if bit #7 of the byte is set. (ie, Is the byte AND hexadecimal
+80 equal to hexadecimal 80)? If so, loop back to step #2. Otherwise,
+you're done, and 'result' now has the appropriate value.</LI>
+</OL>
+
+<P>In pseudo code, WriteVarLen() could be:
+
+<P><OL>
+<LI>Assume that you have a variable named 'result' which
+contains the value to write out as a Variable Length Quantity.</LI>
+<LI>Declare an array which can contain 4 numbers. We'll call
+this variable 'array'. Initialize a variable named 'count' to 0.</LI>
+<LI>Is 'result' less than 128? If so, skip to step #8.</LI>
+<LI>Take the value 'result' AND with hexadecimal 7F, and OR
+with hexadecimal 80, and store it in 'count' element of 'array'.
+(ie, The first time through  the loop, this gets stored in the first
+element of 'array'). NOTE: Don't alter the value of 'result' itself.
+<LI>Increment 'count' by 1.</LI>
+<LI>Shift all bits in 'result' 7 places to the right. (This can be done by dividing by 128).</LI>
+<LI>Loop back to step #3.</LI>
+<LI>Take the value 'result' AND with hexadecimal 7F, and store
+it in 'count' element of 'array'.</LI>
+<LI>Increment 'count' by 1.</LI>
+<LI>Write out the values stored in 'array'. Start with the last
+element stored above, and finish with the first element stored.
+(ie, Write them out in reverse order so that the first element of
+'array' gets written to the MIDI file last). NOTE: The variable
+'count' tells you how many total bytes to write. It also can be
+used as an index into the array (if you subtract one from it, and
+keep writing out bytes until it is -1).</LI>
+</OL>
+
+</FONT></BODY></HTML>

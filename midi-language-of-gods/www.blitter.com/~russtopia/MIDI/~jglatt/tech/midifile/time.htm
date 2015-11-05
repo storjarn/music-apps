@@ -1,0 +1,34 @@
+<HTML><HEAD><TITLE>MIDI File Format: Time Signature</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<FONT COLOR=BLUE><H3><CENTER>Time Signature</CENTER></H3></FONT></P>
+
+<P>FF 58 04 <I><FONT COLOR=RED><B>nn dd cc bb</B></FONT></I>
+
+<P>Time signature is expressed as 4 numbers. <I><FONT COLOR=RED><B>nn</B></FONT></I>
+and <I><FONT COLOR=RED><B>dd</B></FONT></I> represent the
+"numerator" and "denominator" of the signature as notated on sheet music. The denominator is a
+negative power of 2: 2 = quarter note, 3 = eighth, etc.
+
+<P>The <I><FONT COLOR=RED><B>cc</B></FONT></I> expresses the number of
+MIDI clocks in a metronome click.
+
+<P>The <I><FONT COLOR=RED><B>bb</B></FONT></I> parameter expresses the number of notated
+32nd notes in a MIDI quarter note (24 MIDI clocks). This event allows a program to relate what
+MIDI thinks of as a quarter, to something entirely different.
+
+<P>For example, 6/8 time with a
+metronome click every 3 eighth notes and 24 clocks per quarter note would be the following
+event:
+
+<P>FF 58 04 06 03 18 08
+
+<P><B><FONT COLOR=RED>NOTE:</FONT></B> If there are no time signature events in a MIDI file,
+then the time signature is assumed to be 4/4.
+
+<P>In a format 0 file, the time signatures changes are scattered throughout the one
+MTrk. In format 1, the very first MTrk should consist of only the time signature (and tempo) events
+so that it could be read by some device capable of generating a "tempo map". It is best not to
+place MIDI events in this MTrk. In format 2, each
+MTrk should begin with at least one initial time signature (and tempo) event.
+
+</FONT></BODY></HTML>

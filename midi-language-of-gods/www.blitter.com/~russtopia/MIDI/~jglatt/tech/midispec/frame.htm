@@ -1,0 +1,20 @@
+<HTML><HEAD><TITLE>MIDI Specification: MTC Quarter Frame</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>MTC Quarter Frame Message</CENTER></FONT></H2>
+
+<P>Category: System Common
+
+<P><FONT COLOR=GREEN>Purpose</FONT></P>
+<P>Some master device that controls sequence playback sends this timing message to keep a slave device in sync with the master.
+
+<P><FONT COLOR=GREEN>Status</FONT>
+<P>0xF1
+
+<P><FONT COLOR=GREEN>Data</FONT>
+<P>One data byte follows the Status. It's the time code value, a number from 0 to 127.
+
+<P><FONT COLOR=GREEN>Errata</FONT>
+<P>This is one of the MIDI Time Code (MTC) series of messages. See
+<A HREF="../mtc.htm">MIDI Time Code</A>.
+
+</FONT></BODY></HTML>

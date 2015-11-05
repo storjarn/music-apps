@@ -1,0 +1,228 @@
+<HTML><HEAD><TITLE>Resolving hardware conflicts</TITLE></HEAD><BODY BGCOLOR=WHITE TEXT=BLACK ALINK=PURPLE VLINK=PURPLE LINK=BLUE>
+
+<CENTER><FONT COLOR=RED><B>Introduction</B></FONT></CENTER>
+
+<P>Sometimes, the cause of internal IBM PC cards not working is the result of conflicts with IRQ (Interrupt Request Line),
+I/O (Input/Output) Addresses, or DMA (Direct Memory Access) channels. Two (or more) cards may be trying to simultaneously
+use the same IRQ, I/O address, or DMA channels. The net result is that the cards interfere with each others' operation
+<B>at the hardware level</B>, typically making the cards uncontrollable by drivers and software. These hardware conflicts
+need to be corrected before drivers and software programs will work with the cards.
+
+<P>Most motherboards also have built-in components that use IRQ, I/O addresses, and even DMA channels. For example, IRQ 7 is used
+by the parallel port upon most motherboards. So, you must make sure that your card isn't set to some resource that is
+also being used by a component upon your motherboard.
+
+<P>One good sign that you may have an IRQ conflict with your sound/MIDI card is when MIDI playback works fine, but MIDI
+recording doesn't. Many cards do not use the IRQ for playback (ie, polled output) but most all do use the IRQ for
+recording (ie, interrupt-driven input).
+
+<P><HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Plug and Play (PnP)</B></FONT></CENTER>
+
+<P>The very first IBM PC cards that came out were designed to be plugged into ISA bus slots. Later, PCI and AGP
+bus slots were added to motherboards for newer PCI and AGP cards.
+
+<P>The ISA bus is much more primitive than PCI and AGP, and therefore the configuration of ISA cards is less automatic and
+more troublesome. Typically, you have to manually set "jumpers" or DIP switches on an ISA card to determine the
+IRQ, I/O address, and DMA channels that you wish the card to use.
+
+<P>On the other hand, most all PCI and AGP cards have a feature called <B>Plug and Play</B> (ie, PnP) that lets the
+computer itself configure the cards to resolve all hardware conflicts. So you don't have to manually set any jumpers
+or DIP switches for PnP cards, nor inevitably worry about hardware conflicts... at least in theory. This assumes
+that the card wasn't cheaply made to support only a limited set of the possible IRQ numbers. (ie, Some manufacturers will
+make PnP sound cards which only allow a choice of the most common IRQs used by sound cards; 5, 7, or 9. They do this to
+save a few pennies. But this can be really bad if you happen to have a few other cards that only support these same few
+IRQs such that there aren't enough IRQs to dole out among the cards). Furthermore, some older motherboard BIOSes have bugs
+in their PnP code such that conflicts aren't properly resolved. (In this case, either update your BIOS, or if using an OS
+that supports PnP, such as Win95/98/2000, see if you can disable your BIOS handling of PnP and let the OS setup the
+cards' IRQs and base addresses). So, it's still possible (but rare) to see hardware conflicts with PnP cards.
+
+<P>Some companies have tried to make ISA cards that allege to be PnP, but ISA cards don't really support PnP. An ISA
+card that alleges to be PnP may or may not work properly with real PCI PnP cards. In my experience, they don't, and
+should be treated as non-PnP cards.
+
+<P>Hardware conflicts are very common if your sound/MIDI card is not PnP (or if you have
+other types of cards in your computer which are not PnP). Non-PnP cards may interfere with the operation of PnP cards
+(or vice versa) if you don't properly setup your computer's BIOS and Windows' Device Manager. So, unless your computer
+system has all PCI (and AGP) cards in it and does not have <B>any</B> ISA cards, then you should definitely check for
+hardware conflicts.</P>
+
+<P><HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Checking for conflicts</B></FONT></CENTER>
+
+<P>For non-PnP cards, do physically inspect the cards to make sure that every one is set to a different IRQ and base
+address. I can't possibly stress this enough. If you're not sure what IRQ's the non-PnP cards in your system are using,
+then open up the case and take inventory. (I urge anyone who buys a pre-built system to insist, <B>when you buy the
+system</B>, that the vendor provide you with a list of any non-PnP devices in the system indicating which
+IRQs, base addresses, and DMA channels are used by those devices. Demand it. And then make sure you do get it). Apparently,
+there are lots of people who enjoy playing what I call "the IRQ guessing game". Without knowing what IRQs, base addresses,
+and DMA channels are in use in his system, this person will arbitrarily set the jumpers on a non-PnP card being added to his
+system, install the card, and then hope that when he boots up everything will magically work. It usually doesn't. In fact,
+by the time that the person has played this game for a suitably long time, monkeying around with drivers, he has really
+messed up his entire software installation. It isn't worth doing that when, if you have a list of what devices use which
+resources in your computer, changing or adding hardware to a PC is typically a very simple, quick, trouble-free process.
+I've done this a lot to my own system and others' systems. (You know all those horror stories about installing PC cards?
+They come from people playing the "IRQ guessing game").
+
+<P>If you have non-PnP cards, don't rely upon Win95 (or any other OS) telling you if you have an IRQ or base address
+conflict. The ISA bus does not support determining this, so OS's (and utilities such as MSD.EXE) have to perform a sort
+of "guessing game" of their own, assuming certain "standard and/or typical" IRQ settings, and then checking for anything
+that looks like a deviation from this.
+
+<P>In order to unequivocally determine what IRQs, base addresses, and DMA channels are in use on non-PnP devices, you need
+to know the jumper/DIP settings of your cards. This includes all of your ISA cards as well as any non-PnP devices on your
+motherboard. IRQ conflicts appear to be the biggest cause of conflicts. Base address and DMA conflicts aren't nearly as
+common (but if you have 2 or more of the same type of card in your system, for example, 2 MIDI/audio cards, the chances of
+base and DMA conflicts increase dramatically as many manufacturers of the same types of cards follow each others'
+"standards" for IRQ/address/DMA settings. For example, most MIDI cards use the Roland MPU-401 standard I/O address of 330).
+Here's a list of what I've found to be the most common IRQ assignments. I think that it's pretty safe to assume these, but
+beyond the standard devices (ie, clocks, keyboard, serial + parallel ports, HD and floppy controllers, math chip), check 
+all of your other devices:
+
+<PRE>IRQ #
+0      System timer
+1      Keyboard
+2      Cascade for second interrupt chip
+3      Serial (COM) port 2 (often a modem is attached to this)
+4      Serial (COM) port 1 (usually a serial mouse is attached to this)
+5      Parallel port 2 (not often used)
+6      Floppy controller
+7      Parallel port 1 (usually a printer is attached to this)
+8      Realtime clock
+9      free (but some video cards may use this for EGA emulation)
+10     free
+11     free
+12     free
+13     Math chip
+14     HD (IDE) controller
+15     Second IDE controller (usually a CD-ROM is attached to this. This second
+       IDE controller may even be on your sound card, such as an SB card)</PRE>
+
+<P>Typically, sound cards are set to use IRQ 5. This is often a good choice. Usually, IRQs 10, 11, and 12 are safe to use
+(assuming other ISA cards aren't using such). If the card has a MPU-401 compatible MIDI port, it usually uses I/O addresses
+330 and 331 (hex). The MIDI port may also use another IRQ such as 9, separate from the IRQ used by the digital audio
+portion of the card.
+
+<P><HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Checking for conflicts using Win95/98/2000 Device Manager</B></FONT></CENTER>
+
+<P>Win95/98/2000 are PnP aware operating systems. This means that they can not only determine (and display for you) what
+IRQs, I/O addresses, and DMA channels are in use by all of your PnP cards, Win95/98/2000 can also let you change what
+IRQs, I/O addresses, and DMA channels are used by each PnP card. You may be able to easily resolve any conflicts just by
+using the Win95/98/2000 utility that controls IRQ, I/O Address, and DMA channel assignments. That utility is the
+<B>Device Manager</B> page of Control Panel's <B>System</B> utility.
+
+<P>Here's what you do to get a listing of what IRQ's are being used for what on your system. Go into Control Panel, run the
+System utility, and turn to the Device Manager page. Click on the Print button. Ask for a "System Summary". You'll get a
+listing (actually a .prn file that you must print out) that has a section which on my system looks like this:</P>
+<PRE>
+       ******************** IRQ SUMMARY ********************
+
+       IRQ Usage Summary:
+         00 - System timer
+         01 - Standard 101/102-Key or Microsoft Natural Keyboard
+         02 - Programmable interrupt controller
+         03 - Sportster 28800 Internal
+         04 - Communications Port (COM1)
+         05 - Printer Port (LPT1)
+         06 - Standard Floppy Disk Controller
+         08 - System CMOS/real time clock
+         11 - Adaptec AHA-2940U/AHA-2940UW PCI SCSI Controller
+         13 - Numeric data processor
+         15 - Diamond Stealth 64 Series (Diamond GT)
+</PRE>
+This shows me what devices are using which IRQs. For example, IRQ 11 is being used by my Adaptec SCSI card. My Diamond
+video card is using IRQ 15. You'll notice that IRQ 12 isn't shown in this above list. That's because no device is using
+that. So if I were to add a new non-PnP card to my system, I'd set it to use IRQ 12 for example. (If you have some device
+that is using an old Win3.1 driver rather than a newer Win95-aware driver, it may not show up in the above listing. For
+example, my RAP-10 Sound Card has an old Win3.1 driver. It doesn't show up in the above list even though I have set it
+to use IRQ 7. So although IRQ 7 is not shown as being used in the above list, it really is. That's why it's so important
+to have all Win95-aware drivers on your system. Otherwise, Win95 may not be able to properly setup PnP peripherals because
+it may not know that some device is using an IRQ. Always update all drivers and avoid using Win3.1 drivers on your Win95
+system, especially if you have PnP cards. If you must use a non-PnP card with a Win3.1 driver, then at a minimum, go
+into your BIOS' PnP configuration screen, and set the IRQ used by that card to be reserved for a "legacy ISA device").
+
+<P>If you've got a conflict, you'll typically see two cards listed using the same IRQ. For example, here's a conflict
+between my printer and sound card:</P>
+<PRE>
+       ******************** IRQ SUMMARY ********************
+
+       IRQ Usage Summary:
+         05 - Printer Port (LPT1)
+         05 - Jeff's Sound Card
+</PRE>
+You may also want to check the IO Port Summary to make sure that no 2 cards have address ranges that encompass the same
+values.
+
+<P>Incidentally, that small yellow exclamation mark (or red <B>X</B>) you see next to a device name in 
+"Device Manager" indicates a conflict (usually IRQ) or that something is wrong with the device's response. (ie,
+For example, I use SCSI devices rather than IDE, so I disabled my IDE ports. My PnP BIOS told Win95 that I had IDE ports,
+but Win95 didn't get any response from them, hence that exclamation mark next to my "PCI IDE controller". In fact, it's
+common to see exclamation marks related to PnP ISA cards. Often the devices appear to have several "phantom" units, each one
+dedicated to whatever IRQs the device supports, and Win95 thinks that these are real yet gets no response from them. Hence
+you may see several instances of a particular PnP ISA card listed, with all but one having an exclamation mark. It's
+OK to leave these phantom devices, and if Win95 ever tells you it detected new hardware the next time you boot, tell Win95
+to ignore each one of those phantom devices as it pops up a dialog for each, asking you to choose a driver to install.
+Better yet, select the Properties of each one of these Phantom devices, and remove the checkmark next to "Original
+Configuration". This helps free up that wasted IRQ for another PnP card which will really use it, rather than simply
+reserve it for no good reason).
+
+<P><FONT COLOR=RED>NOTE:</FONT> If you have Windows 98/2000, a new feature was added to Device Manager which pretty much
+displays all of the info that you saved in that .prn file produced by Device Manager's Print feature. Just double-click
+on the "Computer" icon in Device Manager. This will bring up a dialog box that can show lists of which devices are using
+which IRQ numbers, I/O addresses, and DMA channels.
+
+<P><HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Solving conflicts</B></FONT></CENTER>
+
+<P>The way to solve hardware conflicts depends upon whether the cards in conflict are all Plug and Play (PnP), or
+whether one or more of them is a non-PnP card.
+
+<P>If the two, conflicting cards are PnP, then you're in luck. All of the hardware conflicts can be resolved just by
+using Windows' Device Manager. You won't even have to open your computer case. (But you should make sure that you have
+the latest version drivers for those cards. Sometimes, updated drivers solve what appear to be hardware problems with
+PnP cards). Merely go through Device Manager's IRQ, I/O Address, and DMA channels lists to note any resource conflicts,
+and then use Device Manager to change the Properties of any conflicting cards and set them to use unique IRQ, I/O Address,
+and DMA channels. For PnP cards, you can change a device's IRQ or I/O Address Range by
+clicking on the device's name in the Device Manager list, clicking the Properties button, and turning to the Resources
+page. Uncheck the "Use automatic settings" box. Now you can click on any individual "Interrupt Request" or "Input/Output
+Range" setting to change its IRQ or I/O Address respectively. Click on the "Change Setting" button to pick a new value for
+that setting.
+
+<P>If one of the conflicting cards is PnP, and the other is non-PnP, then you may be able to resolve the conflict by
+adjusting your computer's BIOS PnP configuration. You should reserve any IRQs used by non-PnP cards -- setting each of those
+IRQs to be reserved by a "legacy ISA device". At worst, you'll have to open the computer case and change jumpers or DIP
+switches on the non-PnP card.
+
+<P>If both cards are non-PnP, then you'll have to open the computer case and change jumpers or DIP switches on one of
+the cards.
+
+<P>In conclusion, here is a list of things to do to solve hardware conflicts:
+
+<P><OL>
+<LI>If you have non-PnP cards in your computer, first make sure that you know what IRQ, I/O Addresses, and DMA channels
+(if any) that these cards are using. Don't depend upon Windows to be able to tell you. If you don't know, physically
+inspect the card's jumpers or DIP switches. Write this information down.</LI>
+<P><LI>If you have PnP cards in your computer, make sure that your motherboard's BIOS is a PnP-aware BIOS, and make sure
+that it's the latest version of that BIOS. Check the web site of the motherboard manufacturer for any BIOS update for your
+motherboard. They may have an updated BIOS to download, plus a utility that installs it, and instructions how to install it.</LI>
+<LI>If you have non-PnP cards in your computer, go into the BIOS setup screen. (This is usually done by pressing the
+<B><I>Delete</I></B> key while the computer is just starting to boot). Go to the <B>PnP configuration</B> page. Choose a
+manual setup (rather than an automatic one). For every IRQ that is being used by one of those non-PnP cards, set that
+IRQ to be reserved for a "legacy ISA device" (rather than used for "legacy ISA/PCI"). Note that your mouse may not work in
+selecting items in the BIOS setup, so you typically have to use the arrow keys to move between selections, and the Page
+UP and Page DOWN keys to change the value of a selection.</LI>
+<P><LI>Use a PnP-aware operating system such as Windows 95/98/2000. Use Device Manager to check for any hardware conflicts,
+and if any of the conflicting cards are PnP, use Device Manager to change the resources so that conflicts are resolved.</LI>
+<P><LI>Make sure that you have the latest versions of all drivers for your cards. Check the web site of each card's
+manufacturer for any driver update for that card. They may have an updated driver to download, plus instructions how to
+install it.</LI>
+</OL>
+
+<P><HR SIZE=5 NOSHADE><P><CENTER><FONT COLOR=RED><B>Driver issues</B></FONT></CENTER>
+
+<P>Another, even more common problem concerns software drivers. The fact of the matter is that programmers <B>do</B> write
+buggy software, and there's a chance that any problem which looks hardware-related may actually be due to some bug in the
+card's driver. Check with the card's manufacturer that you have the latest drivers. Ask if there have been any problems
+reported that may be applicable to your own setup.
+
+<P>And definitely don't rule out the possibility that you may have configured the driver's setup (ie, "Properties" in
+Microsoft-speak) incorrectly. If you use Windows 95/98/2000, read the FAQ <A HREF="win95.htm">"MIDI/Audio under Win95/98/2000"</A>.
+
+</BODY></HTML>

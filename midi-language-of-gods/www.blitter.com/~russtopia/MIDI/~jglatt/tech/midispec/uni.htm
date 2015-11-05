@@ -1,0 +1,43 @@
+<HTML><HEAD><TITLE>MIDI Specification: Universal SysEx Messages</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+Universal SysEx messages are SysEx messages that are not for any one particular manufacturer, but
+rather, meant to be utilized by all manufacturer's products. For example, many manufacturers
+make digital samplers. It became desirable for manufacturers to allow exchange of waveform data
+between each others' products. So, a standard protocol was developed called <B>MIDI Sample Dump
+Standard</B> (SDS). Of course, since waveforms typically entail large amounts of data, SysEx
+messages (ie, containing over a hundred bytes each) were chosen as the most suitable vehicle to
+transmit the data over MIDI. But, it was decided not to use a particular manufacturer's ID for
+these SysEx messages. So, a universal ID was created.
+
+There are actually 2 IDs dedicated to Universal SysEx messages. There's a universal ID meant
+for realtime messages (ie, ones that need to be responded to immediately), and one for
+non-realtime (ie, ones which can be processed when the device gets around to it). Here are
+those ID numbers:
+
+<PRE><B><FONT SIZE=3 COLOR=BLUE>RealTime ID	    0x7F
+Non-RealTime ID  0x7E
+</B></FONT></PRE>
+
+<P>No particular manufacturer is ever assigned an ID consisting of the single byte 0x7F or
+0x7E. These are reserved for Universal SysEx messages adopted by the MMA.
+
+<P>A general template for these two IDs was defined. After the ID byte is a
+<B><I>SysEx Channel</I></B> byte. This could be from 0 to 127 for a total of 128 SysEx channels.
+So, although "normal" SysEx messages have no MIDI channel like Voice Category messages do, a
+Universal SysEx message can be sent on one of 128 SysEx channels. This allows the musician
+to set various devices to ignore certain Universal SysEx messages (ie, if the device allows the
+musician to set its Base SysEx Channel. Most devices just set their Base Sysex channel to the
+same number as the Base Channel for Voice Category messages). On the other hand, a SysEx channel
+of 127 is actually meant to tell the device to "disregard the channel and pay attention to this
+message regardless".
+
+<P>After the SysEx channel, the next two bytes are <B>Sub IDs</B> which tell
+what the SysEx is for. There are several Sub IDs defined for particular messages. There is a Sub ID for a Universal
+SysEx message to set a device's master volume. (This is different than Volume controller which
+sets the volume for only one particular MIDI channel). There is a Sub ID for a Universal
+SysEx message to set a device's Pitch Wheel bend range. There are a couple of Sub IDs for 
+some Universal SysEx messages to implement a waveform (sample) dump over MIDI. Etc.
+
+<P>The next sections of this online book document the defined Universal SysEx messages.
+
+</FONT></BODY></HTML>

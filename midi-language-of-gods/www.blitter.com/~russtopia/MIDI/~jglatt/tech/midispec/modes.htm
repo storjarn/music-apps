@@ -1,0 +1,119 @@
+<HTML><HEAD><TITLE>MIDI Specification: MIDI Modes</TITLE></HEAD><BODY TEXT=BLACK BGCOLOR=WHITE LINK=RED VLINK=PURPLE ALINK=PURPLE><FONT SIZE=4>
+
+<H2><FONT COLOR=GREEN><CENTER>MIDI Modes</CENTER></FONT></H2>
+
+<P>Some MIDI devices can be switched in and out of <B>Omni</B> state.
+
+<P>When Omni is off, a MIDI device can only respond to Voice Category messages (ie, Status bytes of 0x80 to 0xEF) upon a
+limited number of channels, usually only 1. Typically, the device allows the musician to pick one of the 16 MIDI channels
+that the device will respond to. This is then referred to as the device's <B>Base Channel</B>. So for example, if a
+device's Base Channel is set to 1, and a Voice Category message upon channel 2 arrives at the device's MIDI IN, the
+device ignores that message.
+
+<P><B><FONT COLOR=RED>Note:</FONT></B> Virtually all modern devices allow the musician to manually choose the Base Channel. A device may even define its own
+SysEx message that can change its Base Channel. Remember that SysEx messages are of the System Common Category,
+and therefore aren't (normally) tied to the Base Channel itself.
+
+<P>When Omni is on, a device doesn't respond to just one MIDI channel, but rather, responds to all 16 MIDI channels. The
+only benefit of Omni On is that, regardless of which channel any message is received upon, a device always responds to
+the message. This mades it very foolproof for a musician to hook up two devices and always have one device respond to
+the other regardless of any MIDI channel discrepancies between the device generating the data (ie, referred to as the
+<B>transmitter</B>) and the device receiving the data (ie, referred to as the <B>receiver</B>). Of course, if the
+musician daisy-chains another device, and he wants the 2 devices to play different musical parts, then he has to switch
+Omni Off on both devices. Otherwise, a device with Omni On will respond to messages intended for the other device (as
+well as messages intended for itself).
+
+<P><B><FONT COLOR=RED>Note:</FONT></B> Omni can be switched on or off with the
+<A HREF="omon.htm">Omni On</A> and <A HREF="omoff.htm">Omni Off</A> controller
+messages. But these messages must be received upon the device's Base Channel in order for the device to respond to them. What this implies
+is that even when a device is in Omni On state (ie, capable of responding to all 16 channels), it still has a Base Channel for
+the purpose of turning Omni On or Off.
+
+<P>One might think that MultiTimbral devices employ Omni On. Because you typically may choose (upto) 16 different
+Patches, each playing its own musical part, you need the device to be able to respond to more than one MIDI channel so
+that you can assign each Patch to a different MIDI channel. Actually, MultiTimbral devices do not use Omni On for this
+purpose. Rather, the device regards itself as having 16 separate sound modules (ie, Parts) inside of it, with each module
+in Omni Off mode, and capable of being set to its own Base Channel.  Usually, you also have a "master" Base Channel
+which may end up having to be set the same as one of the individual Parts. Most MultiTimbral devices offer the musician
+the choice of which particular channels to use, and which to ignore (if he doesn't need all 16 patches playing
+simultaneously on different channels). In this way, he can daisy-chain another multitimbral device and use any ignored
+channels (on the first device) with this second device.  Unfortunately, the MIDI spec has no specific "MultiTimbral" mode
+message. So, a little "creative reinterpretation" of Monophonic mode is employed, as you'll learn in a moment.
+
+<P>In addition to Omni On or Off, many devices can be switched between Polyphonic or Monophonic operation.
+
+<P>In Polyphonic operation, a device can respond to more than one Note On upon a given channel. In other words, it can
+play chords on that channel. For example, assume that a device is responding to Voice Category messages on channel
+1. If the device receives a Note On for middle C on channel 1, it will sound that note. If the device then receives a Note On
+for high C also on channel 1 (before receiving a Note Off for middle C), the device will sound the high C as well. Both notes
+will then be sounding simultaneously.
+
+<P>In Monophonic operation, a device can only respond to one Note On at a time upon a given channel. It can't play chords;
+only single note "melodies". For example, assume that a device is responding to Voice Category messages on channel
+1.  If the device receives a Note On for middle C on channel 1, it will play that note. If the device then receives a Note On for
+high C (before receiving a Note Off for middle C), the device will automatically turn off the middle C before playing the high
+C. So what's the use of forcing a device capable of playing chords into such a Monophonic state? Well, there are lots of
+Monophonic instruments in the world, for example, most brass and woodwinds. They can only play one note at a time. If
+using a Trumpet Patch, a keyboard player might want to force a device into Monophonic operation in order to better simulate
+a Trumpet.  Some devices have special effects that only work in Monophonic operation such as Portamento, and smooth
+transition between notes (ie, skipping the VCA attack when moving from one Note On that "overlaps" another Note On -- this
+is often referred to as <B>legato</B> and makes for a more realistic musical performance for brass and woodwind
+patches). That's in theory how Mono operation is supposed to work, but MultiTimbral devices created long after the MIDI
+spec was designed, had to subvert Mono operation into Polyphonic operation in order to come up with a "MultiTimbral
+mode", as you'll learn.
+
+<P><B><FONT COLOR=RED>Note:</FONT></B> A device can be switched between Polyphonic or Monophonic with the <A HREF="poly.htm">Polyphonic</A> and <A HREF="mono.htm">Monophonic</A>
+controller messages. But these messages must be received upon the device's Base Channel in order for the device to
+respond to them.
+
+<P>Of course, a MIDI device could have Omni On and be in Polyphonic state. Or, the device could have Omni On but be in
+Monophonic state. Or, the device could have Omni Off and be in Polyphonic state. Or, the device could have Omni Off but
+be in Monophonic state. There are 4 possible combinations here, and MIDI refers to these as 4 <B>Modes</B>. For
+example, Mode 1 is the aforementioned Omni On / Polyphonic state. Here are the 4 Modes:
+
+<P><B><FONT COLOR=BLUE>Mode 1 - Omni On / Poly</FONT></B>
+<P>The device plays <U>all</U> MIDI data received on all 16 MIDI channels. If a MultiTimbral device, then it often
+requires the musician to manually select which one Patch to play all 16 channels, and this setting is usually saved in
+"patch memory".
+
+<P><B><FONT COLOR=BLUE>Mode 2 - Omni On / Mono</FONT></B>
+<P>The device plays only one note out of all of the MIDI data received on all 16 MIDI channels. This mode is seldom
+implemented because playing one note out of all the data happening on all 16 channels is not very useful.
+
+<P><B><FONT COLOR=BLUE>Mode 3 - Omni Off / Poly</FONT></B>
+<P>The device plays all MIDI data received on 1 specific MIDI channel. The musician usually gets to choose which channel
+he wants that to be. If a MultiTimbral device, then it often requires the musician to manually select which one Patch to play
+that MIDI channel, and this setting is usually saved in "patch memory".
+
+<P><B><FONT COLOR=BLUE>Mode 4 - Omni Off / Mono</FONT></B>
+<P>In theory, the device plays one note at a time on 1 (or more) specific MIDI channels. In practice, the manufacturers of
+MultiTimbral threw the entire concept of Monophonic out the window, and use this for "MultiTimbral mode". On a
+MultiTimbral device, this mode means that the device plays polyphonically on 1 (or more) specific MIDI channels. The
+Monophonic controller message has a Value associated with it. This Value is applicable in Mode 4 (whereas
+it's ignored in Mode 2), and determines how many MIDI channels are responded to. If 1, then on a non-MultiTimbral device,
+this would give you a truly monophonic instrument. Of course, on a MultiTimbral device, it gives you the same thing as
+Mode 3. If the Value is 0, then a non-MultiTimbral device uses as many MIDI channels as it has voices. So, for an 8 voice
+synth, it would use 8 MIDI Channels, and each of those channels would play one note at a time. For a MultiTimbral device,
+if the Value is 0, then the device uses as many MIDI channels as it has Parts. So, if a MultiTimbral device can play only 8
+patches simultaneously, then it would use 8 MIDI Channels, and each of those channels could play polyphonically.
+
+<P>Some devices do not support all of these modes. The device should ignore controller messages which attempt to switch
+it into an unsupported state, or switch to the next closest mode.<P>
+
+<P>If a device doesn't have some way of saving the musician's choice of Mode when the unit is turned off, the device should
+default to Mode 1 upon the next power up.
+
+<P>On final question arises. If a MultiTimbral device doesn't implement a true monophonic mode for Mode 4, then how do
+you get one of its Parts to play in that useful Monophonic state (ie, where you have Portamento and legato features)? Well,
+many MultiTimbral devices allow a musician to manually enable a "Solo Mode" per each Part. Some devices even
+use the <A HREF="leg.htm">Legato Pedal</A> controller
+(or a <A HREF="genb.htm">General Purpose Button controller</A>) to enable/disable that
+function, so that you can turn it on/off for each Part over MIDI.<P>
+
+<P><B><FONT COLOR=RED>Note:</FONT></B> A device that can both generate MIDI messages (ie, perhaps from an electronic piano keyboard) as well as receive MIDI
+messages (ie, to be played on its internal sound circuitry), is allowed to have its transmitter set to a different Mode and
+MIDI channel than its receiver, if this is desired. In fact, on MultiTimbral devices with a keyboard, the keyboard often has to
+switch between MIDI channels so that the musician can access the Parts one at a time, without upsetting the MIDI channel
+assignments for those Parts.
+
+</FONT></BODY></HTML>
